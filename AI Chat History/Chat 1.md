@@ -4,6 +4,8 @@ Sadly the exact conversations have been lost to the sands of time ie I closed Cu
 
 Fortunately I have been keeping notes
 
+## The Beginning
+
 I want to create a game called TheWanderer using React.
 
 The game consists of levels where each level is a maze for the player to navigate. Use the image @Maze.jpg to guide your design of the maze. Instructions for the elements of the image can be found in maze.md. The gamebehaviour is described in gamebehaviour.md
