@@ -1,70 +1,10 @@
-# Getting Started with Create React App
+This game called The Wanderer is based upon an Amiga game [The Wanderer](https://openretro.org/game/736fedbc-ca4b-4a6c-9651-37efdf5adc98/edit#5c6e78f8-8b33-5aa5-8799-0deab5b2b517) ([see also](https://www.video-games-museum.com/en/game/Wanderer-The/82/3/72080)) 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### History
 
-## Available Scripts
+The game came into existance in 1991 and appears to have its origins in a MS-DOS 1988  game of the same name by a company called [mobygames.com](https://www.bing.com/images/search?view=detailV2&ccid=njwql2Qp&id=04C132F7383528DA105C45DF0D508F62A127889A&thid=OIP.njwql2Qpr9H6DoilpbylyQHaEo&mediaurl=https%3a%2f%2fcdn.mobygames.com%2ffbae36b6-aba5-11ed-bd13-02420a00019c.webp&exph=375&expw=600&q=wanderer+game+1980s&simid=607987363899065693&FORM=IRPRST&ck=9914B4738DB45F49737A7C21A52A1122&selectedIndex=0&itb=0&idpp=overlayview&ajaxhist=0&ajaxserp=0) 
 
-In the project directory, you can run:
+This Game has been created using AI, React and Typescript
+I have tried to generate as much of the game as I can using AI the instructions and images I have provided to the AI can be found under the folder _Instructions_
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The game can be run using _npm start_

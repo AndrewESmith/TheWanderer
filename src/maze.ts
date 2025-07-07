@@ -1,4 +1,3 @@
-"use strict";
 /* import React from "react";
 import "./maze.css";
 
@@ -31,4 +30,4 @@ export default function maze() {
       )}
     </div>
   );
-} */ 
+} */
