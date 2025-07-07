@@ -1,0 +1,26 @@
+.maze-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 32px);
+    grid-template-rows: repeat(5, 32px);
+    gap: 2px;
+    background: #222;
+    padding: 10px;
+    width: max-content;
+  }
+  
+  .cell {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: 1px solid #333;
+  }
+  
+  .cell.empty { background: #2e7d32; }
+  .cell.player { background: #f44336; }
+  .cell.rock { background: #795548; }
+  .cell.soil { background: #a1887f; }
+  .cell.diamond { background: #fff; }
+  .cell.boulder { background: #757575; }
+  .cell.bomb { background: #000; }
+  .cell.exit { background: #ffeb3b; }
