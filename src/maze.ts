@@ -1,7 +1,18 @@
-/* import React from "react";
+import React from "react";
 import "./maze.css";
 
-const CELL_TYPES = {
+export const ICONS = {
+  empty: "",
+  player: "🧑",
+  rock: "🧱",
+  soil: "🟫",
+  diamond: "💎",
+  boulder: "🪨",
+  bomb: "💣",
+  exit: "🚪",
+} as const;
+
+export const CELL = {
   EMPTY: "empty",
   PLAYER: "player",
   ROCK: "rock",
@@ -10,24 +21,16 @@ const CELL_TYPES = {
   BOULDER: "boulder",
   BOMB: "bomb",
   EXIT: "exit",
-};
+} as const;
 
-const sampleMaze = [
-  ["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],
-  ["rock", "soil", "diamond", "empty", "boulder", "soil", "bomb", "rock"],
-  ["rock", "empty", "rock", "empty", "rock", "empty", "empty", "rock"],
-  ["rock", "player", "empty", "diamond", "empty", "soil", "exit", "rock"],
-  ["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],
+// Type definitions
+export type CellType = keyof typeof ICONS;
+export type MazeCell = CellType;
+
+export const initialMaze: MazeCell[][] = [
+  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
+  [CELL.ROCK, CELL.SOIL, CELL.DIAMOND, CELL.EMPTY, CELL.BOULDER, CELL.SOIL, CELL.BOMB, CELL.ROCK],
+  [CELL.ROCK, CELL.EMPTY, CELL.ROCK, CELL.EMPTY, CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
+  [CELL.ROCK, CELL.PLAYER, CELL.EMPTY, CELL.DIAMOND, CELL.EMPTY, CELL.SOIL, CELL.EXIT, CELL.ROCK],
+  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
 ];
-
-export default function maze() {
-  return (
-    <div className="maze-grid">
-      {sampleMaze.map((row, y) =>
-        row.map((cell, x) => (
-          <div key={`${y}-${x}`} className={`cell ${cell}`}></div>
-        ))
-      )}
-    </div>
-  );
-} */

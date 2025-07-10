@@ -1,54 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { ICONS, CELL, MazeCell, initialMaze } from "./maze";
 import "./maze.css";
 import "./App.css";
+import { IPlayerPos } from "./Interfaces/IPlayerPos";
+import { PlayerPos } from "./PlayerPos";
 
-const ICONS = {
-  empty: "",
-  player: "🧑",
-  rock: "🧱",
-  soil: "🟫",
-  diamond: "💎",
-  boulder: "🪨",
-  bomb: "💣",
-  exit: "🚪",
-} as const;
-
-const CELL = {
-  EMPTY: "empty",
-  PLAYER: "player",
-  ROCK: "rock",
-  SOIL: "soil",
-  DIAMOND: "diamond",
-  BOULDER: "boulder",
-  BOMB: "bomb",
-  EXIT: "exit",
-} as const;
-
-// Type definitions
-export type CellType = keyof typeof ICONS;
-export type MazeCell = CellType;
-export interface PlayerPos { x: number; y: number; }
-
-const initialMaze: MazeCell[][] = [
-  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
-  [CELL.ROCK, CELL.SOIL, CELL.DIAMOND, CELL.EMPTY, CELL.BOULDER, CELL.SOIL, CELL.BOMB, CELL.ROCK],
-  [CELL.ROCK, CELL.EMPTY, CELL.ROCK, CELL.EMPTY, CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.PLAYER, CELL.EMPTY, CELL.DIAMOND, CELL.EMPTY, CELL.SOIL, CELL.EXIT, CELL.ROCK],
-  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
-];
-
-const getPlayerPos = (maze: MazeCell[][]): PlayerPos | null => {
-  for (let y = 0; y < maze.length; y++) {
-    for (let x = 0; x < maze[0].length; x++) {
-      if (maze[y][x] === CELL.PLAYER) return { x, y };
-    }
-  }
-  return null;
-};
+const getPlayerPos = PlayerPos.getPlayerPos;
 
 const Maze: React.FC = () => {
   const [maze, setMaze] = useState<MazeCell[][]>(initialMaze);
-  const [player, setPlayer] = useState<PlayerPos | null>(getPlayerPos(initialMaze));
+  const [player, setPlayer] = useState<IPlayerPos | null>(getPlayerPos(initialMaze));
   const [score, setScore] = useState<number>(0);
   const [diamonds, setDiamonds] = useState<number>(
     initialMaze.flat().filter((c) => c === CELL.DIAMOND).length
