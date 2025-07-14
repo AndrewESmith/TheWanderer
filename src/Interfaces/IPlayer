@@ -1,0 +1,6 @@
+// @IPlayerPos.ts
+export interface IPlayer {
+  getPosition(): IPlayerPos;
+  move(dx: number, dy: number, maze: IMaze): void;
+  // ...other methods as needed
+}

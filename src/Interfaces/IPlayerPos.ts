@@ -7,3 +7,4 @@ export interface IPlayerPos {
 export interface IPlayerPosStatic {
   getPlayerPos(maze: string[][]): IPlayerPos | null;
 }
+

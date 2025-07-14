@@ -4,12 +4,14 @@ import "./maze.css";
 import "./App.css";
 import { IPlayerPos } from "./Interfaces/IPlayerPos";
 import { PlayerPos } from "./PlayerPos";
+import { Maze } from "./maze";
 
 const getPlayerPos = PlayerPos.getPlayerPos;
 
-const Maze: React.FC = () => {
+const MazeComponent: React.FC = () => {
   const [maze, setMaze] = useState<MazeCell[][]>(initialMaze);
-  const [player, setPlayer] = useState<IPlayerPos | null>(getPlayerPos(initialMaze));
+  const mazeInstance = new Maze();
+  const [player, setPlayer] = useState<IPlayerPos | null>(getPlayerPos(mazeInstance));
   const [score, setScore] = useState<number>(0);
   const [diamonds, setDiamonds] = useState<number>(
     initialMaze.flat().filter((c) => c === CELL.DIAMOND).length
@@ -130,4 +132,4 @@ const Maze: React.FC = () => {
   );
 };
 
-export default Maze;
+export default MazeComponent;
