@@ -11,10 +11,16 @@ export class GameState implements IGameState {
   diamonds: number;
   gameState: 'playing' | 'dead' | 'won';
 
-  constructor() {
-    // Deep copy the initial maze
-    this.maze = initialMaze.map(row => [...row]);
-    this.player = PlayerPos.getPlayerPos({
+  constructor(
+    maze: MazeCell[][] = initialMaze,
+    player: IPlayerPos | null = null,
+    score: number = 0,
+    moves: number = 1000,
+    diamonds: number = initialMaze.flat().filter((c) => c === CELL.DIAMOND).length,
+    gameState: 'playing' | 'dead' | 'won' = 'playing',
+  ) {
+    this.maze = maze.map(row => [...row]);
+    this.player = player ?? PlayerPos.getPlayerPos({
       getPlayerPos: () => {
         for (let y = 0; y < this.maze.length; y++) {
           for (let x = 0; x < this.maze[0].length; x++) {
@@ -24,10 +30,10 @@ export class GameState implements IGameState {
         return null;
       }
     } as any);
-    this.score = 0;
-    this.diamonds = this.maze.flat().filter((c) => c === CELL.DIAMOND).length;
-    this.moves = 1000;
-    this.gameState = 'playing';
+    this.score = score;
+    this.diamonds = diamonds;
+    this.moves = moves;
+    this.gameState = gameState;
   }
 
   movePlayer(dx: number, dy: number): void {
