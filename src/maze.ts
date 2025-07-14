@@ -1,4 +1,3 @@
-import React from "react";
 import "./maze.css";
 import { IMaze } from "./Interfaces/IMaze";
 import { IPlayerPos } from "./Interfaces/IPlayerPos";
