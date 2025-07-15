@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { GameState } from "./GameState";
 import { CELL, MazeCell } from "./maze";
 import { IPlayerPos } from "./Interfaces/IPlayerPos";
