@@ -118,3 +118,11 @@ The player can move up, down, left or right using the keys 'A', 'S', 'W' and 'D'
 - If the number of moves equals the maximum number of moves the player dies
 - If the number of diamonds on the maze is zero the exit is enabled
 - If the exit is enabled and the player hits the exit the maze is finished a new maze is used
+
+## Sound
+
+- Boulderhitting player should cause player to cry out
+- Boulder hitting rock,boulder, arrow or soil should make a thud sound
+- Arrow hitting rock, arrow, boulder, or soil should make a thud sound
+- Player entering soil should have digging sound
+- Arrow hitting player shoudl cause player to cryout

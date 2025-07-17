@@ -1,0 +1,24 @@
+# To Dos
+
+- [ ] Investigate memories
+- [ ] How might we use cursor rules?
+- [ ] Lets use gamma.app to create our presentation
+- [ ] invite family property team aka Nick to review
+- [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
+- [ ] Add arrows as described in .\instructions\gamebehaviour.md
+- [ ] Improve boulder behavour as described in .\instructions\gamebehaviour.md
+- [ ] Enlarge maze size
+- [ ] upgrade from react-scripts@5.0.1 to Vite
+- [ ] Upgrade type script once upgraded to Vite
+- [ ] Create more maze levels
+- [ ] Assign a random password to each maze
+- [ ] Share password with player when exiting current maze
+- [ ] Use password for player to jump to another level
+- [ ] Add maze layout rules to .\instructions\maze.md
+- [x] generate unit tests
+- [x] automate unit tests on launch
+- [x] create a code structure
+- [x] Convert to typescript
+- [x] Create interfaces to allow testing
+- [x] investigate playwright to play test the game
+- [x] Create a check list/todo.
