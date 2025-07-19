@@ -1,6 +1,7 @@
-import { IGameState } from "./Interfaces/IGameState";
-import { MazeCell, CELL, initialMaze } from "./maze";
-import { IPlayerPos } from "./Interfaces/IPlayerPos";
+import type { IGameState } from "./Interfaces/IGameState";
+import { CELL, initialMaze } from "./maze";
+import type { MazeCell } from "./maze";
+import type { IPlayerPos } from "./Interfaces/IPlayerPos";
 import { PlayerPos } from "./PlayerPos";
 
 export class GameState implements IGameState {
@@ -23,8 +24,10 @@ export class GameState implements IGameState {
     this.player = player ?? PlayerPos.getPlayerPos({
       getPlayerPos: () => {
         for (let y = 0; y < this.maze.length; y++) {
-          for (let x = 0; x < this.maze[0].length; x++) {
-            if (this.maze[y][x] === CELL.PLAYER) return { x, y };
+          const row = this.maze[y];
+          if (!row) continue;
+          for (let x = 0; x < row.length; x++) {
+            if (row[x] === CELL.PLAYER) return { x, y };
           }
         }
         return null;
@@ -41,15 +44,21 @@ export class GameState implements IGameState {
     const { x, y } = this.player;
     const nx = x + dx;
     const ny = y + dy;
+
+    const row = this.maze[ny];
+    if (!row) return;
+
     if (
       ny < 0 ||
       ny >= this.maze.length ||
       nx < 0 ||
-      nx >= this.maze[0].length
+      nx >= row.length
     )
       return;
 
-    const target = this.maze[ny][nx];
+    const target = row[nx];
+    if (target === undefined) return;
+
     let newGameState: 'playing' | 'dead' | 'won' = this.gameState;
 
     // Blocked by rock or boulder
@@ -63,20 +72,29 @@ export class GameState implements IGameState {
 
     // Soil: disappears
     if (target === CELL.SOIL || target === CELL.DIAMOND) {
-      this.maze[ny][nx] = CELL.PLAYER;
-      this.maze[y][x] = CELL.EMPTY;
+      const currentRow = this.maze[y];
+      if (row && currentRow) {
+        row[nx] = CELL.PLAYER;
+        currentRow[x] = CELL.EMPTY;
+      }
     }
     // Bomb: die
     else if (target === CELL.BOMB) {
-      this.maze[ny][nx] = CELL.PLAYER;
-      this.maze[y][x] = CELL.EMPTY;
+      const currentRow = this.maze[y];
+      if (row && currentRow) {
+        row[nx] = CELL.PLAYER;
+        currentRow[x] = CELL.EMPTY;
+      }
       newGameState = 'dead';
     }
     // Exit: only if all diamonds collected
     else if (target === CELL.EXIT) {
       if (this.diamonds === 0) {
-        this.maze[ny][nx] = CELL.PLAYER;
-        this.maze[y][x] = CELL.EMPTY;
+        const currentRow = this.maze[y];
+        if (row && currentRow) {
+          row[nx] = CELL.PLAYER;
+          currentRow[x] = CELL.EMPTY;
+        }
         newGameState = 'won';
       } else {
         return;
@@ -84,8 +102,11 @@ export class GameState implements IGameState {
     }
     // Empty: just move
     else if (target === CELL.EMPTY) {
-      this.maze[ny][nx] = CELL.PLAYER;
-      this.maze[y][x] = CELL.EMPTY;
+      const currentRow = this.maze[y];
+      if (row && currentRow) {
+        row[nx] = CELL.PLAYER;
+        currentRow[x] = CELL.EMPTY;
+      }
     }
 
     this.player = { x: nx, y: ny };

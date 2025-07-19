@@ -1,12 +1,21 @@
 {
-  "vitest.commandLine": "node --experimental-vm-modules vscode-test-runner.js",
-  "vitest.include": ["src/**/*.test.ts", "tests/**/*.test.ts"],
+  "vitest.commandLine": "npx vitest",
+  "vitest.include": ["src/**/*.test.ts", "src/**/*.test.tsx", "tests/**/*.test.ts", "tests/**/*.test.tsx"],
   "vitest.exclude": ["**/node_modules/**", "**/dist/**"],
   "vitest.enable": true,
   "vitest.environment": "jsdom",
-  "javascript.validate.enable": false,
   "typescript.validate.enable": true,
   "vitest.nodeEnv": {
     "NODE_ENV": "test"
-  }
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ]
 }

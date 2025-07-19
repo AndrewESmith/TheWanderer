@@ -1,6 +1,6 @@
 import "./maze.css";
-import { IMaze } from "./Interfaces/IMaze";
-import { IPlayerPos } from "./Interfaces/IPlayerPos";
+import type { IMaze } from "./Interfaces/IMaze";
+import type { IPlayerPos } from "./Interfaces/IPlayerPos";
 
 export const ICONS = {
   empty: "",
@@ -34,18 +34,25 @@ export const initialMaze: MazeCell[][] = [
   [CELL.ROCK, CELL.PLAYER, CELL.EMPTY, CELL.DIAMOND, CELL.EMPTY, CELL.SOIL, CELL.EXIT, CELL.ROCK],
   [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
 ];
-export class Maze implements IMaze{
+export class Maze implements IMaze {
   getCell(x: number, y: number): MazeCell {
-    return initialMaze[y][x];
+    const row = initialMaze[y];
+    return row ? row[x] ?? CELL.EMPTY : CELL.EMPTY;
   }
+
   setCell(x: number, y: number, value: MazeCell): void {
-    initialMaze[y][x] = value;
+    const row = initialMaze[y];
+    if (row) {
+      row[x] = value;
+    }
   }
 
   getPlayerPos(): IPlayerPos | null {
     for (let y = 0; y < initialMaze.length; y++) {
-      for (let x = 0; x < initialMaze[0].length; x++) {
-        if (initialMaze[y][x] === CELL.PLAYER) return { x, y };
+      const row = initialMaze[y];
+      if (!row) continue;
+      for (let x = 0; x < row.length; x++) {
+        if (row[x] === CELL.PLAYER) return { x, y };
       }
     }
     return null;

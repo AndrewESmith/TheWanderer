@@ -1,26 +1,21 @@
 // This file contains setup code for tests
+import { expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Clear any existing matchers that might be from Jest
-if (typeof global !== 'undefined') {
-  // Remove any existing matchers
-  if (global.expect && global.expect.extend) {
-    const originalExpect = global.expect;
-    delete global.expect;
-    global.expect = originalExpect;
-  }
-}
+// Ensure we're using Vitest's globals
+global.expect = expect;
+global.vi = vi;
+global.beforeEach = beforeEach;
+global.afterEach = afterEach;
 
 // Mock CSS imports
 vi.mock('*.css', () => ({}));
 vi.mock('../src/maze.css', () => ({}));
 
-// Explicitly disable any Jest-related globals
-if (typeof window !== 'undefined') {
-  // @ts-ignore
-  delete window.jest;
-}
+// Reset mocks between tests
+beforeEach(() => {
+  vi.resetModules();
+});
 
-// Ensure we're using Vitest's globals
-import { expect, vi } from 'vitest';
-global.expect = expect;
-global.vi = vi;
+afterEach(() => {
+  vi.clearAllMocks();
+});

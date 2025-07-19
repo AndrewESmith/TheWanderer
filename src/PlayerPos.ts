@@ -1,5 +1,5 @@
-import { IMaze } from "./Interfaces/IMaze";
-import { IPlayerPos, IPlayerPosStatic } from "./Interfaces/IPlayerPos";
+import type { IMaze } from "./Interfaces/IMaze";
+import type { IPlayerPos } from "./Interfaces/IPlayerPos";
 
 export class PlayerPos implements IPlayerPos {
   x: number;

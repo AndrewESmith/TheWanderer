@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { ICONS, CELL, MazeCell, initialMaze } from "./maze";
+import React from "react";
+import { ICONS } from "./maze";
+import type { MazeCell } from "./maze";
 import "./maze.css";
 import "./App.css";
-import { PlayerPos } from "./PlayerPos";
 import { GameState } from "./GameState";
 
-const getPlayerPos = PlayerPos.getPlayerPos;
-
-const MazeComponent: React.FC = () => {
+const App: React.FC = () => {
   const [gameState, setGameState] = React.useState(new GameState());
 
   const movePlayer = React.useCallback(
@@ -70,4 +68,4 @@ const MazeComponent: React.FC = () => {
   );
 };
 
-export default MazeComponent;
+export default App;
