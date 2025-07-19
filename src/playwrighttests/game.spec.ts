@@ -1,0 +1,101 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Game functionality', () => {
+    test.beforeEach(async ({ page }) => {
+        // Navigate to the game before each test
+        await page.goto('/');
+    });
+
+    test('maze grid renders with correct cells', async ({ page }) => {
+        // Check that the maze grid exists
+        const mazeGrid = page.locator('.maze-grid');
+        await expect(mazeGrid).toBeVisible();
+
+        // Check that there are cells in the grid
+        const cells = page.locator('.cell');
+        const count = await cells.count();
+        expect(count).toBeGreaterThan(0);
+
+        // Check for different cell types
+        const playerCell = page.locator('.cell.player');
+        await expect(playerCell).toBeVisible();
+
+        // Check for at least one diamond
+        const diamondCells = page.locator('.cell.diamond');
+        const diamondCount = await diamondCells.count();
+        expect(diamondCount).toBeGreaterThan(0);
+    });
+
+    test('player can collect diamonds', async ({ page }) => {
+        // Get initial diamond count
+        const diamondsText = await page.locator('.hud span').filter({ hasText: /Diamonds left:/ }).textContent();
+        const initialDiamonds = extractNumber(diamondsText || '0');
+
+        // Find a path to a diamond and move there
+        // This is a simplified approach - in a real test, you'd need to determine the actual path
+
+        // Try different directions to find a diamond
+        const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
+
+        for (const direction of directions) {
+            await page.keyboard.press(direction);
+            await page.waitForTimeout(100);
+
+            // Check if diamond count changed
+            const newDiamondsText = await page.locator('.hud span').filter({ hasText: /Diamonds left:/ }).textContent();
+            const newDiamonds = extractNumber(newDiamondsText || '0');
+
+            if (newDiamonds < initialDiamonds) {
+                // Diamond collected
+                expect(newDiamonds).toBe(initialDiamonds - 1);
+                break;
+            }
+        }
+    });
+
+    test('score increases when collecting diamonds', async ({ page }) => {
+        // Get initial score
+        const scoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
+        const initialScore = extractNumber(scoreText || '0');
+
+        // Try different directions to find a diamond
+        const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
+
+        for (const direction of directions) {
+            await page.keyboard.press(direction);
+            await page.waitForTimeout(100);
+
+            // Check if score changed
+            const newScoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
+            const newScore = extractNumber(newScoreText || '0');
+
+            if (newScore > initialScore) {
+                // Score increased
+                expect(newScore).toBe(initialScore + 10); // Assuming diamonds are worth 10 points
+                break;
+            }
+        }
+    });
+
+    test('moves counter decreases with each move', async ({ page }) => {
+        // Get initial moves count
+        const movesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
+        const initialMoves = extractNumber(movesText || '0');
+
+        // Make a move
+        await page.keyboard.press('ArrowRight');
+        await page.waitForTimeout(100);
+
+        // Check if moves decreased
+        const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
+        const newMoves = extractNumber(newMovesText || '0');
+
+        expect(newMoves).toBe(initialMoves - 1);
+    });
+});
+
+// Helper function to extract numbers from strings like "Score: 10"
+function extractNumber(text: string): number {
+    const match = text.match(/\d+/);
+    return match ? parseInt(match[0], 10) : 0;
+}

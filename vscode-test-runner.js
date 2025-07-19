@@ -1,7 +1,6 @@
 // This is a special script for VS Code Test Explorer
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
-import { createServer } from 'vite';
 import { startVitest } from 'vitest/node';
 
 // Clear any existing matchers that might be from Jest
@@ -20,13 +19,15 @@ if (typeof window !== 'undefined') {
   delete window.jest;
 }
 
-// Start Vitest with a clean configuration
+// Run Vitest
 const config = defineConfig({
+  plugins: [],
   test: {
     globals: true,
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
     environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: ['./src/playwrighttests/vitest-setup.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    exclude: ['**/node_modules/**', '**/dist/**'],
     deps: {
       optimizer: {
         web: {
@@ -41,10 +42,10 @@ const config = defineConfig({
   },
   resolve: {
     alias: {
-      '*.css': resolve(process.cwd(), 'tests/mocks/styleMock.js')
+      '@': resolve(process.cwd(), 'src'),
+      '*.css': resolve(process.cwd(), 'src/playwrighttests/mocks/styleMock.js')
     }
   }
 });
 
-// Run Vitest
 startVitest('run', config);

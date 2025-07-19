@@ -9,13 +9,13 @@ global.afterEach = afterEach;
 
 // Mock CSS imports
 vi.mock('*.css', () => ({}));
-vi.mock('../src/maze.css', () => ({}));
+vi.mock('../maze.css', () => ({}));
 
 // Reset mocks between tests
 beforeEach(() => {
-  vi.resetModules();
+    vi.resetModules();
 });
 
 afterEach(() => {
-  vi.clearAllMocks();
+    vi.clearAllMocks();
 });

@@ -1,22 +1,34 @@
 import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     globals: true,
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
     environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: ['./src/tests/vitest-setup.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    exclude: ['**/node_modules/**', '**/dist/**'],
     deps: {
-      inline: [/\.css$/],
+      optimizer: {
+        web: {
+          include: ['.*\\.css$']
+        }
+      }
     },
-    // Prevent conflicts with Jest
+    // Use a completely isolated environment for better test stability
     pool: 'forks',
     isolate: true,
+    threads: false,
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+    },
   },
   resolve: {
     alias: {
-      '*.css': resolve(__dirname, 'tests/mocks/styleMock.js')
-    }
-  }
+      '@': resolve(__dirname, 'src'),
+      '*.css': resolve(__dirname, 'src/tests/mocks/styleMock.js')
+    },
+  },
 });

@@ -1,7 +1,21 @@
 {
-  "vitest.commandLine": "npx vitest",
-  "vitest.include": ["src/**/*.test.ts", "src/**/*.test.tsx", "tests/**/*.test.ts", "tests/**/*.test.tsx"],
-  "vitest.exclude": ["**/node_modules/**", "**/dist/**"],
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "**/src/Playwright/config.json"
+      ],
+      "url": "./src/Playwright/config.schema.json"
+    }
+  ],
+  "vitest.commandLine": "npm run test:isolated",
+  "vitest.include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ],
+  "vitest.exclude": [
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
   "vitest.enable": true,
   "vitest.environment": "jsdom",
   "typescript.validate.enable": true,
@@ -10,12 +24,14 @@
   },
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
-  ]
+  ],
+  "javascript.validate.enable": true,
+  "testing.automaticallyOpenPeekView": "never"
 }

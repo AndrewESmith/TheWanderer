@@ -7,20 +7,28 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*.test.ts', 'tests/**/*.test.tsx'],
+    setupFiles: ['./src/tests/vitest-setup.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     exclude: ['**/node_modules/**', '**/dist/**'],
+    deps: {
+      optimizer: {
+        web: {
+          include: ['.*\\.css$']
+        }
+      }
+    },
+    // Use a completely isolated environment for better test stability
+    pool: 'forks',
+    isolate: true,
+    threads: false,
     coverage: {
       reporter: ['text', 'json', 'html'],
-    },
-    deps: {
-      inline: [/\.css$/],
     },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '*.css': resolve(__dirname, 'tests/mocks/styleMock.js')
+      '*.css': resolve(__dirname, 'src/tests/mocks/styleMock.js')
     },
   },
 });

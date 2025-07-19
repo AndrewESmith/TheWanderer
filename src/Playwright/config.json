@@ -1,33 +1,37 @@
+// @ts-nocheck
 {
-    "browser": {
-      "browserName": "chromium",
-      "isolated": false,
-      "userDataDir": "",
-      "launchOptions": {
-        "channel": "",
-        "headless": false,
-        "executablePath": ""
-      },
-      "contextOptions": {
-        "viewport": { "width": 1280, "height": 720 }
-      },
-      "cdpEndpoint": "",
-      "remoteEndpoint": ""
+  "browser": {
+    "browserName": "chromium",
+    "isolated": false,
+    "userDataDir": "",
+    "launchOptions": {
+      "channel": "",
+      "headless": false,
+      "executablePath": ""
     },
-    "server": {
-      "port": 3000,
-      "host": "localhost"
+    "contextOptions": {
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      }
     },
-    "capabilities": [
-      "tabs",
-      "install",
-      "pdf",
-      "vision"
-    ],
-    "outputDir": "",
-    "network": {
-      "allowedOrigins": [],
-      "blockedOrigins": []
-    },
-    "imageResponses": "allow"
-  }
+    "cdpEndpoint": "",
+    "remoteEndpoint": ""
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "capabilities": [
+    "tabs",
+    "install",
+    "pdf",
+    "vision"
+  ],
+  "outputDir": "",
+  "network": {
+    "allowedOrigins": [],
+    "blockedOrigins": []
+  },
+  "imageResponses": "allow"
+}

@@ -1,20 +1,21 @@
+// This is a special script for VS Code Test Explorer
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { startVitest } from 'vitest/node';
 
-// This is a special configuration file for VS Code Test Explorer
-export default defineConfig({
-  plugins: [react()],
+// Run Vitest
+const config = defineConfig({
+  plugins: [],
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/tests/vitest-setup.ts'],
+    setupFiles: ['./src/playwrighttests/vitest-setup.ts'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     exclude: ['**/node_modules/**', '**/dist/**'],
     deps: {
       optimizer: {
         web: {
-          include: ['.*\\.css$']
+          include: [/\.css$/]
         }
       }
     },
@@ -25,8 +26,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, '../src'),
-      '*.css': resolve(__dirname, '../src/tests/mocks/styleMock.js')
-    },
+      '@': resolve(process.cwd(), 'src'),
+      '*.css': resolve(process.cwd(), 'src/playwrighttests/mocks/styleMock.js')
+    }
   }
 });
+
+startVitest('run', config);

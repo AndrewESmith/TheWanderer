@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Playwright Configuration",
+  "type": "object",
+  "properties": {
+    "browser": {
+      "type": "object",
+      "properties": {
+        "browserName": {
+          "type": "string",
+          "enum": ["chromium", "firefox", "webkit"]
+        },
+        "isolated": {
+          "type": "boolean"
+        },
+        "userDataDir": {
+          "type": "string"
+        },
+        "launchOptions": {
+          "type": "object",
+          "properties": {
+            "channel": {
+              "type": "string"
+            },
+            "headless": {
+              "type": "boolean"
+            },
+            "executablePath": {
+              "type": "string"
+            }
+          }
+        },
+        "contextOptions": {
+          "type": "object",
+          "properties": {
+            "viewport": {
+              "type": "object",
+              "properties": {
+                "width": {
+                  "type": "integer"
+                },
+                "height": {
+                  "type": "integer"
+                }
+              },
+              "required": ["width", "height"]
+            }
+          }
+        },
+        "cdpEndpoint": {
+          "type": "string"
+        },
+        "remoteEndpoint": {
+          "type": "string"
+        }
+      }
+    },
+    "server": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "type": "integer"
+        },
+        "host": {
+          "type": "string"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "outputDir": {
+      "type": "string"
+    },
+    "network": {
+      "type": "object",
+      "properties": {
+        "allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blockedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "imageResponses": {
+      "type": "string",
+      "enum": ["allow", "omit"]
+    }
+  }
+}
