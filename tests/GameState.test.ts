@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { GameState } from "./GameState";
-import { CELL, MazeCell } from "./maze";
-import { IPlayerPos } from "./Interfaces/IPlayerPos";
+import { GameState } from "./mocks/GameState";
+import { CELL, MazeCell } from "./mocks/maze";
+import { IPlayerPos } from "../src/Interfaces/IPlayerPos";
 
 describe("GameState", () => {
   it("movePlayer collects diamond and updates state", () => {
@@ -48,4 +48,4 @@ describe("GameState", () => {
     expect(gameState.maze[0][0]).toBe(CELL.EMPTY);
     expect(gameState.maze[0][1]).toBe(CELL.PLAYER);
   });
-}); 
+});

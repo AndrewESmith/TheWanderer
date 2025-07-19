@@ -1,6 +1,6 @@
 # To Dos
 
-- [ ] Switch to Kiro to see what it can do. This gives me access to Caude Sonnet 4.0!
+- [x] Switch to Kiro to see what it can do. This gives me access to Caude Sonnet 4.0!
 - [ ] Introduce https://github.com/microsoft/playwright-mcp for integration tests
 - [ ] Investigate the value of AI generated unit tests
 - [ ] Investigate memories
