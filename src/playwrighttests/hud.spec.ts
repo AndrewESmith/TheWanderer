@@ -60,29 +60,18 @@ test('player moves with keyboard controls', async ({ page }) => {
 
 // Test game over scenario
 test('game shows game over when player hits bomb', async ({ page }) => {
-    await page.goto('/');
+    // Load the game with our test-specific maze that has a bomb right next to the player
+    await page.goto('/?testMaze=bomb');
 
-    // This test assumes there's a way to trigger game over
-    // You might need to adapt this based on your game's implementation
+    // Wait for the game to load
+    await page.waitForSelector('.maze-grid');
 
-    // Find a bomb in the game (this is a simplified example)
-    // In a real test, you would need to navigate to a bomb
-
-    // Simulate moves to reach a bomb
-    // This is just an example - you'll need to implement the actual navigation
-    await page.keyboard.press('ArrowRight');
-    await page.keyboard.press('ArrowDown');
+    // In our test maze, the bomb is directly to the right of the player
     await page.keyboard.press('ArrowRight');
 
     // Check for game over message
-    // This might need to be adjusted based on your actual game over indication
     const gameOverMessage = page.locator('.hud span').filter({ hasText: 'Game Over' });
 
-    // Use a try/catch since we're not sure if the moves above will actually hit a bomb
-    try {
-        await expect(gameOverMessage).toBeVisible({ timeout: 1000 });
-        console.log('Game over message found');
-    } catch (e) {
-        console.log('Game over message not found - player might not have hit a bomb');
-    }
+    // Verify the game over message is visible
+    await expect(gameOverMessage).toBeVisible({ timeout: 2000 });
 });

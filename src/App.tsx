@@ -1,12 +1,31 @@
 import React from "react";
-import { ICONS } from "./maze";
+import { ICONS, CELL } from "./maze";
 import type { MazeCell } from "./maze";
 import "./maze.css";
 import "./App.css";
 import { GameState } from "./GameState";
 
+// Test-specific maze with a bomb right next to the player for testing
+const testBombMaze: MazeCell[][] = [
+  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
+  [CELL.ROCK, CELL.PLAYER, CELL.BOMB, CELL.EMPTY, CELL.ROCK],
+  [CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.DIAMOND, CELL.ROCK],
+  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
+];
+
 const App: React.FC = () => {
-  const [gameState, setGameState] = React.useState(new GameState());
+  // Check URL parameters for test-specific maze
+  const useTestMaze = React.useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('testMaze') === 'bomb';
+    }
+    return false;
+  }, []);
+
+  const [gameState, setGameState] = React.useState(
+    new GameState(useTestMaze ? testBombMaze : undefined)
+  );
 
   const movePlayer = React.useCallback(
     (dx: number, dy: number) => {

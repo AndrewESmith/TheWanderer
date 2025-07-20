@@ -4,7 +4,7 @@ This directory contains end-to-end tests for The Wanderer game using Playwright.
 
 ## Test Files
 
-- `example.spec.ts`: Basic tests for application loading and UI elements
+- `hud.spec.ts`: Basic tests for application loading and UI elements
 - `game.spec.ts`: Tests for game functionality like player movement and diamond collection
 
 ## Running Tests

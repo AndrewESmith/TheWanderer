@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "name": "README Updater",
+  "description": "Monitors changes to key project files and suggests updates to the README.md to keep documentation current",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.css",
+      "package.json",
+      "vite.config.js",
+      "tsconfig.json",
+      "src/TODO.md"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "I noticed changes to project files. Please analyze these changes and suggest updates to the README.md to ensure it accurately reflects:\n\n1. Any new features or components added\n2. Updated dependencies or configuration changes\n3. Changes to project structure or architecture\n4. New or modified functionality\n5. Updated installation or usage instructions if needed\n\nPlease provide specific suggestions for README.md updates based on the recent changes, maintaining the existing style and format of the document."
+  }
+}

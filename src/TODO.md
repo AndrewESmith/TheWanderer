@@ -1,9 +1,7 @@
 # To Dos
 
-- [x] Switch to Kiro to see what it can do. This gives me access to Caude Sonnet 4.0!
-- [ ] Introduce https://github.com/microsoft/playwright-mcp for integration tests
-- [ ] Investigate the value of AI generated unit tests
 - [ ] Investigate memories
+- [ ] Agent Hooks in Kiro
 - [ ] How might we use cursor rules?
 - [ ] Lets use gamma.app to create our presentation
 - [ ] invite family property team aka Nick to review
@@ -11,13 +9,16 @@
 - [ ] Add arrows as described in .\instructions\gamebehaviour.md
 - [ ] Improve boulder behavour as described in .\instructions\gamebehaviour.md
 - [ ] Enlarge maze size
-- [ ] upgrade from react-scripts@5.0.1 to Vite
-- [ ] Upgrade type script once upgraded to Vite
 - [ ] Create more maze levels
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze
 - [ ] Use password for player to jump to another level
 - [ ] Add maze layout rules to .\instructions\maze.md
+- [x] Switch to Kiro to see what it can do. This gives me access to Caude Sonnet 4.0!
+- [x] Introduce https://github.com/microsoft/playwright-mcp for integration tests
+- [x] Investigate the value of AI generated unit tests
+- [x] upgrade from react-scripts@5.0.1 to Vite
+- [x] Upgrade type script once upgraded to Vite
 - [x] generate unit tests
 - [x] automate unit tests on launch
 - [x] create a code structure
