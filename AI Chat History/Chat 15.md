@@ -199,7 +199,7 @@ If you have access to Kiro documentation or support, I recommend checking there 
  
 [2025-07-20T11:25:05.057Z] [error] [aws-docs] Failed to connect to MCP server: MCP error -32000: Connection closed 
 [2025-07-20T11:25:05.058Z] [info] [aws-docs] MCP connection closed successfully 
-[2025-07-20T11:25:05.058Z] [error] [aws-docs] Error connecting to MCP server: MCP error -32000: Connection closed 
+[2025-07-20T11:25:05.058Z] [error] [aws-docs] Error connecting to MCP server: MCP error -32000: Connection closed.
 ```Help me debug the aws-docs MCP server, here are the logs
 
 **Kiro**: I see the issue. The logs show that the package `aws-documentation-mcp-server` was not found in the package registry. Let's try a different approach.
@@ -275,6 +275,8 @@ You can now use these MCP tools in your projects. If you want to add more tools 
 **User**: Can you copy all the text in this session to a file called "Chat 15.md" and put the file "Chat 15.md" in to the folder "AI Chat History". then can you take a screenshot of Kiro and add the screenshot to Chat 15.md
 
 **Kiro**: I'll create the "Chat 15.md" file in the "AI Chat History" folder with all the text from this session, and then take a screenshot of Kiro to add to the file.
+```
+## Screen Shot
 
 ![Screenshot of Kiro Interface](KiroMCPServers.png)
 
