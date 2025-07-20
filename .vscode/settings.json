@@ -9,8 +9,8 @@
   ],
   "vitest.commandLine": "npm run test:isolated",
   "vitest.include": [
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx"
+    "src/tests/**/*.test.ts",
+    "src/tests/**/*.test.tsx"
   ],
   "vitest.exclude": [
     "**/node_modules/**",

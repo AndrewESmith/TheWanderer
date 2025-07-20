@@ -25,8 +25,8 @@ const config = defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/playwrighttests/vitest-setup.ts'],
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    setupFiles: ['./src/tests/vitest-setup.ts'],
+    include: ['src/tests/**/*.test.ts', 'src/tests/**/*.test.tsx'],
     exclude: ['**/node_modules/**', '**/dist/**'],
     deps: {
       optimizer: {
@@ -43,7 +43,7 @@ const config = defineConfig({
   resolve: {
     alias: {
       '@': resolve(process.cwd(), 'src'),
-      '*.css': resolve(process.cwd(), 'src/playwrighttests/mocks/styleMock.js')
+      '*.css': resolve(process.cwd(), 'src/tests/mocks/styleMock.js')
     }
   }
 });

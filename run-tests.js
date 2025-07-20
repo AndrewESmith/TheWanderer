@@ -25,7 +25,7 @@ const config = {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/tests/vitest-setup.ts'],
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    include: ['src/tests/**/*.test.ts', 'src/tests/**/*.test.tsx'],
     exclude: ['**/node_modules/**', '**/dist/**'],
     deps: {
       optimizer: {
