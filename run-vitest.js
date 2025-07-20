@@ -3,6 +3,9 @@ import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 import { startVitest } from 'vitest/node';
 
+// Suppress Node.js deprecation warnings
+process.env.NODE_NO_WARNINGS = '1';
+
 // Run Vitest
 const config = defineConfig({
   plugins: [],

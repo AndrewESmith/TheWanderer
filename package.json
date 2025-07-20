@@ -14,13 +14,15 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "vite --mode development",
-    "dev": "vite --mode development",
+    "start": "cross-env NODE_NO_WARNINGS=1 node start-with-tests.js",
+    "start:no-tests": "cross-env NODE_NO_WARNINGS=1 vite --mode development",
+    "dev": "cross-env NODE_NO_WARNINGS=1 vite --mode development",
     "build": "vite build --mode production",
     "preview": "vite preview",
     "test": "vitest run -c vitest.config.ts",
     "test:watch": "vitest -c vitest.config.ts",
     "test:isolated": "node --experimental-vm-modules run-tests.js",
+    "test:no-warnings": "cross-env NODE_NO_WARNINGS=1 vitest run -c vitest.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
@@ -47,6 +49,7 @@
     "@playwright/test": "^1.54.1",
     "@types/node": "^24.0.15",
     "@vitejs/plugin-react": "^4.7.0",
+    "cross-env": "^7.0.3",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "vitest": "^3.2.4"
