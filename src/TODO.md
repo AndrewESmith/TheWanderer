@@ -1,22 +1,38 @@
 # To Dos
 
-- [ ] Boulders should be able to be pushed by player
-- [ ] Stretch goal: While AI may create a maze can we ensure all diamonds reachable?
-- [ ] Document and create a IBaseCellItem and child ICellItem. These items populate a cell.
 - [ ] Investigate memories
-- [x] Agent Hooks in Kiro
 - [ ] How might we use cursor rules?
+- [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
+
+## Version 2
+
+- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.
+- [ ] Boulders should be able to be pushed by player
+- [ ] Boulders should move and potentially kill the player.
+
+## Presentation
+
 - [ ] Lets use gamma.app to create our presentation
 - [ ] invite family property team aka Nick to review
-- [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
-- [ ] Add arrows as described in .\instructions\gamebehaviour.md
-- [ ] Improve boulder behavour as described in .\instructions\gamebehaviour.md
-- [x] Enlarge maze size
-- [ ] Create more maze levels
+
+## Version 3 Stretch Goal
+
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze
 - [ ] Use password for player to jump to another level
+- [ ] Introduce Arrows
+- [ ] Introduce slopes (aka logs)
+- [ ] Create more maze levels
+
+## Version 4 Bonus Stretch Goal
+
+- [ ] Can AI create a maze can we ensure all diamonds reachable?
 - [ ] Add maze layout rules to .\instructions\maze.md
+
+## Done
+
+- [x] Agent Hooks in Kiro
+- [x] Enlarge maze size
 - [x] Switch to Kiro to see what it can do. This gives me access to Caude Sonnet 4.0!
 - [x] Introduce https://github.com/microsoft/playwright-mcp for integration tests
 - [x] Investigate the value of AI generated unit tests

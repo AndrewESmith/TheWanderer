@@ -29,6 +29,7 @@ This project has been migrated from Create React App (react-scripts) to Vite for
 - **Enhanced Maze Generation**: Ensuring all diamonds are reachable in AI-generated mazes
 - **Multiple Maze Levels**: Creating additional maze layouts with increasing difficulty
 - **Level Password System**: Assigning unique passwords to each maze level for direct access
+- **Cell Item Architecture**: Implementation of a cell-based component system where various items populate cells
 
 ### Completed Features
 
@@ -106,6 +107,7 @@ This project includes VS Code configurations for:
 - Vite
 - Vitest for testing
 - Kiro with Agent Hooks for development automation
+- Component-based architecture for game elements
 
 ## Game Features
 
@@ -117,6 +119,7 @@ This project includes VS Code configurations for:
   - Boulders to navigate around
   - Bombs to avoid
   - Exit to complete levels
+- Cell-based architecture where game elements populate individual cells
 - Move counter to track progress
 - Test mazes for specific gameplay scenarios
 - Comprehensive test suite for game mechanics and player movement
