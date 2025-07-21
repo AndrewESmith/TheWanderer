@@ -1,14 +1,17 @@
 # To Dos
 
+- [ ] Boulders should be able to be pushed by player
+- [ ] Stretch goal: While AI may create a maze can we ensure all diamonds reachable?
+- [ ] Document and create a IBaseCellItem and child ICellItem. These items populate a cell.
 - [ ] Investigate memories
-- [ ] Agent Hooks in Kiro
+- [x] Agent Hooks in Kiro
 - [ ] How might we use cursor rules?
 - [ ] Lets use gamma.app to create our presentation
 - [ ] invite family property team aka Nick to review
 - [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
 - [ ] Add arrows as described in .\instructions\gamebehaviour.md
 - [ ] Improve boulder behavour as described in .\instructions\gamebehaviour.md
-- [ ] Enlarge maze size
+- [x] Enlarge maze size
 - [ ] Create more maze levels
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze

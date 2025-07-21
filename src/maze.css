@@ -1,7 +1,7 @@
 .maze-grid {
     display: grid;
-    grid-template-columns: repeat(8, 32px);
-    grid-template-rows: repeat(5, 32px);
+    grid-template-columns: repeat(16, 32px);
+    grid-template-rows: repeat(10, 32px);
     gap: 2px;
     background: #222;
     padding: 10px;
@@ -24,3 +24,20 @@
   .cell.boulder { background: #757575; }
   .cell.bomb { background: #000; }
   .cell.exit { background: #ffeb3b; }
+/* HU
+D styles for the larger maze */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: #333;
+  color: white;
+  margin-top: 10px;
+  width: calc(16 * 32px + 12px); /* Match the width of the maze grid */
+  box-sizing: border-box;
+}
+
+.hud span {
+  margin: 0 10px;
+  font-size: 16px;
+}
