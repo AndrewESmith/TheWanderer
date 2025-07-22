@@ -3,6 +3,7 @@
 - [ ] Investigate memories
 - [ ] How might we use cursor rules?
 - [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
+- [ ] Create a branch so we could objects for maze items
 
 ## Version 2
 
@@ -15,7 +16,12 @@
 - [ ] Lets use gamma.app to create our presentation
 - [ ] invite family property team aka Nick to review
 
-## Version 3 
+
+## Version 3
+
+- [ ] Deploy the game!
+
+## Version 4
 
 - [ ] Improve Graphics
 - [ ] Assign a random password to each maze
@@ -25,9 +31,6 @@
 - [ ] Introduce slopes (aka logs)
 - [ ] Create more maze levels
 
-## Version 4
-
-- [ ] Deploy the game!
 
 ## Version 4 Bonus Stretch Goal
 
