@@ -6,7 +6,7 @@
 
 ## Version 2
 
-- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.
+- [ ] _parked_ Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.
 - [ ] Boulders should be able to be pushed by player
 - [ ] Boulders should move and potentially kill the player.
 
@@ -15,8 +15,9 @@
 - [ ] Lets use gamma.app to create our presentation
 - [ ] invite family property team aka Nick to review
 
-## Version 3 Stretch Goal
+## Version 3 
 
+- [ ] Improve Graphics
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze
 - [ ] Use password for player to jump to another level
@@ -28,6 +29,11 @@
 
 - [ ] Can AI create a maze can we ensure all diamonds reachable?
 - [ ] Add maze layout rules to .\instructions\maze.md
+
+## AI at run time?
+
+- [ ] can the game call AI to create a new level...? 
+- [ ] or Ask AI for hint? 
 
 ## Done
 
