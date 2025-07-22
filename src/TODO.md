@@ -25,6 +25,10 @@
 - [ ] Introduce slopes (aka logs)
 - [ ] Create more maze levels
 
+## Version 4
+
+- [ ] Deploy the game!
+
 ## Version 4 Bonus Stretch Goal
 
 - [ ] Can AI create a maze can we ensure all diamonds reachable?
