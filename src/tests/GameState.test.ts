@@ -127,4 +127,25 @@ describe("GameState", () => {
         // Moves should decrease by 1
         expect(gameState.moves).toBe(9);
     });
+
+    it("player dies when running out of moves", () => {
+        const testMaze: MazeCell[][] = [
+            [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+            [CELL.ROCK, CELL.ROCK, CELL.ROCK],
+        ];
+        const player: IPlayerPos = { x: 0, y: 0 };
+        // Start with only 1 move remaining
+        const gameState = new GameState(testMaze, player, 0, 1, 0, 'playing');
+
+        // Make a move that uses up the last move
+        gameState.movePlayer(1, 0);
+
+        // Player should be dead after running out of moves
+        expect(gameState.gameState).toBe('dead');
+        expect(gameState.moves).toBe(0);
+        expect(gameState.player).toEqual({ x: 1, y: 0 });
+        // Maze should still be updated from the move
+        expect(gameState.maze[0]?.[0]).toBe(CELL.EMPTY);
+        expect(gameState.maze[0]?.[1]).toBe(CELL.PLAYER);
+    });
 });

@@ -1,5 +1,8 @@
 # To Dos
 
+- [X] Fix the maze
+- [x] Limit number of moves
+- [ ] Create a unit test to confirm player dies if they run out of moves
 - [ ] Investigate memories
 ~~- [ ] How might we use cursor rules?~~ Lets look at Agent Steering
 - [ ] Setup Agent Steering documentation

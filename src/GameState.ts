@@ -16,7 +16,7 @@ export class GameState implements IGameState {
     maze: MazeCell[][] = initialMaze,
     player: IPlayerPos | null = null,
     score: number = 0,
-    moves: number = 2000, // Increased from 1000 to account for larger maze
+    moves: number = 55,
     diamonds: number = initialMaze.flat().filter((c) => c === CELL.DIAMOND).length,
     gameState: 'playing' | 'dead' | 'won' = 'playing',
   ) {
