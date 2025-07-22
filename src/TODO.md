@@ -1,21 +1,26 @@
 # To Dos
 
 - [ ] Investigate memories
-- [ ] How might we use cursor rules?
+~~- [ ] How might we use cursor rules?~~ Lets look at Agent Steering
+- [ ] Setup Agent Steering documentation
+- [ ] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
 - [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
-- [ ] Create a branch so we could objects for maze items
 
-## Version 2
 
-- [ ] _parked_ Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.
+## Version 2 - Add another dynamic
+
+~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
+
 - [ ] Boulders should be able to be pushed by player
 - [ ] Boulders should move and potentially kill the player.
 
-## Presentation
+## Presentation - Stop Coding and get presentation dafted
 
-- [ ] Lets use gamma.app to create our presentation
+- [ ] Use Chat, Onenote and prompt to build a presentation out line
+- [ ] Use gamma.app to create our presentation
 - [ ] invite family property team aka Nick to review
 
+## Road Map for future versions
 
 ## Version 3
 
@@ -24,20 +29,28 @@
 ## Version 4
 
 - [ ] Improve Graphics
+
+## Version 5
+
+- [ ] Introduce Arrows
+
+## Version 6
+
+- [ ] Create more maze levels
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze
 - [ ] Use password for player to jump to another level
-- [ ] Introduce Arrows
+
+## Version 7
+
 - [ ] Introduce slopes (aka logs)
-- [ ] Create more maze levels
 
-
-## Version 4 Bonus Stretch Goal
+## Version 8 Bonus Stretch Goal
 
 - [ ] Can AI create a maze can we ensure all diamonds reachable?
 - [ ] Add maze layout rules to .\instructions\maze.md
 
-## AI at run time?
+## Version 9 AI at run time?
 
 - [ ] can the game call AI to create a new level...? 
 - [ ] or Ask AI for hint? 
