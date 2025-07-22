@@ -3,10 +3,10 @@
 - [X] Fix the maze
 - [x] Limit number of moves
 - [x] Create a unit test to confirm player dies if they run out of moves
-- [ ] Investigate memories
+- [x] Investigate memories
 ~~- [ ] How might we use cursor rules?~~ Lets look at Agent Steering
-- [ ] Setup Agent Steering documentation
-- [ ] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
+- [x] Setup Agent Steering documentation
+- [x] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
 - [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
 
 
