@@ -1,119 +1,150 @@
 import type { IGameState } from "./Interfaces/IGameState";
-import { CELL, initialMaze } from "./maze";
+import { CELL, initialMaze, getPlayerPosition } from "./maze";
 import type { MazeCell } from "./maze";
 import type { IPlayerPos } from "./Interfaces/IPlayerPos";
-import { PlayerPos } from "./PlayerPos";
 
-export class GameState implements IGameState {
+// Game state type following TypeScript standards
+export interface GameStateData {
   maze: MazeCell[][];
   player: IPlayerPos | null;
   score: number;
   moves: number;
   diamonds: number;
   gameState: 'playing' | 'dead' | 'won';
+}
 
-  constructor(
-    maze: MazeCell[][] = initialMaze,
-    player: IPlayerPos | null = null,
-    score: number = 0,
-    moves: number = 55,
-    diamonds: number = initialMaze.flat().filter((c) => c === CELL.DIAMOND).length,
-    gameState: 'playing' | 'dead' | 'won' = 'playing',
-  ) {
-    this.maze = maze.map(row => [...row]);
-    this.player = player ?? PlayerPos.getPlayerPos({
-      getPlayerPos: () => {
-        for (let y = 0; y < this.maze.length; y++) {
-          const row = this.maze[y];
-          if (!row) continue;
-          for (let x = 0; x < row.length; x++) {
-            if (row[x] === CELL.PLAYER) return { x, y };
-          }
-        }
-        return null;
-      }
-    } as any);
-    this.score = score;
-    this.diamonds = diamonds;
-    this.moves = moves;
-    this.gameState = gameState;
+// Pure function to count diamonds in maze
+export function countDiamonds(maze: MazeCell[][]): number {
+  return maze.flat().filter((cell) => cell === CELL.DIAMOND).length;
+}
+
+// Pure function to create initial game state
+export function createInitialGameState(maze: MazeCell[][] = initialMaze): GameStateData {
+  const mazeCopy = maze.map(row => [...row]);
+  const playerPosition = getPlayerPosition(mazeCopy);
+  const diamondCount = countDiamonds(mazeCopy);
+
+  return {
+    maze: mazeCopy,
+    player: playerPosition,
+    score: 0,
+    moves: 55,
+    diamonds: diamondCount,
+    gameState: 'playing',
+  };
+}
+
+// Pure function to check if position is valid
+function isValidPosition(maze: MazeCell[][], x: number, y: number): boolean {
+  return y >= 0 && y < maze.length && x >= 0 && x < (maze[y]?.length ?? 0);
+}
+
+// Pure function to check if cell blocks movement
+function isBlockingCell(cell: MazeCell): boolean {
+  return cell === CELL.ROCK || cell === CELL.BOULDER;
+}
+
+// Pure function to handle player movement
+export function movePlayer(gameState: GameStateData, dx: number, dy: number): GameStateData {
+  if (gameState.gameState !== 'playing' || !gameState.player) {
+    return gameState;
   }
 
-  movePlayer(dx: number, dy: number): void {
-    if (this.gameState !== 'playing' || !this.player) return;
-    const { x, y } = this.player;
-    const nx = x + dx;
-    const ny = y + dy;
+  const { x, y } = gameState.player;
+  const newX = x + dx;
+  const newY = y + dy;
 
-    const row = this.maze[ny];
-    if (!row) return;
+  // Check bounds
+  if (!isValidPosition(gameState.maze, newX, newY)) {
+    return gameState;
+  }
 
-    if (
-      ny < 0 ||
-      ny >= this.maze.length ||
-      nx < 0 ||
-      nx >= row.length
-    )
-      return;
+  const targetCell = gameState.maze[newY]?.[newX];
+  if (targetCell === undefined) {
+    return gameState;
+  }
 
-    const target = row[nx];
-    if (target === undefined) return;
+  // Check if movement is blocked
+  if (isBlockingCell(targetCell)) {
+    return gameState;
+  }
 
-    let newGameState: 'playing' | 'dead' | 'won' = this.gameState;
+  // Create new maze with player movement
+  const newMaze = gameState.maze.map(row => [...row]);
+  newMaze[y]![x] = CELL.EMPTY; // Clear old position
+  newMaze[newY]![newX] = CELL.PLAYER; // Set new position
 
-    // Blocked by rock or boulder
-    if (target === CELL.ROCK || target === CELL.BOULDER) return;
+  let newScore = gameState.score;
+  let newDiamonds = gameState.diamonds;
+  let newGameState: 'playing' | 'dead' | 'won' = gameState.gameState;
 
-    // Diamond: collect
-    if (target === CELL.DIAMOND) {
-      this.score += 10;
-      this.diamonds -= 1;
-    }
-
-    // Soil: disappears
-    if (target === CELL.SOIL || target === CELL.DIAMOND) {
-      const currentRow = this.maze[y];
-      if (row && currentRow) {
-        row[nx] = CELL.PLAYER;
-        currentRow[x] = CELL.EMPTY;
-      }
-    }
-    // Bomb: die
-    else if (target === CELL.BOMB) {
-      const currentRow = this.maze[y];
-      if (row && currentRow) {
-        row[nx] = CELL.PLAYER;
-        currentRow[x] = CELL.EMPTY;
-      }
+  // Handle different cell types
+  switch (targetCell) {
+    case CELL.DIAMOND:
+      newScore += 10;
+      newDiamonds -= 1;
+      break;
+    case CELL.BOMB:
       newGameState = 'dead';
-    }
-    // Exit: only if all diamonds collected
-    else if (target === CELL.EXIT) {
-      if (this.diamonds === 0) {
-        const currentRow = this.maze[y];
-        if (row && currentRow) {
-          row[nx] = CELL.PLAYER;
-          currentRow[x] = CELL.EMPTY;
-        }
+      break;
+    case CELL.EXIT:
+      if (newDiamonds === 0) {
         newGameState = 'won';
       } else {
-        return;
+        return gameState; // Can't exit with diamonds remaining
       }
-    }
-    // Empty: just move
-    else if (target === CELL.EMPTY) {
-      const currentRow = this.maze[y];
-      if (row && currentRow) {
-        row[nx] = CELL.PLAYER;
-        currentRow[x] = CELL.EMPTY;
-      }
-    }
-
-    this.player = { x: nx, y: ny };
-    this.moves -= 1;
-    this.gameState = newGameState;
-    if (this.moves <= 0 && this.gameState === 'playing') {
-      this.gameState = 'dead';
-    }
+      break;
+    case CELL.SOIL:
+    case CELL.EMPTY:
+      // No special handling needed
+      break;
   }
+
+  const newMoves = gameState.moves - 1;
+
+  // Check if out of moves
+  if (newMoves <= 0 && newGameState === 'playing') {
+    newGameState = 'dead';
+  }
+
+  return {
+    maze: newMaze,
+    player: { x: newX, y: newY },
+    score: newScore,
+    moves: newMoves,
+    diamonds: newDiamonds,
+    gameState: newGameState,
+  };
+}
+
+// Factory function to create game state manager following functional patterns
+export function createGameState(initialData?: Partial<GameStateData>): IGameState {
+  let currentState: GameStateData;
+
+  if (initialData?.maze) {
+    // If a custom maze is provided, create initial state from that maze
+    currentState = {
+      ...createInitialGameState(initialData.maze),
+      ...initialData,
+    };
+  } else {
+    // Use default maze
+    currentState = {
+      ...createInitialGameState(),
+      ...initialData,
+    };
+  }
+
+  return {
+    get maze() { return currentState.maze; },
+    get player() { return currentState.player; },
+    get score() { return currentState.score; },
+    get moves() { return currentState.moves; },
+    get diamonds() { return currentState.diamonds; },
+    get gameState() { return currentState.gameState; },
+
+    movePlayer: (dx: number, dy: number) => {
+      currentState = movePlayer(currentState, dx, dy);
+    },
+  };
 }

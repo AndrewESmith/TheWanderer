@@ -49,27 +49,48 @@ export const initialMaze: MazeCell[][] = [
   // Row 9: Bottom border
   [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
 ];
-export class Maze implements IMaze {
-  getCell(x: number, y: number): MazeCell {
-    const row = initialMaze[y];
-    return row ? row[x] ?? CELL.EMPTY : CELL.EMPTY;
+// Functional maze utilities following TypeScript standards
+export function getCell(maze: MazeCell[][], x: number, y: number): MazeCell {
+  if (y < 0 || y >= maze.length || x < 0 || x >= (maze[y]?.length ?? 0)) {
+    return CELL.EMPTY;
+  }
+  return maze[y]?.[x] ?? CELL.EMPTY;
+}
+
+export function setCell(maze: MazeCell[][], x: number, y: number, value: MazeCell): MazeCell[][] {
+  if (y < 0 || y >= maze.length || x < 0 || x >= (maze[y]?.length ?? 0)) {
+    return maze; // Return unchanged if out of bounds
   }
 
-  setCell(x: number, y: number, value: MazeCell): void {
-    const row = initialMaze[y];
-    if (row) {
-      row[x] = value;
-    }
-  }
+  // Create a deep copy to avoid mutation
+  const newMaze = maze.map(row => [...row]);
+  newMaze[y]![x] = value;
+  return newMaze;
+}
 
-  getPlayerPos(): IPlayerPos | null {
-    for (let y = 0; y < initialMaze.length; y++) {
-      const row = initialMaze[y];
-      if (!row) continue;
-      for (let x = 0; x < row.length; x++) {
-        if (row[x] === CELL.PLAYER) return { x, y };
+export function getPlayerPosition(maze: MazeCell[][]): IPlayerPos | null {
+  for (let y = 0; y < maze.length; y++) {
+    const row = maze[y];
+    if (!row) continue;
+
+    for (let x = 0; x < row.length; x++) {
+      if (row[x] === CELL.PLAYER) {
+        return { x, y };
       }
     }
-    return null;
   }
+  return null;
+}
+
+// Factory function to create maze instances
+export function createMaze(initialLayout: MazeCell[][] = initialMaze): IMaze {
+  let currentMaze = initialLayout.map(row => [...row]); // Deep copy
+
+  return {
+    getCell: (x: number, y: number) => getCell(currentMaze, x, y),
+    setCell: (x: number, y: number, value: MazeCell) => {
+      currentMaze = setCell(currentMaze, x, y, value);
+    },
+    getPlayerPos: () => getPlayerPosition(currentMaze),
+  };
 }

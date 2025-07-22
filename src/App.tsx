@@ -3,7 +3,7 @@ import { ICONS, CELL } from "./maze";
 import type { MazeCell } from "./maze";
 import "./maze.css";
 import "./App.css";
-import { GameState } from "./GameState";
+import { createGameState } from "./GameState";
 
 // Test-specific maze with a bomb right next to the player for testing
 const testBombMaze: MazeCell[][] = [
@@ -27,18 +27,20 @@ const App: React.FC = () => {
     return false;
   }, []);
 
-  const [gameState, setGameState] = React.useState(
-    new GameState(useTestMaze ? testBombMaze : undefined)
+  const [gameState, setGameState] = React.useState(() =>
+    createGameState(useTestMaze ? { maze: testBombMaze } : undefined)
   );
+
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
   const movePlayer = React.useCallback(
     (dx: number, dy: number) => {
       // Call the GameState method
       gameState.movePlayer(dx, dy);
-      // Force re-render by creating a new GameState reference (shallow copy)
-      setGameState(Object.assign(Object.create(Object.getPrototypeOf(gameState)), gameState));
+      // Force re-render
+      forceUpdate();
     },
-    [gameState]
+    [gameState, forceUpdate]
   );
 
   // Handle keyboard input
@@ -54,13 +56,7 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKey);
   }, [movePlayer, gameState.gameState]);
 
-  // Game over if out of moves
-  React.useEffect(() => {
-    if (gameState.moves <= 0 && gameState.gameState === 'playing') {
-      gameState.gameState = 'dead';
-      setGameState(Object.assign(Object.create(Object.getPrototypeOf(gameState)), gameState));
-    }
-  }, [gameState]);
+  // Game over logic is now handled in the functional GameState
 
   // Render cell (reuse previous Cell component)
   const Cell: React.FC<{ type: MazeCell }> = ({ type }) => {
@@ -74,8 +70,8 @@ const App: React.FC = () => {
   return (
     <div>
       <div className="maze-grid">
-        {gameState.maze.map((row, y) =>
-          row.map((cell, x) => <Cell key={`${y}-${x}`} type={cell} />)
+        {gameState.maze.map((row: MazeCell[], y: number) =>
+          row.map((cell: MazeCell, x: number) => <Cell key={`${y}-${x}`} type={cell} />)
         )}
       </div>
       <div className="hud">

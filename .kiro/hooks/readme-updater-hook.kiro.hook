@@ -4,7 +4,7 @@
   "description": "Monitors changes to key project files and suggests updates to the README.md to keep documentation current",
   "version": "1",
   "when": {
-    "type": "fileEdited",
+    "type": "userTriggered",
     "patterns": [
       "src/**/*.ts",
       "src/**/*.tsx",

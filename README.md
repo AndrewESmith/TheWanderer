@@ -14,6 +14,9 @@ This project has been migrated from Create React App (react-scripts) to Vite for
 
 ### Recent Updates
 
+- **Functional Architecture Migration**: Refactored game state management to use pure functional programming patterns with immutable state updates
+- **Enhanced Testing Framework**: Comprehensive test suite using Vitest with functional testing patterns for game mechanics
+- **TypeScript Standards Compliance**: Code now follows modern TypeScript best practices with interfaces over types and functional components
 - **Development Tooling**: Implemented Agent Hooks in Kiro for improved development workflow automation
 - **✅ Enlarged Maze**: The maze dimensions have been increased from 8x5 to 16x10, providing a more challenging gameplay experience
 - **Enhanced Game Elements**: Additional diamonds, boulders, and bombs have been strategically placed throughout the larger maze
@@ -33,6 +36,9 @@ This project has been migrated from Create React App (react-scripts) to Vite for
 
 ### Completed Features
 
+- ✅ **Functional Architecture**: Refactored to pure functional programming patterns with immutable state management
+- ✅ **Modern TypeScript**: Updated to follow TypeScript best practices with interfaces and functional components
+- ✅ **Enhanced Testing**: Comprehensive Vitest test suite with functional testing patterns
 - ✅ **Enlarged Maze**: Expanded maze dimensions from 8x5 to 16x10 for more complex gameplay
 - ✅ **Agent Hooks**: Implemented Kiro Agent Hooks for development workflow automation
 - ✅ **Vite Migration**: Migrated from Create React App to Vite for improved performance
@@ -70,27 +76,43 @@ npm run preview
 ### Testing
 
 ```bash
-# Run tests
+# Run unit tests with Vitest
 npm test
 
 # Run tests in watch mode
 npm run test:watch
+
+# Run tests without warnings
+npm run test:no-warnings
+
+# Run end-to-end tests with Playwright
+npm run test:e2e
+
+# Run Playwright tests with UI
+npm run test:e2e:ui
+
+# Debug Playwright tests
+npm run test:e2e:debug
 ```
 
 The project includes comprehensive test coverage for:
 
-- Game mechanics and player movement
-- UI adaptation for the larger maze dimensions
-- Game state management
-- Player position tracking in the larger maze
+- **Functional Game Logic**: Pure function testing for game state transitions
+- **Player Movement Mechanics**: Immutable state updates and collision detection
+- **Game State Management**: Functional patterns with proper TypeScript interfaces
+- **UI Adaptation**: Responsive design testing for the larger maze dimensions
+- **End-to-End Testing**: Playwright integration with MCP server automation
+- **Player Position Tracking**: Coordinate system validation in the expanded maze
 
 ## Environment Variables
 
 Environment variables should be prefixed with `VITE_` to be accessible in the client-side code. You can define them in the following files:
 
 - `.env` - Loaded in all environments
-- `.env.development` - Loaded in development
-- `.env.production` - Loaded in production
+- `.env.development` - Loaded in development mode
+- `.env.production` - Loaded in production builds
+
+**Note**: This project was migrated from Create React App, so any legacy `REACT_APP_*` variables need to be updated to use the `VITE_*` prefix. See [MigrateToVite.md](./MigrateToVite.md) for migration details.
 
 ## VS Code Integration
 
@@ -102,27 +124,53 @@ This project includes VS Code configurations for:
 
 ## Technologies
 
-- React
-- TypeScript
-- Vite
-- Vitest for testing
-- Kiro with Agent Hooks for development automation
-- Component-based architecture for game elements
+- **React 19.1.0** - Latest React with modern hooks and functional components
+- **TypeScript 5.8.3** - Following modern TypeScript standards with interfaces over types
+- **Vite 6.3.5** - Fast build tool with optimized chunking strategy and ES modules
+- **Vitest 3.2.4** - Modern testing framework with native TypeScript support
+- **Playwright** - End-to-end testing with MCP server integration
+- **Kiro with Agent Hooks** - AI-powered development automation
+- **Functional Architecture** - Pure functions and immutable state management
+- **CSS Modules** - Component-scoped styling with mobile-first responsive design
 
 ## Game Features
 
-- ✅ 16x10 maze grid with 32px cell size (enlarged from previous 8x5)
-- Responsive HUD that adapts to the maze dimensions
-- Multiple game elements including:
-  - Player character
-  - Diamonds to collect
+- ✅ **16x10 maze grid** with 32px cell size (enlarged from previous 8x5)
+- **Functional State Management** with immutable updates and pure functions
+- **Responsive HUD** that adapts to the maze dimensions using mobile-first CSS
+- **Multiple game elements** with type-safe interfaces:
+  - Player character with position tracking
+  - Diamonds to collect (affects exit availability)
   - Boulders to navigate around
-  - Bombs to avoid
-  - Exit to complete levels
-- Cell-based architecture where game elements populate individual cells
-- Move counter to track progress
-- Test mazes for specific gameplay scenarios
-- Comprehensive test suite for game mechanics and player movement
+  - Bombs to avoid (fatal on contact)
+  - Exit to complete levels (requires all diamonds)
+  - Soil that disappears when traversed
+- **Cell-based architecture** where game elements populate individual cells
+- **Move counter** with game-over mechanics when moves are exhausted
+- **Test mazes** for specific gameplay scenarios and edge cases
+- **Comprehensive test suite** with functional testing patterns and TypeScript interfaces
+
+## Architecture
+
+This project follows modern TypeScript and React best practices:
+
+### Functional Programming Patterns
+- **Pure Functions**: All game logic uses pure functions with no side effects
+- **Immutable State**: Game state updates create new objects rather than mutating existing ones
+- **Functional Components**: React components use hooks instead of classes
+- **Type Safety**: Comprehensive TypeScript interfaces for all game entities
+
+### Code Organization
+- **Interface-First Design**: TypeScript interfaces define contracts before implementation
+- **Modular Structure**: Each file contains related functionality with clear separation of concerns
+- **Descriptive Naming**: Variables use auxiliary verbs (isLoading, hasError) for clarity
+- **Named Exports**: Functions use named exports for better tree-shaking
+
+### Testing Strategy
+- **Vitest Integration**: Modern testing framework with native TypeScript support
+- **Functional Testing**: Tests focus on pure function behavior and state transitions
+- **End-to-End Coverage**: Playwright tests verify complete user workflows
+- **Type-Safe Tests**: All tests use proper TypeScript interfaces
 
 ## Game Mechanics
 

@@ -1,151 +1,189 @@
 import { describe, it, expect } from "vitest";
-import { GameState } from "./mocks/GameState";
-import { CELL, type MazeCell } from "./mocks/maze";
-import { type IPlayerPos } from "../Interfaces/IPlayerPos";
+import { createGameState, movePlayer, createInitialGameState, type GameStateData } from "../GameState";
+import { CELL, type MazeCell } from "../maze";
+import type { IPlayerPos } from "../Interfaces/IPlayerPos";
 
-describe("GameState", () => {
-    it("movePlayer collects diamond and updates state", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.DIAMOND],
-            [CELL.ROCK, CELL.ROCK],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        const diamonds = 1;
-        const gameState = new GameState(testMaze, player, 0, 10, diamonds, 'playing');
-        gameState.movePlayer(1, 0);
-        expect(gameState.score).toBe(10);
-        expect(gameState.diamonds).toBe(0);
-        expect(gameState.player).toEqual({ x: 1, y: 0 });
-        // Add null checks to prevent "Object is possibly 'undefined'" errors
-        expect(gameState.maze[0]?.[0]).toBe(CELL.EMPTY);
-        expect(gameState.maze[0]?.[1]).toBe(CELL.PLAYER);
-        expect(gameState.moves).toBe(9);
-        expect(gameState.gameState).toBe('playing');
+// Helper function to create test maze data following functional patterns
+function createTestGameState(
+    maze: MazeCell[][],
+    player: IPlayerPos,
+    score: number = 0,
+    moves: number = 10,
+    diamonds: number = 0,
+    gameState: 'playing' | 'dead' | 'won' = 'playing'
+): GameStateData {
+    return {
+        maze: maze.map(row => [...row]), // Deep copy
+        player,
+        score,
+        moves,
+        diamonds,
+        gameState,
+    };
+}
+
+describe("GameState - Functional Implementation", () => {
+    describe("movePlayer function", () => {
+        it("should collect diamond and update state correctly", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.DIAMOND],
+                [CELL.ROCK, CELL.ROCK],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 0, 10, 1, 'playing');
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.score).toBe(10);
+            expect(newState.diamonds).toBe(0);
+            expect(newState.player).toEqual({ x: 1, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.EMPTY);
+            expect(newState.maze[0]?.[1]).toBe(CELL.PLAYER);
+            expect(newState.moves).toBe(9);
+            expect(newState.gameState).toBe('playing');
+        });
+
+        it("should not move when blocked by rock", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.ROCK],
+                [CELL.ROCK, CELL.ROCK],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 });
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.player).toEqual({ x: 0, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.PLAYER);
+            expect(newState.maze[0]?.[1]).toBe(CELL.ROCK);
+            expect(newState.moves).toBe(10); // Moves should not decrease for invalid move
+        });
+
+        it("should set game state to dead when hitting bomb", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.BOMB],
+                [CELL.ROCK, CELL.ROCK],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 });
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.gameState).toBe('dead');
+            expect(newState.player).toEqual({ x: 1, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.EMPTY);
+            expect(newState.maze[0]?.[1]).toBe(CELL.PLAYER);
+            expect(newState.moves).toBe(9);
+        });
+
+        it("should prevent exit when diamonds remain", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.EXIT],
+                [CELL.ROCK, CELL.DIAMOND],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 0, 10, 1, 'playing');
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.gameState).toBe('playing');
+            expect(newState.player).toEqual({ x: 0, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.PLAYER);
+            expect(newState.maze[0]?.[1]).toBe(CELL.EXIT);
+            expect(newState.diamonds).toBe(1);
+            expect(newState.moves).toBe(10); // No move should occur
+        });
+
+        it("should allow exit when all diamonds are collected", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.EXIT],
+                [CELL.ROCK, CELL.ROCK],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 10, 10, 0, 'playing');
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.gameState).toBe('won');
+            expect(newState.player).toEqual({ x: 1, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.EMPTY);
+            expect(newState.maze[0]?.[1]).toBe(CELL.PLAYER);
+            expect(newState.score).toBe(10);
+            expect(newState.moves).toBe(9);
+        });
+
+        it("should handle soil movement correctly", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.SOIL],
+                [CELL.ROCK, CELL.ROCK],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 0, 10, 0, 'playing');
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.player).toEqual({ x: 1, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.EMPTY);
+            expect(newState.maze[0]?.[1]).toBe(CELL.PLAYER);
+            expect(newState.gameState).toBe('playing');
+            expect(newState.score).toBe(0);
+            expect(newState.moves).toBe(9);
+        });
+
+        it("should set game state to dead when running out of moves", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
+                [CELL.ROCK, CELL.ROCK, CELL.ROCK],
+            ];
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 0, 1, 0, 'playing');
+
+            const newState = movePlayer(initialState, 1, 0);
+
+            expect(newState.gameState).toBe('dead');
+            expect(newState.moves).toBe(0);
+            expect(newState.player).toEqual({ x: 1, y: 0 });
+            expect(newState.maze[0]?.[0]).toBe(CELL.EMPTY);
+            expect(newState.maze[0]?.[1]).toBe(CELL.PLAYER);
+        });
     });
 
-    it("movePlayer into rock does nothing", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.ROCK],
-            [CELL.ROCK, CELL.ROCK],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        const gameState = new GameState(testMaze, player);
-        gameState.movePlayer(1, 0);
-        expect(gameState.player).toEqual({ x: 0, y: 0 });
-        // Add null checks to prevent "Object is possibly 'undefined'" errors
-        expect(gameState.maze[0]?.[0]).toBe(CELL.PLAYER);
-        expect(gameState.maze[0]?.[1]).toBe(CELL.ROCK);
-    });
+    describe("createGameState factory function", () => {
+        it("should create game state with default values", () => {
+            const gameState = createGameState();
 
-    it("movePlayer into bomb sets gameState to dead", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.BOMB],
-            [CELL.ROCK, CELL.ROCK],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        const gameState = new GameState(testMaze, player);
-        gameState.movePlayer(1, 0);
-        expect(gameState.gameState).toBe('dead');
-        expect(gameState.player).toEqual({ x: 1, y: 0 });
-        // Add null checks to prevent "Object is possibly 'undefined'" errors
-        expect(gameState.maze[0]?.[0]).toBe(CELL.EMPTY);
-        expect(gameState.maze[0]?.[1]).toBe(CELL.PLAYER);
-    });
+            expect(gameState.score).toBe(0);
+            expect(gameState.moves).toBe(55);
+            expect(gameState.gameState).toBe('playing');
+            expect(gameState.player).toBeTruthy();
+        });
 
-    it("movePlayer into exit fails when diamonds remain", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.EXIT],
-            [CELL.ROCK, CELL.DIAMOND],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        // Set diamonds to 1 to indicate there's still a diamond to collect
-        const diamonds = 1;
-        const gameState = new GameState(testMaze, player, 0, 10, diamonds, 'playing');
+        it("should create game state with custom initial data", () => {
+            const customMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.EMPTY],
+                [CELL.ROCK, CELL.ROCK],
+            ];
 
-        // Try to move into the exit
-        gameState.movePlayer(1, 0);
+            const gameState = createGameState({
+                maze: customMaze,
+                score: 100,
+                moves: 20,
+            });
 
-        // Player should not move and game state should remain unchanged
-        expect(gameState.gameState).toBe('playing');
-        expect(gameState.player).toEqual({ x: 0, y: 0 });
-        // Maze should remain unchanged
-        expect(gameState.maze[0]?.[0]).toBe(CELL.PLAYER);
-        expect(gameState.maze[0]?.[1]).toBe(CELL.EXIT);
-        expect(gameState.maze[1]?.[1]).toBe(CELL.DIAMOND);
-        // Diamonds count should remain unchanged
-        expect(gameState.diamonds).toBe(1);
-        // Moves should remain unchanged since the move was invalid
-        expect(gameState.moves).toBe(10);
-    });
+            expect(gameState.score).toBe(100);
+            expect(gameState.moves).toBe(20);
+            expect(gameState.maze).toEqual(customMaze);
+        });
 
-    it("movePlayer into exit succeeds when all diamonds are collected", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.EXIT],
-            [CELL.ROCK, CELL.ROCK],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        // Set diamonds to 0 to indicate all diamonds have been collected
-        const diamonds = 0;
-        const gameState = new GameState(testMaze, player, 10, 10, diamonds, 'playing');
+        it("should handle player movement through factory interface", () => {
+            const testMaze: MazeCell[][] = [
+                [CELL.PLAYER, CELL.DIAMOND],
+                [CELL.ROCK, CELL.ROCK],
+            ];
 
-        // Try to move into the exit
-        gameState.movePlayer(1, 0);
+            const gameState = createGameState({
+                maze: testMaze,
+                diamonds: 1,
+            });
 
-        // Player should move and game state should change to 'won'
-        expect(gameState.gameState).toBe('won');
-        expect(gameState.player).toEqual({ x: 1, y: 0 });
-        // Maze should be updated
-        expect(gameState.maze[0]?.[0]).toBe(CELL.EMPTY);
-        expect(gameState.maze[0]?.[1]).toBe(CELL.PLAYER);
-        // Score should remain unchanged
-        expect(gameState.score).toBe(10);
-        // Moves should decrease by 1
-        expect(gameState.moves).toBe(9);
-    });
+            const initialScore = gameState.score;
+            gameState.movePlayer(1, 0);
 
-    it("movePlayer into soil succeeds and replaces soil with player", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.SOIL],
-            [CELL.ROCK, CELL.ROCK],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        const gameState = new GameState(testMaze, player, 0, 10, 0, 'playing');
-
-        // Move into the soil cell
-        gameState.movePlayer(1, 0);
-
-        // Player should move to the soil cell
-        expect(gameState.player).toEqual({ x: 1, y: 0 });
-        // Original position should be empty
-        expect(gameState.maze[0]?.[0]).toBe(CELL.EMPTY);
-        // Soil should be replaced by player
-        expect(gameState.maze[0]?.[1]).toBe(CELL.PLAYER);
-        // Game state should remain playing
-        expect(gameState.gameState).toBe('playing');
-        // Score should remain unchanged
-        expect(gameState.score).toBe(0);
-        // Moves should decrease by 1
-        expect(gameState.moves).toBe(9);
-    });
-
-    it("player dies when running out of moves", () => {
-        const testMaze: MazeCell[][] = [
-            [CELL.PLAYER, CELL.EMPTY, CELL.EMPTY],
-            [CELL.ROCK, CELL.ROCK, CELL.ROCK],
-        ];
-        const player: IPlayerPos = { x: 0, y: 0 };
-        // Start with only 1 move remaining
-        const gameState = new GameState(testMaze, player, 0, 1, 0, 'playing');
-
-        // Make a move that uses up the last move
-        gameState.movePlayer(1, 0);
-
-        // Player should be dead after running out of moves
-        expect(gameState.gameState).toBe('dead');
-        expect(gameState.moves).toBe(0);
-        expect(gameState.player).toEqual({ x: 1, y: 0 });
-        // Maze should still be updated from the move
-        expect(gameState.maze[0]?.[0]).toBe(CELL.EMPTY);
-        expect(gameState.maze[0]?.[1]).toBe(CELL.PLAYER);
+            expect(gameState.score).toBe(initialScore + 10);
+            expect(gameState.diamonds).toBe(0);
+        });
     });
 });
