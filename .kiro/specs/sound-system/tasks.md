@@ -2,20 +2,12 @@
 
 - [x] 1. Set up sound system infrastructure and core interfaces
 
-
-
-
-
   - Create TypeScript interfaces for sound events, audio manager, and sound assets
   - Set up directory structure for sound files and audio utilities
   - Define sound configuration constants with all game sound mappings
   - _Requirements: 6.1, 6.2_
 
 - [x] 2. Implement core audio manager with Web Audio API
-
-
-
-
 
   - Create AudioManager class with preloading, playback, and mute functionality
   - Implement browser compatibility detection and fallback strategies
@@ -25,11 +17,6 @@
 
 - [x] 3. Create React hooks for sound management
 
-
-
-
-
-
   - Implement useSound hook for component-level audio control
   - Create useAudioSettings hook for mute/unmute and preferences
   - Add React context for global audio state management
@@ -37,10 +24,6 @@
   - _Requirements: 5.1, 5.2, 5.3, 6.1_
 
 - [x] 4. Integrate sound events with game state transitions
-
-
-
-
 
   - Modify movePlayer function to emit sound events for player movement
   - Add sound event emission for collision detection in game logic
@@ -51,10 +34,6 @@
 
 - [x] 5. Implement collision and interaction sound effects
 
-
-
-
-
   - Add sound event detection for boulder movement and collisions
   - Implement arrow movement and collision sound triggers
   - Create sound events for object interactions (boulder hits rock, arrow hits soil)
@@ -62,10 +41,6 @@
   - _Requirements: 1.2, 2.1, 2.2, 2.3_
 
 - [x] 6. Add game state change sound effects
-
-
-
-
 
   - Implement death sound when player hits bomb or runs out of moves
   - Add victory sound for successful exit completion
@@ -76,10 +51,6 @@
 
 - [x] 7. Create sound asset loading and management system
 
-
-
-
-
   - Implement preloading system for all game sound files
   - Add support for multiple audio formats (MP3/OGG) with fallbacks
   - Create audio file optimization and compression utilities
@@ -89,12 +60,6 @@
 
 - [x] 8. Implement audio settings and user controls
 
-
-
-
-
-
-
   - Add mute/unmute functionality with keyboard shortcut
   - Create persistent storage for audio preferences
   - Implement volume control system for different sound categories
@@ -103,6 +68,7 @@
   - _Requirements: 5.1, 5.2, 5.3_
 
 - [ ] 9. Add comprehensive error handling and fallbacks
+
   - Implement graceful degradation when Web Audio API is unavailable
   - Add error recovery for failed sound file loads
   - Create silent mode fallback for unsupported browsers
