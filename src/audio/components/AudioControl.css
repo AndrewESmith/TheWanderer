@@ -1,0 +1,55 @@
+.audio-control {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.audio-button {
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.audio-button:hover {
+    background: #444;
+    border-color: #666;
+}
+
+.audio-button:active {
+    background: #222;
+    transform: translateY(1px);
+}
+
+.mute-button.muted {
+    background: #662222;
+    border-color: #884444;
+}
+
+.mute-button.muted:hover {
+    background: #773333;
+    border-color: #995555;
+}
+
+.settings-button {
+    font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .audio-button {
+        padding: 6px 10px;
+        min-width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}

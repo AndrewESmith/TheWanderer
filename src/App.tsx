@@ -4,6 +4,11 @@ import type { MazeCell } from "./maze";
 import "./maze.css";
 import "./App.css";
 import { createGameState } from "./GameState";
+import { AudioProvider } from "./audio/context/audio-context";
+import { useSound } from "./audio/hooks/use-sound";
+import { getGameEndSoundManager } from "./audio/events/game-end-sound-manager";
+import { getSoundEventEmitter } from "./audio/events/sound-event-emitter";
+import { AudioControl } from "./audio/components/AudioControl";
 
 // Test-specific maze with a bomb right next to the player for testing
 const testBombMaze: MazeCell[][] = [
@@ -17,7 +22,9 @@ const testBombMaze: MazeCell[][] = [
   [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
 ];
 
-const App: React.FC = () => {
+const GameComponent: React.FC = () => {
+  const { playSound, stopAllSounds } = useSound();
+
   // Check URL parameters for test-specific maze
   const useTestMaze = React.useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -32,6 +39,25 @@ const App: React.FC = () => {
   );
 
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+
+  // Set up sound event callback and game end sound manager
+  React.useEffect(() => {
+    const soundEmitter = getSoundEventEmitter();
+    const gameEndManager = getGameEndSoundManager();
+
+    // Set up sound event callback
+    soundEmitter.setCallback((soundId, event) => {
+      playSound(soundId, { volume: event.volume });
+    });
+
+    // Set up game end sound manager callback
+    gameEndManager.setStopAllSoundsCallback(stopAllSounds);
+
+    return () => {
+      soundEmitter.setCallback(null);
+      gameEndManager.setStopAllSoundsCallback(null);
+    };
+  }, [playSound, stopAllSounds]);
 
   const movePlayer = React.useCallback(
     (dx: number, dy: number) => {
@@ -56,8 +82,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKey);
   }, [movePlayer, gameState.gameState]);
 
-  // Game over logic is now handled in the functional GameState
-
   // Render cell (reuse previous Cell component)
   const Cell: React.FC<{ type: MazeCell }> = ({ type }) => {
     return (
@@ -75,15 +99,28 @@ const App: React.FC = () => {
         )}
       </div>
       <div className="hud">
-        <span>Score: {gameState.score}</span>
-        <span>Diamonds left: {gameState.diamonds}</span>
-        <span>Moves: {gameState.moves}</span>
-        <span>
-          {gameState.gameState === 'dead' && 'Game Over'}
-          {gameState.gameState === 'won' && 'You Win!'}
-        </span>
+        <div className="hud-left">
+          <span>Score: {gameState.score}</span>
+          <span>Diamonds left: {gameState.diamonds}</span>
+          <span>Moves: {gameState.moves}</span>
+          <span>
+            {gameState.gameState === 'dead' && 'Game Over'}
+            {gameState.gameState === 'won' && 'You Win!'}
+          </span>
+        </div>
+        <div className="hud-right">
+          <AudioControl />
+        </div>
       </div>
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <AudioProvider>
+      <GameComponent />
+    </AudioProvider>
   );
 };
 

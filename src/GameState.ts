@@ -2,6 +2,10 @@ import type { IGameState } from "./Interfaces/IGameState";
 import { CELL, initialMaze, getPlayerPosition } from "./maze";
 import type { MazeCell } from "./maze";
 import type { IPlayerPos } from "./Interfaces/IPlayerPos";
+import { generatePlayerMoveEvents } from "./audio/events/sound-event-mapper";
+import { emitSoundEvents } from "./audio/events/sound-event-emitter";
+import { simulatePhysicsStep } from "./physics/physics-engine";
+import { handleGameEndSounds } from "./audio/events/game-end-sound-manager";
 
 // Game state type following TypeScript standards
 export interface GameStateData {
@@ -69,6 +73,10 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     return gameState;
   }
 
+  // Store previous state for sound event generation
+  const previousGameState = gameState.gameState;
+  const fromCell = gameState.maze[y]?.[x] ?? CELL.EMPTY;
+
   // Create new maze with player movement
   const newMaze = gameState.maze.map(row => [...row]);
   newMaze[y]![x] = CELL.EMPTY; // Clear old position
@@ -107,8 +115,44 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     newGameState = 'dead';
   }
 
+  // Generate and emit sound events for the move
+  const playerSoundEvents = generatePlayerMoveEvents(
+    fromCell,
+    targetCell,
+    newGameState,
+    previousGameState,
+    newDiamonds
+  );
+
+  // Simulate physics after player movement (boulder gravity, etc.)
+  const physicsResult = simulatePhysicsStep(newMaze);
+  const finalMaze = physicsResult.newMaze;
+  const physicsSoundEvents = physicsResult.soundEvents;
+
+  // Handle game end sounds separately to ensure movement sounds are stopped
+  if (newGameState !== 'playing' && previousGameState === 'playing') {
+    // Game just ended - handle end sounds with proper stopping of movement sounds
+    handleGameEndSounds(newGameState);
+
+    // Only emit non-game-state-change sounds for game end moves
+    const nonGameEndEvents = [...playerSoundEvents, ...physicsSoundEvents].filter(
+      event => event.type !== 'death' && event.type !== 'victory'
+    );
+
+    if (nonGameEndEvents.length > 0) {
+      emitSoundEvents(nonGameEndEvents);
+    }
+  } else {
+    // Normal gameplay - emit all sound events
+    const allSoundEvents = [...playerSoundEvents, ...physicsSoundEvents];
+
+    if (allSoundEvents.length > 0) {
+      emitSoundEvents(allSoundEvents);
+    }
+  }
+
   return {
-    maze: newMaze,
+    maze: finalMaze,
     player: { x: newX, y: newY },
     score: newScore,
     moves: newMoves,
