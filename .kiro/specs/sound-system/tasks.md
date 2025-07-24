@@ -84,6 +84,8 @@
 
 
 
+
+
   - Add sound hooks to App.tsx for global audio management
   - Connect keyboard event handlers to trigger appropriate sounds
   - Implement sound initialization during app startup

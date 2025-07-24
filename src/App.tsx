@@ -24,7 +24,7 @@ const testBombMaze: MazeCell[][] = [
 ];
 
 const GameComponent: React.FC = () => {
-  const { playSound, stopAllSounds } = useSound();
+  const { playSound, stopAllSounds, resetAudioSystem, hasPlaybackErrors, fallbackMode } = useSound();
 
   // Check URL parameters for test-specific maze
   const useTestMaze = React.useMemo(() => {
@@ -92,6 +92,15 @@ const GameComponent: React.FC = () => {
     );
   };
 
+  // Handle audio system reset
+  const handleAudioReset = React.useCallback(async () => {
+    try {
+      await resetAudioSystem();
+    } catch (error) {
+      console.error('Failed to reset audio system:', error);
+    }
+  }, [resetAudioSystem]);
+
   return (
     <div>
       <AudioErrorDisplay />
@@ -109,9 +118,32 @@ const GameComponent: React.FC = () => {
             {gameState.gameState === 'dead' && 'Game Over'}
             {gameState.gameState === 'won' && 'You Win!'}
           </span>
+          {fallbackMode && (
+            <span style={{ color: '#ffa500', fontSize: '0.8em' }}>
+              Audio: Fallback Mode
+            </span>
+          )}
         </div>
         <div className="hud-right">
           <AudioControl />
+          {hasPlaybackErrors && (
+            <button 
+              onClick={handleAudioReset}
+              style={{ 
+                marginLeft: '8px', 
+                padding: '4px 8px', 
+                fontSize: '0.8em',
+                backgroundColor: '#ff6b6b',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+              title="Reset audio system due to playback errors"
+            >
+              Reset Audio
+            </button>
+          )}
         </div>
       </div>
     </div>

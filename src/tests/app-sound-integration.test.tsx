@@ -86,14 +86,18 @@ vi.mock('../audio/hooks/use-audio-settings', () => ({
 
 // Mock the useSound hook
 let mockHasPlaybackErrors = false;
+let mockFallbackMode = false;
+const mockResetAudioSystem = vi.fn();
+
 vi.mock('../audio/hooks/use-sound', () => ({
     useSound: () => ({
         playSound: mockPlaySound,
         stopAllSounds: mockStopAllSounds,
         isLoading: false,
         error: null,
-        resetAudioSystem: vi.fn(),
-        hasPlaybackErrors: mockHasPlaybackErrors
+        resetAudioSystem: mockResetAudioSystem,
+        hasPlaybackErrors: mockHasPlaybackErrors,
+        fallbackMode: mockFallbackMode
     })
 }));
 
@@ -108,8 +112,10 @@ describe('App Sound Integration', () => {
         mockInitializeAudio.mockClear();
         mockSoundEventCallback.mockClear();
         mockSetMuted.mockClear();
+        mockResetAudioSystem.mockClear();
         mockIsMuted = false;
         mockHasPlaybackErrors = false;
+        mockFallbackMode = false;
         
         // Mock Web Audio API
         global.AudioContext = vi.fn(() => mockAudioContext) as any;
@@ -513,6 +519,56 @@ describe('App Sound Integration', () => {
             // Game should still be playable
             fireEvent.keyDown(window, { key: 'ArrowRight' });
 
+            expect(screen.getByText(/Score:/)).toBeInTheDocument();
+        });
+
+        it('should show fallback mode indicator when in fallback', async () => {
+            // Set fallback mode
+            mockFallbackMode = true;
+
+            render(<App />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Audio: Fallback Mode')).toBeInTheDocument();
+            });
+        });
+
+        it('should show reset audio button when there are playback errors', async () => {
+            // Set up playback errors
+            mockHasPlaybackErrors = true;
+            
+            render(<App />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Reset Audio')).toBeInTheDocument();
+            });
+
+            // Click reset button
+            const resetButton = screen.getByText('Reset Audio');
+            fireEvent.click(resetButton);
+
+            // Should attempt to reset audio system
+            await waitFor(() => {
+                expect(screen.getByText('Reset Audio')).toBeInTheDocument();
+            });
+        });
+
+        it('should handle audio reset errors gracefully', async () => {
+            // Set up playback errors and mock reset to fail
+            mockHasPlaybackErrors = true;
+            mockResetAudioSystem.mockRejectedValue(new Error('Reset failed'));
+
+            render(<App />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Reset Audio')).toBeInTheDocument();
+            });
+
+            // Click reset button
+            const resetButton = screen.getByText('Reset Audio');
+            fireEvent.click(resetButton);
+
+            // Should handle error gracefully (game continues to work)
             expect(screen.getByText(/Score:/)).toBeInTheDocument();
         });
     });
