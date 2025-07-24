@@ -207,7 +207,7 @@ export class WebAudioManager implements AudioManager {
 
         // Set up recovery on next user interaction
         const resumeAfterInterruption = () => {
-            if ((this.state.audioContext?.state as any) === 'interrupted') {
+            if (this.state.audioContext && (this.state.audioContext.state as any) === 'interrupted') {
                 this.state.audioContext.resume().catch(error => {
                     console.warn('Failed to resume after interruption:', error);
                 });
@@ -281,8 +281,9 @@ export class WebAudioManager implements AudioManager {
         // Enhanced resume handlers
         const resumeHandlers = {
             click: () => attemptResume('click'),
-            keydown: (event: KeyboardEvent) => {
-                if (!['Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'NumLock', 'ScrollLock'].includes(event.key)) {
+            keydown: (event: Event) => {
+                const keyboardEvent = event as KeyboardEvent;
+                if (!['Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'NumLock', 'ScrollLock'].includes(keyboardEvent.key)) {
                     attemptResume('keydown');
                 }
             },
@@ -324,7 +325,7 @@ export class WebAudioManager implements AudioManager {
                     'AUTOPLAY_POLICY_5S'
                 );
             }
-        }, 5000));
+        }, 5000) as unknown as number);
 
         // 15 second warning
         this.suspensionTimeouts.push(setTimeout(() => {
@@ -335,7 +336,7 @@ export class WebAudioManager implements AudioManager {
                     'AUTOPLAY_POLICY_15S'
                 );
             }
-        }, 15000));
+        }, 15000) as unknown as number);
     }
 
     /**
@@ -640,9 +641,11 @@ export class WebAudioManager implements AudioManager {
      * Get category volume for a specific sound
      */
     private getCategoryVolumeForSound(soundId: string): number {
-        const asset = SOUND_ASSETS[soundId];
-        if (asset && asset.category) {
-            return this.categoryVolumes.get(asset.category) ?? 1.0;
+        // Find which category this sound belongs to
+        for (const [categoryKey, category] of Object.entries(SOUND_CONFIG.categories)) {
+            if (category.sounds[soundId]) {
+                return this.categoryVolumes.get(categoryKey) ?? 1.0;
+            }
         }
         return 1.0;
     }
@@ -757,14 +760,20 @@ export class WebAudioManager implements AudioManager {
      * Subscribe to loading progress
      */
     onLoadingProgress(callback: (progress: LoadingProgress) => void): () => void {
-        return this.assetLoader.onLoadingProgress(callback);
+        return this.assetLoader.onProgress(callback);
     }
 
     /**
      * Get optimization report
      */
     getOptimizationReport(): any {
-        return this.optimizer.getOptimizationReport();
+        // Convert loaded sound buffers to the format expected by the optimizer
+        const audioFiles = Array.from(this.state.soundBuffers.entries()).map(([name, buffer]) => ({
+            name,
+            buffer
+        }));
+
+        return this.optimizer.getOptimizationReport(audioFiles);
     }
 
     /**
@@ -822,7 +831,7 @@ export class HTML5AudioManager implements AudioManager {
         loadedCount: 0,
         totalCount: 0,
         failedSounds: [],
-        currentSound: null
+        errors: new Map()
     };
 
     constructor() {
@@ -899,9 +908,11 @@ export class HTML5AudioManager implements AudioManager {
      * Get category volume for a specific sound
      */
     private getCategoryVolumeForSound(soundId: string): number {
-        const asset = SOUND_ASSETS[soundId];
-        if (asset && asset.category) {
-            return this.categoryVolumes.get(asset.category) ?? 1.0;
+        // Find which category this sound belongs to
+        for (const [categoryKey, category] of Object.entries(SOUND_CONFIG.categories)) {
+            if (category.sounds[soundId]) {
+                return this.categoryVolumes.get(categoryKey) ?? 1.0;
+            }
         }
         return 1.0;
     }
@@ -941,8 +952,6 @@ export class HTML5AudioManager implements AudioManager {
 
         const loadPromises = Object.entries(SOUND_ASSETS).map(async ([soundId, asset]) => {
             try {
-                this.loadingState.currentSound = soundId;
-
                 const audio = new Audio();
 
                 // Find a supported source
@@ -967,13 +976,13 @@ export class HTML5AudioManager implements AudioManager {
             } catch (error) {
                 console.warn(`Failed to preload ${soundId}:`, error);
                 this.loadingState.failedSounds.push(soundId);
+                this.loadingState.errors.set(soundId, error as Error);
             }
         });
 
         await Promise.allSettled(loadPromises);
 
         this.loadingState.isLoading = false;
-        this.loadingState.currentSound = null;
 
         console.log(`HTML5 Audio preloaded ${this.loadingState.loadedCount} sounds`);
     }
@@ -1171,7 +1180,7 @@ export class SilentAudioManager implements AudioManager {
             loadedCount: 0,
             totalCount: 0,
             failedSounds: [],
-            currentSound: null
+            errors: new Map()
         };
     }
 
