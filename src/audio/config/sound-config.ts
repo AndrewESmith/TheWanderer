@@ -69,7 +69,7 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     },
     DIAMOND_COLLECT: {
         id: 'diamond_collect',
-        src: ['sounds/environment/door-slam.mp3'], // Using existing file as placeholder
+        src: ['sounds/diamond/collect.mp3'], // replaced placeholder with collect.mp3
         volume: 0.7,
         loop: false,
         preload: true
