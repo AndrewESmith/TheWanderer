@@ -1,5 +1,6 @@
 // Vitest setup file
 import { expect, vi, beforeEach, afterEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 // Ensure we're using Vitest's globals
 global.expect = expect;
