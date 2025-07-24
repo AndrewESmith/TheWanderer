@@ -7,6 +7,9 @@ export interface UseSoundHook {
     stopAllSounds: () => void;
     isLoading: boolean;
     error: string | null;
+    fallbackMode: boolean;
+    resetAudioSystem: () => Promise<void>;
+    hasPlaybackErrors: boolean;
 }
 
 export interface UseAudioSettingsHook {

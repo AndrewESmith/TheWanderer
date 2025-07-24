@@ -9,6 +9,7 @@ import { useSound } from "./audio/hooks/use-sound";
 import { getGameEndSoundManager } from "./audio/events/game-end-sound-manager";
 import { getSoundEventEmitter } from "./audio/events/sound-event-emitter";
 import { AudioControl } from "./audio/components/AudioControl";
+import { AudioErrorDisplay } from "./audio/components/audio-error-display";
 
 // Test-specific maze with a bomb right next to the player for testing
 const testBombMaze: MazeCell[][] = [
@@ -93,6 +94,7 @@ const GameComponent: React.FC = () => {
 
   return (
     <div>
+      <AudioErrorDisplay />
       <div className="maze-grid">
         {gameState.maze.map((row: MazeCell[], y: number) =>
           row.map((cell: MazeCell, x: number) => <Cell key={`${y}-${x}`} type={cell} />)
