@@ -8,7 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/tests/vitest-setup.ts'],
-    include: ['src/tests/**/*.test.ts', 'src/tests/**/*.test.tsx'],
+    include: ['src/tests/**/*.test.ts', 'src/tests/**/*.test.tsx', 'src/audio/__tests__/**/*.test.ts', 'src/audio/__tests__/**/*.test.tsx'],
     exclude: ['**/node_modules/**', '**/dist/**'],
     deps: {
       optimizer: {
