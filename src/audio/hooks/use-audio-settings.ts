@@ -71,8 +71,12 @@ export function useAudioSettings(): UseAudioSettingsHook & {
     }, [audioManager, settings.isMuted]);
 
     const setMuted = useCallback((muted: boolean) => {
+        if (!audioManager) {
+            console.warn('Audio manager not initialized');
+            return;
+        }
         setSettings(prev => ({ ...prev, isMuted: muted }));
-    }, []);
+    }, [audioManager]);
 
     const toggleMute = useCallback(() => {
         setSettings(prev => ({ ...prev, isMuted: !prev.isMuted }));

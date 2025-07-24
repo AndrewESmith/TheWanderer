@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import { vi } from 'vitest';
 import { AudioProvider } from '../context/audio-context';
 import { AudioControl } from '../components/AudioControl';
 import { SOUND_CONFIG } from '../config/sound-config';
@@ -27,53 +28,53 @@ Object.defineProperty(window, 'localStorage', {
 
 // Mock Web Audio API
 const mockAudioContext = {
-    createGain: jest.fn(() => ({
-        connect: jest.fn(),
+    createGain: vi.fn(() => ({
+        connect: vi.fn(),
         gain: {
-            setValueAtTime: jest.fn()
+            setValueAtTime: vi.fn()
         }
     })),
-    createBufferSource: jest.fn(() => ({
-        connect: jest.fn(),
-        start: jest.fn(),
-        addEventListener: jest.fn(),
+    createBufferSource: vi.fn(() => ({
+        connect: vi.fn(),
+        start: vi.fn(),
+        addEventListener: vi.fn(),
         buffer: null,
         loop: false
     })),
     destination: {},
     currentTime: 0,
     state: 'running',
-    resume: jest.fn(() => Promise.resolve()),
-    close: jest.fn(() => Promise.resolve())
+    resume: vi.fn(() => Promise.resolve()),
+    close: vi.fn(() => Promise.resolve())
 };
 
 Object.defineProperty(window, 'AudioContext', {
-    value: jest.fn(() => mockAudioContext)
+    value: vi.fn(() => mockAudioContext)
 });
 
 // Mock asset loader
-jest.mock('../managers/asset-loader', () => ({
-    AssetLoader: jest.fn().mockImplementation(() => ({
-        loadAssets: jest.fn(() => Promise.resolve(new Map())),
-        onProgress: jest.fn(() => () => {}),
-        getLoadingState: jest.fn(() => ({
+vi.mock('../managers/asset-loader', () => ({
+    AssetLoader: vi.fn().mockImplementation(() => ({
+        loadAssets: vi.fn(() => Promise.resolve(new Map())),
+        onProgress: vi.fn(() => () => {}),
+        getLoadingState: vi.fn(() => ({
             isLoading: false,
             loadedCount: 0,
             totalCount: 0,
             failedSounds: [],
             errors: new Map()
         })),
-        cleanup: jest.fn()
+        cleanup: vi.fn()
     }))
 }));
 
 // Mock audio optimizer
-jest.mock('../utils/audio-optimization', () => ({
-    AudioOptimizer: jest.fn().mockImplementation(() => ({
-        analyzeAudioBuffer: jest.fn(() => ({ recommendations: [] })),
-        normalizeAudioBuffer: jest.fn((buffer) => buffer),
-        applyFadeInOut: jest.fn((buffer) => buffer),
-        getOptimizationReport: jest.fn(() => ({
+vi.mock('../utils/audio-optimization', () => ({
+    AudioOptimizer: vi.fn().mockImplementation(() => ({
+        analyzeAudioBuffer: vi.fn(() => ({ recommendations: [] })),
+        normalizeAudioBuffer: vi.fn((buffer) => buffer),
+        applyFadeInOut: vi.fn((buffer) => buffer),
+        getOptimizationReport: vi.fn(() => ({
             totalOriginalSize: 0,
             totalOptimizedSize: 0,
             overallCompressionRatio: 1,
@@ -86,7 +87,7 @@ jest.mock('../utils/audio-optimization', () => ({
 describe('Audio Settings Integration', () => {
     beforeEach(() => {
         mockLocalStorage.clear();
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     const renderWithProvider = (component: React.ReactElement) => {

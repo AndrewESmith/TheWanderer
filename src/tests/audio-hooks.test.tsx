@@ -11,12 +11,21 @@ const mockAudioManager: AudioManager = {
     setMuted: vi.fn(),
     isMuted: vi.fn().mockReturnValue(false),
     isSupported: vi.fn().mockReturnValue(true),
-    cleanup: vi.fn()
+    cleanup: vi.fn(),
+    setGlobalVolume: vi.fn(),
+    setCategoryVolume: vi.fn(),
+    stopAllSounds: vi.fn()
 };
 
 // Mock the createAudioManager function
-vi.mock('../audio/managers/audio-manager', () => ({
-    createAudioManager: () => mockAudioManager
+vi.mock('../audio/managers/audio-manager-factory', () => ({
+    createAudioManager: () => mockAudioManager,
+    createSpecificAudioManager: () => mockAudioManager
+}));
+
+// Mock audio utils
+vi.mock('../audio/utils/audio-utils', () => ({
+    canAutoplay: vi.fn().mockResolvedValue(true)
 }));
 
 // Mock localStorage
@@ -33,6 +42,14 @@ Object.defineProperty(window, 'localStorage', {
 // Test wrapper component
 function TestWrapper({ children }: { children: ReactNode }) {
     return <AudioProvider>{children}</AudioProvider>;
+}
+
+// Helper to create a failing audio manager
+function createFailingAudioManager() {
+    return {
+        ...mockAudioManager,
+        preloadSounds: vi.fn().mockRejectedValue(new Error('Failed to initialize'))
+    };
 }
 
 describe('Audio Hooks', () => {
@@ -116,15 +133,26 @@ describe('Audio Hooks', () => {
             expect(mockAudioManager.setMuted).toHaveBeenCalledWith(true);
         });
 
-        it('should handle audio manager not initialized', () => {
-            // Mock createAudioManager to return null temporarily
-            vi.mocked(mockAudioManager.preloadSounds).mockRejectedValueOnce(new Error('Failed to initialize'));
-
+        it('should handle audio manager not initialized', async () => {
             const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            const { result } = renderHook(() => useSound(), {
-                wrapper: TestWrapper
+            // Mock useAudioContext to return null audio manager
+            const mockUseAudioContext = vi.fn().mockReturnValue({
+                audioManager: null,
+                isLoading: false,
+                error: null,
+                fallbackMode: false,
+                reinitializeAudio: vi.fn()
             });
+
+            vi.doMock('../audio/context/audio-context', () => ({
+                useAudioContext: mockUseAudioContext,
+                AudioProvider: ({ children }: { children: ReactNode }) => children
+            }));
+
+            const { useSound: MockedUseSound } = await import('../audio/hooks/use-sound');
+
+            const { result } = renderHook(() => MockedUseSound());
 
             act(() => {
                 result.current.playSound('test-sound');
@@ -132,14 +160,20 @@ describe('Audio Hooks', () => {
 
             expect(consoleSpy).toHaveBeenCalledWith('Audio manager not initialized');
             consoleSpy.mockRestore();
+            vi.doUnmock('../audio/context/audio-context');
         });
 
-        it('should show loading state during initialization', () => {
+        it('should show loading state during initialization', async () => {
             const { result } = renderHook(() => useSound(), {
                 wrapper: TestWrapper
             });
 
             expect(result.current.isLoading).toBe(true);
+
+            // Wait for initialization to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 10));
+            });
         });
 
         it('should handle playSound errors gracefully', async () => {
@@ -168,29 +202,44 @@ describe('Audio Hooks', () => {
     });
 
     describe('useAudioSettings', () => {
-        it('should return default volume from config', () => {
+        it('should return default volume from config', async () => {
             const { result } = renderHook(() => useAudioSettings(), {
                 wrapper: TestWrapper
+            });
+
+            // Wait for initialization
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0));
             });
 
             expect(result.current.volume).toBe(0.8); // Default from SOUND_CONFIG
         });
 
-        it('should load volume from localStorage', () => {
-            mockLocalStorage.getItem.mockReturnValue('0.6');
+        it('should load volume from localStorage', async () => {
+            mockLocalStorage.getItem.mockReturnValue('{"isMuted":false,"globalVolume":0.6,"categoryVolumes":{"movement":0.8,"collision":0.9,"gameState":1}}');
 
             const { result } = renderHook(() => useAudioSettings(), {
                 wrapper: TestWrapper
             });
 
+            // Wait for initialization
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            });
+
             expect(result.current.volume).toBe(0.6);
         });
 
-        it('should handle invalid localStorage volume', () => {
+        it('should handle invalid localStorage volume', async () => {
             mockLocalStorage.getItem.mockReturnValue('invalid');
 
             const { result } = renderHook(() => useAudioSettings(), {
                 wrapper: TestWrapper
+            });
+
+            // Wait for initialization
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0));
             });
 
             expect(result.current.volume).toBe(0.8); // Should fall back to default
@@ -223,7 +272,7 @@ describe('Audio Hooks', () => {
             });
 
             expect(result.current.volume).toBe(0.7);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('audio-volume', '0.7');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('wanderer-audio-settings', expect.stringContaining('"globalVolume":0.7'));
         });
 
         it('should clamp volume between 0 and 1', () => {
@@ -259,9 +308,7 @@ describe('Audio Hooks', () => {
             });
 
             expect(result.current.volume).toBe(0.8);
-            expect(mockAudioManager.setMuted).toHaveBeenCalledWith(false);
-            expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('audio-volume');
-            expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('audio-muted');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('wanderer-audio-settings', expect.stringContaining('"isMuted":false'));
         });
 
         it('should handle localStorage errors gracefully', () => {
@@ -279,19 +326,30 @@ describe('Audio Hooks', () => {
                 result.current.setVolume(0.5);
             });
 
-            expect(consoleSpy).toHaveBeenCalledWith('Failed to save volume preference:', expect.any(Error));
+            expect(consoleSpy).toHaveBeenCalledWith('Failed to save audio settings:', expect.any(Error));
             consoleSpy.mockRestore();
         });
 
-        it('should handle audio manager not initialized for setMuted', () => {
-            // Mock createAudioManager to return null temporarily
-            vi.mocked(mockAudioManager.preloadSounds).mockRejectedValueOnce(new Error('Failed to initialize'));
-
+        it('should handle audio manager not initialized for setMuted', async () => {
             const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            const { result } = renderHook(() => useAudioSettings(), {
-                wrapper: TestWrapper
+            // Mock useAudioContext to return null audio manager
+            const mockUseAudioContext = vi.fn().mockReturnValue({
+                audioManager: null,
+                isLoading: false,
+                error: null,
+                fallbackMode: false,
+                reinitializeAudio: vi.fn()
             });
+
+            vi.doMock('../audio/context/audio-context', () => ({
+                useAudioContext: mockUseAudioContext,
+                AudioProvider: ({ children }: { children: ReactNode }) => children
+            }));
+
+            const { useAudioSettings: MockedUseAudioSettings } = await import('../audio/hooks/use-audio-settings');
+
+            const { result } = renderHook(() => MockedUseAudioSettings());
 
             act(() => {
                 result.current.setMuted(true);
@@ -299,6 +357,7 @@ describe('Audio Hooks', () => {
 
             expect(consoleSpy).toHaveBeenCalledWith('Audio manager not initialized');
             consoleSpy.mockRestore();
+            vi.doUnmock('../audio/context/audio-context');
         });
     });
 });

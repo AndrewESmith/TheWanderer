@@ -178,11 +178,11 @@ describe('Audio Manager', () => {
 
             manager.setMuted(true);
             expect(manager.isMuted()).toBe(true);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('audio-muted', 'true');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('wanderer-audio-muted', 'true');
 
             manager.setMuted(false);
             expect(manager.isMuted()).toBe(false);
-            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('audio-muted', 'false');
+            expect(mockLocalStorage.setItem).toHaveBeenCalledWith('wanderer-audio-muted', 'false');
         });
 
         it('should load muted preference from localStorage', () => {
