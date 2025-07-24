@@ -3,6 +3,71 @@ import type { PlaySoundOptions } from '../../Interfaces/ISoundEvent';
 import { SOUND_ASSETS, SOUND_CONFIG } from '../config/sound-config';
 import { AssetLoader, type LoadingState, type LoadingProgress } from './asset-loader';
 import { AudioOptimizer } from '../utils/audio-optimization';
+import { cleanup } from '@testing-library/react';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { cleanup } from '@testing-library/react';
+import { error } from 'console';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { url } from 'inspector';
+import { url } from 'inspector';
+import { url } from 'inspector';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { error } from 'console';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { buffer } from 'stream/consumers';
+import { error } from 'console';
+import { error } from 'console';
+import { url } from 'inspector';
+import { error } from 'console';
 
 /**
  * Web Audio API implementation of the AudioManager interface
@@ -793,6 +858,8 @@ export class WebAudioManager implements AudioManager {
             case 'ZERO_DURATION':
                 // Try to reload the buffer
                 this.reloadSoundBuffer(soundId);
+                break;   // Try to reload the buffer
+                this.reloadSoundBuffer(soundId);
                 break;
             case 'SOURCE_NODE_ERROR':
                 // Try HTML5 backup for this sound
@@ -1567,23 +1634,16 @@ try {
     }
 
     /**
-     * Determine if a playback error indicates a systemic problem
+     * Check if HTML5 backup is available for a sound
      */
-    private isSystemicPlaybackError(errorType: string): boolean {
-    const systemicErrors = [
-        'NO_CONTEXT',
-        'CONTEXT_CLOSED',
-        'SOURCE_CREATION_FAILED',
-        'GAIN_CREATION_FAILED',
-        'NODE_CONNECTION_FAILED'
-    ];
-    return systemicErrors.includes(errorType);
-}
-if (this.html5Backups.has(soundId)) {
-    console.debug(`Web Audio buffer not found for ${soundId}, will use HTML5 backup`);
-    // Return null here but set a flag to use HTML5 backup
-    this.useHTML5Backup = soundId;
-    return null;
+    private checkHTML5Backup(soundId: string): boolean {
+    if (this.html5Backups.has(soundId)) {
+        console.debug(`Web Audio buffer not found for ${soundId}, will use HTML5 backup`);
+        // Set a flag to use HTML5 backup
+        this.useHTML5Backup = soundId;
+        return true;
+    }
+    return false;
 }
 
 // Try to load the sound on-demand if it wasn't preloaded
