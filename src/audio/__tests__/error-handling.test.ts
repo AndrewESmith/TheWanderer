@@ -150,11 +150,32 @@ describe('Audio Error Handling and Fallbacks', () => {
 
             global.AudioContext = vi.fn(() => suspendedContext) as any;
 
+            // Spy on document.addEventListener to verify event listeners are added
+            const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
             const manager = new WebAudioManager();
 
-            // Simulate user interaction to resume context
-            const clickEvent = new Event('click');
-            document.dispatchEvent(clickEvent);
+            // Verify that event listeners were added
+            expect(addEventListenerSpy).toHaveBeenCalledWith(
+                'click',
+                expect.any(Function),
+                expect.any(Object)
+            );
+
+            // Get the click handler that was added
+            const clickHandler = addEventListenerSpy.mock.calls
+                .find(call => call[0] === 'click')?.[1] as EventListener;
+
+            expect(clickHandler).toBeDefined();
+
+            // Manually call the click handler to simulate the event
+            if (clickHandler) {
+                const clickEvent = new Event('click');
+                clickHandler(clickEvent);
+            }
+
+            // Wait for the async resume operation
+            await new Promise(resolve => setTimeout(resolve, 10));
 
             // Should attempt to resume the context
             expect(suspendedContext.resume).toHaveBeenCalled();

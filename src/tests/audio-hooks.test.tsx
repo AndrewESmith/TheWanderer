@@ -136,13 +136,23 @@ describe('Audio Hooks', () => {
         it('should handle audio manager not initialized', async () => {
             const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-            // Mock useAudioContext to return null audio manager
+            // Mock useAudioContext to return null audio manager with proper settings
             const mockUseAudioContext = vi.fn().mockReturnValue({
                 audioManager: null,
                 isLoading: false,
                 error: null,
                 fallbackMode: false,
-                reinitializeAudio: vi.fn()
+                reinitializeAudio: vi.fn(),
+                settings: {
+                    isMuted: false,
+                    globalVolume: 0.8,
+                    categoryVolumes: { movement: 0.8, collision: 0.9, gameState: 1 }
+                },
+                setMuted: vi.fn(),
+                setGlobalVolume: vi.fn(),
+                setCategoryVolume: vi.fn(),
+                toggleMute: vi.fn(),
+                resetToDefaults: vi.fn()
             });
 
             vi.doMock('../audio/context/audio-context', () => ({
@@ -153,6 +163,9 @@ describe('Audio Hooks', () => {
             const { useSound: MockedUseSound } = await import('../audio/hooks/use-sound');
 
             const { result } = renderHook(() => MockedUseSound());
+
+            // Test that isMuted defaults to false when audio manager is null
+            expect(result.current.isMuted).toBe(false);
 
             act(() => {
                 result.current.playSound('test-sound');
@@ -332,14 +345,25 @@ describe('Audio Hooks', () => {
 
         it('should handle audio manager not initialized for setMuted', async () => {
             const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const mockSetMuted = vi.fn();
 
-            // Mock useAudioContext to return null audio manager
+            // Mock useAudioContext to return null audio manager with proper settings
             const mockUseAudioContext = vi.fn().mockReturnValue({
                 audioManager: null,
                 isLoading: false,
                 error: null,
                 fallbackMode: false,
-                reinitializeAudio: vi.fn()
+                reinitializeAudio: vi.fn(),
+                settings: {
+                    isMuted: false,
+                    globalVolume: 0.8,
+                    categoryVolumes: { movement: 0.8, collision: 0.9, gameState: 1 }
+                },
+                setMuted: mockSetMuted,
+                setGlobalVolume: vi.fn(),
+                setCategoryVolume: vi.fn(),
+                toggleMute: vi.fn(),
+                resetToDefaults: vi.fn()
             });
 
             vi.doMock('../audio/context/audio-context', () => ({
@@ -355,7 +379,8 @@ describe('Audio Hooks', () => {
                 result.current.setMuted(true);
             });
 
-            expect(consoleSpy).toHaveBeenCalledWith('Audio manager not initialized');
+            // The setMuted function should be called even when audio manager is null
+            expect(mockSetMuted).toHaveBeenCalledWith(true);
             consoleSpy.mockRestore();
             vi.doUnmock('../audio/context/audio-context');
         });
