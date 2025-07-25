@@ -590,7 +590,14 @@ export class WebAudioManager implements AudioManager {
 
         const buffer = this.state.soundBuffers.get(soundId);
         if (!buffer) {
-            console.warn(`Sound buffer not found for ${soundId}`);
+            console.log(`Attempting on-demand load for ${soundId}`);
+            this.attemptOnDemandLoad(soundId, options);
+            return;
+        }
+
+        // Validate buffer before playback
+        if (!this.isValidBuffer(buffer)) {
+            console.warn(`Invalid buffer for ${soundId}`, soundId);
             return;
         }
 
@@ -635,6 +642,49 @@ export class WebAudioManager implements AudioManager {
         } catch (error) {
             this.handlePlayError(soundId, error as Error);
         }
+    }
+
+    /**
+     * Attempt to load a sound on-demand when it's not found in the buffer
+     */
+    private async attemptOnDemandLoad(soundId: string, options: PlaySoundOptions = {}): Promise<void> {
+        if (!this.state.audioContext) {
+            const error = new Error(`Cannot load sound ${soundId}: Audio context not available`);
+            this.emitErrorEvent('SOUND_LOAD_ERROR', error, soundId);
+            return;
+        }
+
+        const asset = SOUND_ASSETS[soundId];
+        if (!asset) {
+            const error = new Error(`Sound asset not found: ${soundId}`);
+            this.emitErrorEvent('SOUND_LOAD_ERROR', error, soundId);
+            return;
+        }
+
+        try {
+            const buffer = await this.assetLoader.loadAudioBuffer(soundId, asset, this.state.audioContext);
+            if (buffer) {
+                this.state.soundBuffers.set(soundId, buffer);
+                this.state.loadedSounds.add(soundId);
+                // Now try to play the sound again
+                this.playSound(soundId, options);
+            } else {
+                throw new Error(`Failed to load audio buffer for ${soundId}`);
+            }
+        } catch (error) {
+            this.emitErrorEvent('SOUND_LOAD_ERROR', error as Error, soundId);
+        }
+    }
+
+    /**
+     * Validate if an audio buffer is valid for playback
+     */
+    private isValidBuffer(buffer: AudioBuffer): boolean {
+        return buffer &&
+            buffer.length > 0 &&
+            buffer.numberOfChannels > 0 &&
+            buffer.sampleRate > 0 &&
+            buffer.duration > 0;
     }
 
     /**
