@@ -233,7 +233,9 @@ describe('Audio Manager', () => {
             // Mock that sound is loaded
             (manager as any).state.soundBuffers.set('test_sound', {
                 length: 1000,
-                sampleRate: 44100
+                sampleRate: 44100,
+                numberOfChannels: 2,
+                duration: 1.0
             });
 
             // Should not throw
@@ -246,7 +248,9 @@ describe('Audio Manager', () => {
             // Mock that sound is loaded
             (manager as any).state.soundBuffers.set('test_sound', {
                 length: 1000,
-                sampleRate: 44100
+                sampleRate: 44100,
+                numberOfChannels: 2,
+                duration: 1.0
             });
 
             const options: PlaySoundOptions = {
@@ -266,7 +270,9 @@ describe('Audio Manager', () => {
             // Mock that sound is loaded
             (manager as any).state.soundBuffers.set('test_sound', {
                 length: 1000,
-                sampleRate: 44100
+                sampleRate: 44100,
+                numberOfChannels: 2,
+                duration: 1.0
             });
 
             // Should not create audio source when muted
@@ -503,7 +509,9 @@ describe('Audio Manager', () => {
             // Mock that sound is loaded
             (manager as any).state.soundBuffers.set('test_sound', {
                 length: 1000,
-                sampleRate: 44100
+                sampleRate: 44100,
+                numberOfChannels: 2,
+                duration: 1.0
             });
 
             // Should not throw
