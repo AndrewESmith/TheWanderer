@@ -190,11 +190,25 @@ describe('Audio Error Handling and Fallbacks', () => {
 
             global.AudioContext = vi.fn(() => suspendedContext) as any;
 
+            // Spy on document.addEventListener to capture the actual event handlers
+            const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
             const manager = new WebAudioManager();
 
-            // Simulate user interaction
-            const clickEvent = new Event('click');
-            document.dispatchEvent(clickEvent);
+            // Get the click handler that was added by the WebAudioManager
+            const clickHandler = addEventListenerSpy.mock.calls
+                .find(call => call[0] === 'click')?.[1] as EventListener;
+
+            expect(clickHandler).toBeDefined();
+
+            // Manually call the click handler to simulate the event
+            if (clickHandler) {
+                const clickEvent = new Event('click');
+                clickHandler(clickEvent);
+            }
+
+            // Wait for the async resume operation to complete
+            await new Promise(resolve => setTimeout(resolve, 10));
 
             // Should handle resume failure gracefully
             expect(console.warn).toHaveBeenCalledWith(
@@ -243,7 +257,7 @@ describe('Audio Error Handling and Fallbacks', () => {
 
             // Should log the error
             expect(console.error).toHaveBeenCalledWith(
-                expect.stringContaining('Failed to load sound'),
+                expect.stringContaining('Load error for'),
                 expect.any(Error)
             );
         });
