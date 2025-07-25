@@ -18,11 +18,18 @@ export function useAudioSettings(): UseAudioSettingsHook & {
         resetToDefaults
     } = useAudioContext();
 
+    // Defensive programming: ensure settings is always defined
+    const safeSettings = settings || {
+        isMuted: false,
+        globalVolume: 0.8,
+        categoryVolumes: {}
+    };
+
     return {
-        isMuted: settings.isMuted,
-        volume: settings.globalVolume,
-        globalVolume: settings.globalVolume,
-        categoryVolumes: settings.categoryVolumes,
+        isMuted: safeSettings.isMuted,
+        volume: safeSettings.globalVolume,
+        globalVolume: safeSettings.globalVolume,
+        categoryVolumes: safeSettings.categoryVolumes,
         setMuted,
         setVolume: setGlobalVolume,
         setGlobalVolume,
