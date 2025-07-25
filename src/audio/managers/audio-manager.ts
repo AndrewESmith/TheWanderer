@@ -692,10 +692,10 @@ export class WebAudioManager implements AudioManager {
     }
 
     /**
-     * Check if Web Audio API is supported
+     * Check if Web Audio API is supported and initialized
      */
     isSupported(): boolean {
-        return !!(window.AudioContext || (window as any).webkitAudioContext);
+        return this.state.isInitialized && !this.errorHandling.fallbackMode;
     }
 
     /**

@@ -2,6 +2,13 @@ import React, { createContext, useContext, useEffect, useState, useCallback, Rea
 import type { AudioManager } from '../../Interfaces/IAudioManager';
 import { createAudioManager, createSpecificAudioManager } from '../managers/audio-manager-factory';
 import { canAutoplay } from '../utils/audio-utils';
+import { SOUND_CONFIG } from '../config/sound-config';
+
+interface AudioSettings {
+    isMuted: boolean;
+    globalVolume: number;
+    categoryVolumes: Record<string, number>;
+}
 
 interface AudioContextState {
     audioManager: AudioManager | null;
@@ -10,6 +17,7 @@ interface AudioContextState {
     error: string | null;
     fallbackMode: boolean;
     autoplayAllowed: boolean;
+    settings: AudioSettings;
 }
 
 interface AudioContextValue extends AudioContextState {
@@ -17,9 +25,55 @@ interface AudioContextValue extends AudioContextState {
     cleanup: () => void;
     reinitializeAudio: () => Promise<void>;
     switchToFallback: (type: 'html5' | 'silent') => Promise<void>;
+    setMuted: (muted: boolean) => void;
+    setGlobalVolume: (volume: number) => void;
+    setCategoryVolume: (category: string, volume: number) => void;
+    toggleMute: () => void;
+    resetToDefaults: () => void;
 }
 
 const AudioContext = createContext<AudioContextValue | null>(null);
+
+const DEFAULT_SETTINGS: AudioSettings = {
+    isMuted: false,
+    globalVolume: SOUND_CONFIG.globalVolume,
+    categoryVolumes: Object.fromEntries(
+        Object.entries(SOUND_CONFIG.categories).map(([key, category]) => [key, category.volume])
+    )
+};
+
+const STORAGE_KEY = 'wanderer-audio-settings';
+
+function loadAudioSettings(): AudioSettings {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            // Merge with defaults to handle new settings and ensure proper types
+            return {
+                ...DEFAULT_SETTINGS,
+                ...parsed,
+                isMuted: Boolean(parsed.isMuted),
+                globalVolume: Number(parsed.globalVolume) || DEFAULT_SETTINGS.globalVolume,
+                categoryVolumes: {
+                    ...DEFAULT_SETTINGS.categoryVolumes,
+                    ...parsed.categoryVolumes
+                }
+            };
+        }
+    } catch (error) {
+        console.warn('Failed to load audio settings:', error);
+    }
+    return DEFAULT_SETTINGS;
+}
+
+function saveAudioSettings(settings: AudioSettings): void {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch (error) {
+        console.warn('Failed to save audio settings:', error);
+    }
+}
 
 interface AudioProviderProps {
     children: ReactNode;
@@ -33,8 +87,21 @@ export function AudioProvider({ children, initialManagerType = 'auto' }: AudioPr
         isLoading: false,
         error: null,
         fallbackMode: false,
-        autoplayAllowed: false
+        autoplayAllowed: false,
+        settings: loadAudioSettings()
     });
+
+    // Save settings whenever they change
+    useEffect(() => {
+        saveAudioSettings(state.settings);
+    }, [state.settings]);
+
+    // Sync mute state with audio manager
+    useEffect(() => {
+        if (state.audioManager) {
+            state.audioManager.setMuted(state.settings.isMuted);
+        }
+    }, [state.audioManager, state.settings.isMuted]);
 
     // Check if autoplay is allowed
     useEffect(() => {
@@ -127,49 +194,41 @@ export function AudioProvider({ children, initialManagerType = 'auto' }: AudioPr
             }
             
             // Preload sounds with error handling
-            try {
-                await manager.preloadSounds();
-            } catch (preloadError) {
-                console.error('Error preloading sounds:', preloadError);
-                // Continue with the manager even if preloading fails
-            }
+            await manager.preloadSounds();
             
-            setState({
+            setState(prev => ({
+                ...prev,
                 audioManager: manager,
                 isInitialized: true,
                 isLoading: false,
                 error: null,
-                fallbackMode: !manager.isSupported(),
-                autoplayAllowed: state.autoplayAllowed
-            });
+                fallbackMode: !manager.isSupported()
+            }));
         } catch (error) {
             console.error('Failed to initialize audio:', error);
             
-            // Create silent manager as last resort
-            const silentManager = createSpecificAudioManager('silent');
-            
-            setState({
-                audioManager: silentManager,
-                isInitialized: true,
+            setState(prev => ({
+                ...prev,
+                audioManager: null,
+                isInitialized: false,
                 isLoading: false,
                 error: error instanceof Error ? error.message : 'Failed to initialize audio',
-                fallbackMode: true,
-                autoplayAllowed: false
-            });
+                fallbackMode: false
+            }));
         }
     }, [state.audioManager, state.isLoading, state.autoplayAllowed, initialManagerType]);
 
     const cleanup = useCallback(() => {
         if (state.audioManager) {
             state.audioManager.cleanup();
-            setState({
+            setState(prev => ({
+                ...prev,
                 audioManager: null,
                 isInitialized: false,
                 isLoading: false,
                 error: null,
-                fallbackMode: false,
-                autoplayAllowed: state.autoplayAllowed
-            });
+                fallbackMode: false
+            }));
         }
     }, [state.audioManager, state.autoplayAllowed]);
 
@@ -196,14 +255,15 @@ export function AudioProvider({ children, initialManagerType = 'auto' }: AudioPr
                 console.warn(`Error preloading sounds in ${type} fallback:`, preloadError);
             }
             
-            setState({
+            setState(prev => ({
+                ...prev,
                 audioManager: fallbackManager,
                 isInitialized: true,
                 isLoading: false,
                 error: null,
                 fallbackMode: true,
-                autoplayAllowed: type === 'silent' ? false : state.autoplayAllowed
-            });
+                autoplayAllowed: type === 'silent' ? false : prev.autoplayAllowed
+            }));
             
             console.log(`Switched to ${type} audio manager`);
         } catch (error) {
@@ -216,14 +276,15 @@ export function AudioProvider({ children, initialManagerType = 'auto' }: AudioPr
                 // Create silent manager directly as last resort
                 const silentManager = createSpecificAudioManager('silent');
                 
-                setState({
+                setState(prev => ({
+                    ...prev,
                     audioManager: silentManager,
                     isInitialized: true,
                     isLoading: false,
                     error: error instanceof Error ? error.message : `Failed to switch to ${type} fallback`,
                     fallbackMode: true,
                     autoplayAllowed: false
-                });
+                }));
             }
         }
     }, [state.audioManager, state.autoplayAllowed]);
@@ -238,12 +299,75 @@ export function AudioProvider({ children, initialManagerType = 'auto' }: AudioPr
         };
     }, []);
 
+    // Settings management functions
+    const setMuted = useCallback((muted: boolean) => {
+        setState(prev => ({
+            ...prev,
+            settings: { ...prev.settings, isMuted: muted }
+        }));
+    }, []);
+
+    const toggleMute = useCallback(() => {
+        setState(prev => ({
+            ...prev,
+            settings: { ...prev.settings, isMuted: !prev.settings.isMuted }
+        }));
+    }, []);
+
+    const setGlobalVolume = useCallback((volume: number) => {
+        const clampedVolume = Math.max(0, Math.min(1, volume));
+        setState(prev => ({
+            ...prev,
+            settings: { ...prev.settings, globalVolume: clampedVolume }
+        }));
+    }, []);
+
+    const setCategoryVolume = useCallback((category: string, volume: number) => {
+        const clampedVolume = Math.max(0, Math.min(1, volume));
+        setState(prev => ({
+            ...prev,
+            settings: {
+                ...prev.settings,
+                categoryVolumes: {
+                    ...prev.settings.categoryVolumes,
+                    [category]: clampedVolume
+                }
+            }
+        }));
+    }, []);
+
+    const resetToDefaults = useCallback(() => {
+        setState(prev => ({
+            ...prev,
+            settings: DEFAULT_SETTINGS
+        }));
+    }, []);
+
+    // Set up keyboard shortcut for mute toggle
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Ctrl/Cmd + M to toggle mute
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'm') {
+                event.preventDefault();
+                toggleMute();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [toggleMute]);
+
     const contextValue: AudioContextValue = {
         ...state,
         initializeAudio,
         cleanup,
         reinitializeAudio,
-        switchToFallback
+        switchToFallback,
+        setMuted,
+        setGlobalVolume,
+        setCategoryVolume,
+        toggleMute,
+        resetToDefaults
     };
 
     return (

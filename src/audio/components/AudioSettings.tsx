@@ -19,10 +19,6 @@ export function AudioSettings({ isOpen, onClose }: AudioSettingsProps): JSX.Elem
         resetToDefaults
     } = useAudioSettings();
 
-    if (!isOpen) {
-        return <></>;
-    }
-
     const handleGlobalVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const volume = parseFloat(event.target.value);
         setGlobalVolume(volume);
@@ -36,6 +32,10 @@ export function AudioSettings({ isOpen, onClose }: AudioSettingsProps): JSX.Elem
     const handleMuteToggle = () => {
         setMuted(!isMuted);
     };
+
+    if (!isOpen) {
+        return <></>;
+    }
 
     return (
         <div className="audio-settings-overlay" onClick={onClose}>
@@ -53,7 +53,7 @@ export function AudioSettings({ isOpen, onClose }: AudioSettingsProps): JSX.Elem
                         <label className="mute-toggle">
                             <input
                                 type="checkbox"
-                                checked={isMuted}
+                                checked={!!isMuted}
                                 onChange={handleMuteToggle}
                             />
                             <span className="toggle-slider"></span>

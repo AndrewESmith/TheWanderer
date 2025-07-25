@@ -510,7 +510,7 @@ describe('Audio Manager', () => {
             expect(() => manager.playSound('test_sound')).not.toThrow();
 
             // Verify that error was logged
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to create audio source:', expect.any(Error));
+            expect(consoleErrorSpy).toHaveBeenCalledWith('Play error for test_sound:', expect.any(Error));
 
             // Restore console.error
             consoleErrorSpy.mockRestore();

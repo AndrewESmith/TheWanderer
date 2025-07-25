@@ -15,8 +15,9 @@ const mockAudioManager: AudioManager = {
 };
 
 // Mock the createAudioManager function
-vi.mock('../audio/managers/audio-manager', () => ({
-    createAudioManager: () => mockAudioManager
+vi.mock('../audio/managers/audio-manager-factory', () => ({
+    createAudioManager: () => mockAudioManager,
+    createSpecificAudioManager: () => mockAudioManager
 }));
 
 // Test component that uses the audio context

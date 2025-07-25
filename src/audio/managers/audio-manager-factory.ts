@@ -1,26 +1,5 @@
 import type { AudioManager } from '../../Interfaces/IAudioManager';
-// Import the WebAudioManager class
-// Note: This is commented out because we're having issues with the WebAudioManager class
-// import { WebAudioManager } from './audio-manager';
-
-// Temporary placeholder for WebAudioManager
-class WebAudioManager implements AudioManager {
-    playSound() { }
-    async preloadSounds() { return Promise.resolve(); }
-    setMuted() { }
-    isMuted() { return false; }
-    isSupported() { return false; }
-    stopAllSounds() { }
-    cleanup() { }
-    getLoadingState() { return { status: 'idle', progress: 0, total: 0, loaded: 0 }; }
-    onLoadingProgress() { return () => { }; }
-    getOptimizationReport() { return {}; }
-    setGlobalVolume() { }
-    getGlobalVolume() { return 0; }
-    setCategoryVolume() { }
-    getCategoryVolume() { return 0; }
-    getAllCategoryVolumes() { return {}; }
-}
+import { WebAudioManager } from './audio-manager';
 import { HTML5AudioManager } from './html5-audio-manager';
 import { SilentAudioManager } from './silent-audio-manager';
 import { isWebAudioSupported, isHTML5AudioSupported } from '../utils/audio-utils';
@@ -34,7 +13,19 @@ export function createAudioManager(): AudioManager {
         // First try Web Audio API
         if (isWebAudioSupported()) {
             console.log('Using Web Audio API');
-            return new WebAudioManager();
+            try {
+                const manager = new WebAudioManager();
+                // Check if the manager initialized successfully
+                if (manager.isSupported()) {
+                    return manager;
+                } else {
+                    console.warn('WebAudioManager created but not supported, falling back');
+                    // Clean up the failed manager
+                    manager.cleanup();
+                }
+            } catch (webAudioError) {
+                console.error('Error creating WebAudioManager:', webAudioError);
+            }
         }
 
         // Fall back to HTML5 Audio

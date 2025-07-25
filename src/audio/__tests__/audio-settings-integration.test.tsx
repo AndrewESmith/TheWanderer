@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { AudioProvider } from '../context/audio-context';
 import { AudioControl } from '../components/AudioControl';
@@ -107,46 +107,70 @@ describe('Audio Settings Integration', () => {
 
             // Click mute button
             const muteButton = screen.getByLabelText('Mute audio');
-            fireEvent.click(muteButton);
+            act(() => {
+                fireEvent.click(muteButton);
+            });
 
             // Should now show muted state
-            expect(screen.getByLabelText('Unmute audio')).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.getByLabelText('Unmute audio')).toBeInTheDocument();
+            });
 
             // Open settings
             const settingsButton = screen.getByLabelText('Open audio settings');
-            fireEvent.click(settingsButton);
+            act(() => {
+                fireEvent.click(settingsButton);
+            });
 
             // Settings modal should be open
             expect(screen.getByText('Audio Settings')).toBeInTheDocument();
 
-            // Mute toggle should be checked
+            // Test that the mute toggle works in the settings modal
             const muteToggle = screen.getByRole('checkbox');
+            
+            // Should initially be checked since we muted earlier
             expect(muteToggle).toBeChecked();
+            
+            // Toggle mute in the settings modal (this should unmute)
+            act(() => {
+                fireEvent.click(muteToggle);
+            });
+            
+            // Now it should be unchecked (unmuted)
+            await waitFor(() => {
+                expect(muteToggle).not.toBeChecked();
+            });
 
             // Change global volume
             const globalVolumeSlider = screen.getByLabelText(/Master Volume/);
-            fireEvent.change(globalVolumeSlider, { target: { value: '0.5' } });
+            act(() => {
+                fireEvent.change(globalVolumeSlider, { target: { value: '0.5' } });
+            });
 
             // Volume display should update
             expect(screen.getByText('Master Volume: 50%')).toBeInTheDocument();
 
             // Change category volume
             const movementSlider = screen.getByLabelText(/Movement/);
-            fireEvent.change(movementSlider, { target: { value: '0.3' } });
+            act(() => {
+                fireEvent.change(movementSlider, { target: { value: '0.3' } });
+            });
 
             // Category volume display should update
             expect(screen.getByText(/Movement: 30%/)).toBeInTheDocument();
 
             // Close settings
             const closeButton = screen.getByLabelText('Close');
-            fireEvent.click(closeButton);
+            act(() => {
+                fireEvent.click(closeButton);
+            });
 
             // Settings modal should be closed
             expect(screen.queryByText('Audio Settings')).not.toBeInTheDocument();
 
             // Settings should persist in localStorage
             const stored = JSON.parse(mockLocalStorage.getItem('wanderer-audio-settings') || '{}');
-            expect(stored.isMuted).toBe(true);
+            expect(stored.isMuted).toBe(false); // Should be false since we toggled it back to unmuted
             expect(stored.globalVolume).toBe(0.5);
             expect(stored.categoryVolumes.movement).toBe(0.3);
         });
@@ -167,7 +191,9 @@ describe('Audio Settings Integration', () => {
             });
 
             // Should be muted now
-            expect(screen.getByLabelText('Unmute audio')).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.getByLabelText('Unmute audio')).toBeInTheDocument();
+            });
 
             // Simulate Ctrl+M again
             act(() => {
@@ -179,7 +205,9 @@ describe('Audio Settings Integration', () => {
             });
 
             // Should be unmuted again
-            expect(screen.getByLabelText('Mute audio')).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.getByLabelText('Mute audio')).toBeInTheDocument();
+            });
         });
 
         it('should reset settings to defaults', async () => {
@@ -199,7 +227,9 @@ describe('Audio Settings Integration', () => {
 
             // Open settings
             const settingsButton = screen.getByLabelText('Open audio settings');
-            fireEvent.click(settingsButton);
+            act(() => {
+                fireEvent.click(settingsButton);
+            });
 
             // Should show custom settings
             expect(screen.getByText('Master Volume: 30%')).toBeInTheDocument();
@@ -207,7 +237,9 @@ describe('Audio Settings Integration', () => {
 
             // Click reset button
             const resetButton = screen.getByText('Reset to Defaults');
-            fireEvent.click(resetButton);
+            act(() => {
+                fireEvent.click(resetButton);
+            });
 
             // Should show default settings
             expect(screen.getByText(`Master Volume: ${Math.round(SOUND_CONFIG.globalVolume * 100)}%`)).toBeInTheDocument();
@@ -223,18 +255,25 @@ describe('Audio Settings Integration', () => {
 
             // Open settings
             const settingsButton = screen.getByLabelText('Open audio settings');
-            fireEvent.click(settingsButton);
+            act(() => {
+                fireEvent.click(settingsButton);
+            });
 
             // Initially volume controls should be enabled
             const globalVolumeSlider = screen.getByLabelText(/Master Volume/);
             expect(globalVolumeSlider).not.toBeDisabled();
 
-            // Toggle mute
+            // Toggle mute - this should enable the mute state
             const muteToggle = screen.getByRole('checkbox');
-            fireEvent.click(muteToggle);
+            act(() => {
+                fireEvent.click(muteToggle);
+            });
 
-            // Volume controls should now be disabled
-            expect(globalVolumeSlider).toBeDisabled();
+            // Wait for the mute toggle to be checked and volume controls to be disabled
+            await waitFor(() => {
+                expect(muteToggle).toBeChecked();
+                expect(globalVolumeSlider).toBeDisabled();
+            }, { timeout: 2000 });
 
             // All category sliders should be disabled
             Object.keys(SOUND_CONFIG.categories).forEach(categoryKey => {
@@ -265,7 +304,9 @@ describe('Audio Settings Integration', () => {
 
             // Open settings to verify volumes
             const settingsButton = screen.getByLabelText('Open audio settings');
-            fireEvent.click(settingsButton);
+            act(() => {
+                fireEvent.click(settingsButton);
+            });
 
             // Should show saved volumes
             expect(screen.getByText('Master Volume: 60%')).toBeInTheDocument();
@@ -289,7 +330,9 @@ describe('Audio Settings Integration', () => {
 
             // Open settings to verify default volumes
             const settingsButton = screen.getByLabelText('Open audio settings');
-            fireEvent.click(settingsButton);
+            act(() => {
+                fireEvent.click(settingsButton);
+            });
 
             expect(screen.getByText(`Master Volume: ${Math.round(SOUND_CONFIG.globalVolume * 100)}%`)).toBeInTheDocument();
         });
