@@ -263,6 +263,12 @@ describe('Audio Error Handling and Fallbacks', () => {
         });
 
         it('should retry failed sound loads', async () => {
+            // Mock canPlayType to support mp3 format
+            mockAudio.canPlayType.mockImplementation((type: string) => {
+                if (type === 'audio/mpeg') return 'probably';
+                return '';
+            });
+
             // First call fails, second succeeds
             mockFetch
                 .mockRejectedValueOnce(new Error('Network error'))
@@ -279,7 +285,17 @@ describe('Audio Error Handling and Fallbacks', () => {
             });
 
             const manager = new WebAudioManager();
-            await manager.preloadSounds();
+
+            // Test the retry mechanism by directly calling the asset loader
+            const assetLoader = (manager as any).assetLoader;
+            const mockAsset = {
+                src: ['test-sound.mp3'],
+                preload: true,
+                category: 'test'
+            };
+
+            // This should trigger the retry logic
+            await assetLoader.loadAudioBuffer('TEST_SOUND', mockAsset, mockAudioContext);
 
             // Should have retried the failed request
             expect(mockFetch).toHaveBeenCalledTimes(2);
