@@ -1234,10 +1234,34 @@ export function createAudioManager(): AudioManager {
     // Check for HTML5 Audio support
     if (typeof Audio !== 'undefined') {
         console.warn('Web Audio API not supported, using HTML5 Audio fallback');
+
+        // Emit fallback event
+        const fallbackEvent = new CustomEvent('audioManagerFallback', {
+            detail: {
+                from: 'WebAudio',
+                to: 'HTML5Audio',
+                reason: 'WEB_AUDIO_API_NOT_SUPPORTED',
+                timestamp: Date.now()
+            }
+        });
+        window.dispatchEvent(fallbackEvent);
+
         return new HTML5AudioManager();
     }
 
     // No audio support available
     console.warn('No audio support detected, using silent mode');
+
+    // Emit fallback event for silent mode
+    const silentEvent = new CustomEvent('audioManagerFallback', {
+        detail: {
+            from: 'WebAudio',
+            to: 'Silent',
+            reason: 'NO_AUDIO_SUPPORT',
+            timestamp: Date.now()
+        }
+    });
+    window.dispatchEvent(silentEvent);
+
     return new SilentAudioManager();
 }
