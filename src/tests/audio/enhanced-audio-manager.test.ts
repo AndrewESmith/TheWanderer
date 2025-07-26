@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { WebAudioManager, HTML5AudioManager, createAudioManager } from '../../audio/managers/audio-manager';
-import { SOUND_ASSETS } from '../../audio/config/sound-config';
 
 // Mock Web Audio API
 const mockAudioContext = {

@@ -12,7 +12,13 @@ export class HTML5AudioManager implements AudioManager {
     private errorHandling: ErrorHandling;
     private audioElements: Map<string, HTMLAudioElement> = new Map();
     private activeAudio: Set<HTMLAudioElement> = new Set();
-    private loadingState: LoadingState = { status: 'idle', progress: 0, total: 0, loaded: 0 };
+    private loadingState: LoadingState = {
+        isLoading: false,
+        loadedCount: 0,
+        totalCount: 0,
+        failedSounds: [],
+        errors: new Map()
+    };
     private progressCallbacks: Array<(progress: LoadingProgress) => void> = [];
     private globalVolume: number = SOUND_CONFIG.globalVolume;
     private categoryVolumes: Map<string, number> = new Map();
@@ -250,16 +256,23 @@ export class HTML5AudioManager implements AudioManager {
         const soundsToLoad = Object.values(SOUND_ASSETS).filter(asset => asset.preload);
 
         if (soundsToLoad.length === 0) {
-            this.loadingState = { status: 'complete', progress: 1, total: 0, loaded: 0 };
+            this.loadingState = {
+                isLoading: false,
+                loadedCount: 0,
+                totalCount: 0,
+                failedSounds: [],
+                errors: new Map()
+            };
             this.notifyProgressCallbacks({ progress: 1, loaded: 0, total: 0 });
             return Promise.resolve();
         }
 
         this.loadingState = {
-            status: 'loading',
-            progress: 0,
-            total: soundsToLoad.length,
-            loaded: 0
+            isLoading: true,
+            loadedCount: 0,
+            totalCount: soundsToLoad.length,
+            failedSounds: [],
+            errors: new Map()
         };
 
         this.notifyProgressCallbacks({
@@ -286,10 +299,11 @@ export class HTML5AudioManager implements AudioManager {
 
                         const progress = loadedCount / soundsToLoad.length;
                         this.loadingState = {
-                            status: 'loading',
-                            progress,
-                            total: soundsToLoad.length,
-                            loaded: loadedCount
+                            isLoading: true,
+                            loadedCount: loadedCount,
+                            totalCount: soundsToLoad.length,
+                            failedSounds: this.loadingState.failedSounds,
+                            errors: this.loadingState.errors
                         };
 
                         this.notifyProgressCallbacks({
@@ -304,7 +318,10 @@ export class HTML5AudioManager implements AudioManager {
 
                     const onError = () => {
                         console.warn(`Failed to preload ${asset.id}`);
-                        this.errorHandling.onLoadError(asset.id, new Error(`Failed to preload ${asset.id}`));
+                        const error = new Error(`Failed to preload ${asset.id}`);
+                        this.loadingState.failedSounds.push(asset.id);
+                        this.loadingState.errors.set(asset.id, error);
+                        this.errorHandling.onLoadError(asset.id, error);
                         audio.removeEventListener('error', onError);
                         resolve();
                     };
@@ -320,6 +337,9 @@ export class HTML5AudioManager implements AudioManager {
                         setTimeout(() => {
                             if (!this.state.loadedSounds.has(asset.id)) {
                                 console.warn(`Timeout preloading ${asset.id}`);
+                                const error = new Error(`Timeout preloading ${asset.id}`);
+                                this.loadingState.failedSounds.push(asset.id);
+                                this.loadingState.errors.set(asset.id, error);
                                 audio.removeEventListener('canplaythrough', onLoaded);
                                 audio.removeEventListener('error', onError);
                                 resolve();
@@ -328,6 +348,8 @@ export class HTML5AudioManager implements AudioManager {
                     }
                 } catch (error) {
                     console.error(`Error preloading ${asset.id}:`, error);
+                    this.loadingState.failedSounds.push(asset.id);
+                    this.loadingState.errors.set(asset.id, error as Error);
                     this.errorHandling.onLoadError(asset.id, error as Error);
                     resolve();
                 }
@@ -337,10 +359,11 @@ export class HTML5AudioManager implements AudioManager {
         await Promise.all(loadPromises);
 
         this.loadingState = {
-            status: 'complete',
-            progress: 1,
-            total: soundsToLoad.length,
-            loaded: loadedCount
+            isLoading: false,
+            loadedCount: loadedCount,
+            totalCount: soundsToLoad.length,
+            failedSounds: this.loadingState.failedSounds,
+            errors: this.loadingState.errors
         };
 
         this.notifyProgressCallbacks({
@@ -439,7 +462,11 @@ export class HTML5AudioManager implements AudioManager {
             optimized: 0,
             skipped: 0,
             totalSavings: 0,
-            details: []
+            details: [],
+            globalRecommendations: [
+                'Consider using Web Audio API for better performance',
+                'HTML5 Audio has limited optimization capabilities'
+            ]
         };
     }
 
