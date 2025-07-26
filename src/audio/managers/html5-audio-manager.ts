@@ -426,6 +426,7 @@ export class HTML5AudioManager implements AudioManager {
 
         this.audioElements.forEach(audio => {
             try {
+                audio.pause();
                 audio.src = '';
                 audio.load();
             } catch (error) {
