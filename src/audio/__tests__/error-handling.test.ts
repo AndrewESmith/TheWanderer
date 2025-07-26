@@ -414,6 +414,9 @@ describe('Audio Error Handling and Fallbacks', () => {
         it('should attempt on-demand loading when buffer not found', () => {
             const manager = new WebAudioManager();
 
+            // Temporarily disable performance mode to enable logging
+            (manager as any).ENABLE_PERFORMANCE_MODE = false;
+
             // Try to play a sound that hasn't been loaded
             manager.playSound('NONEXISTENT_SOUND');
 

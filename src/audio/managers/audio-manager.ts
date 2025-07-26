@@ -615,8 +615,8 @@ export class WebAudioManager implements AudioManager {
             return;
         }
 
-        // Skip buffer validation in performance mode for speed
-        if (!this.ENABLE_PERFORMANCE_MODE && !this.isValidBuffer(buffer)) {
+        // Always validate buffers for critical errors, but only log in non-performance mode
+        if (!this.isValidBuffer(buffer, soundId)) {
             return;
         }
 
@@ -684,6 +684,11 @@ export class WebAudioManager implements AudioManager {
      * Attempt to load a sound on-demand when it's not found in the buffer
      */
     private async attemptOnDemandLoad(soundId: string, options: PlaySoundOptions = {}): Promise<void> {
+        // Only log in non-performance mode to avoid impacting performance tests
+        if (!this.ENABLE_PERFORMANCE_MODE) {
+            console.log(`Attempting on-demand load for sound: ${soundId}`);
+        }
+
         if (!this.state.audioContext) {
             const error = new Error(`Cannot load sound ${soundId}: Audio context not available`);
             this.emitErrorEvent('SOUND_LOAD_ERROR', error, soundId);
@@ -715,12 +720,19 @@ export class WebAudioManager implements AudioManager {
     /**
      * Validate if an audio buffer is valid for playback
      */
-    private isValidBuffer(buffer: AudioBuffer): boolean {
-        return buffer &&
+    private isValidBuffer(buffer: AudioBuffer, soundId?: string): boolean {
+        const isValid = buffer &&
             buffer.length > 0 &&
             buffer.numberOfChannels > 0 &&
             buffer.sampleRate > 0 &&
             buffer.duration > 0;
+
+        // Always log critical buffer validation errors, even in performance mode
+        if (!isValid) {
+            console.warn('Invalid buffer detected for sound:', soundId || 'unknown');
+        }
+
+        return isValid;
     }
 
     /**
