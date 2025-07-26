@@ -709,20 +709,36 @@ export class WebAudioManager implements AudioManager {
             return;
         }
 
-        const loadPromises = Object.entries(SOUND_ASSETS).map(async ([soundId, asset]) => {
-            try {
-                const buffer = await this.assetLoader.loadAudioBuffer(soundId, asset, this.state.audioContext!);
-                if (buffer) {
-                    this.state.soundBuffers.set(soundId, buffer);
+        if (this.errorHandling.fallbackMode) {
+            console.warn('Audio manager in fallback mode, skipping preload');
+            return;
+        }
+
+        try {
+            const buffers = await this.assetLoader.loadAssets(SOUND_ASSETS, this.state.audioContext);
+
+            // Apply optimization to loaded buffers
+            const optimizedBuffers = new Map<string, AudioBuffer>();
+            buffers.forEach((buffer, soundId) => {
+                try {
+                    // Apply basic optimization (normalization)
+                    const optimizedBuffer = this.optimizer.normalizeAudioBuffer(buffer);
+                    optimizedBuffers.set(soundId, optimizedBuffer);
+                    this.state.loadedSounds.add(soundId);
+                } catch (optimizationError) {
+                    console.warn(`Failed to optimize ${soundId}, using original buffer:`, optimizationError);
+                    optimizedBuffers.set(soundId, buffer);
                     this.state.loadedSounds.add(soundId);
                 }
-            } catch (error) {
-                this.handleLoadError(soundId, error as Error);
-            }
-        });
+            });
 
-        await Promise.allSettled(loadPromises);
-        console.log(`Preloaded ${this.state.loadedSounds.size} sounds`);
+            // Update our internal state with the optimized buffers
+            this.state.soundBuffers = optimizedBuffers;
+
+            console.log(`Preloaded ${this.state.loadedSounds.size} sounds`);
+        } catch (error) {
+            console.error('Error during preloading:', error);
+        }
     }
 
     /**
