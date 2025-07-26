@@ -3,6 +3,7 @@ import type { PlaySoundOptions } from '../../Interfaces/ISoundEvent';
 import { SOUND_ASSETS, SOUND_CONFIG } from '../config/sound-config';
 import { AssetLoader, type LoadingState, type LoadingProgress } from './asset-loader';
 import { AudioOptimizer } from '../utils/audio-optimization';
+import { HTML5AudioManager as SophisticatedHTML5AudioManager } from './html5-audio-manager';
 
 /**
  * Web Audio API implementation of the AudioManager interface
@@ -1312,7 +1313,7 @@ export function createAudioManager(): AudioManager {
         });
         window.dispatchEvent(fallbackEvent);
 
-        return new HTML5AudioManager();
+        return new SophisticatedHTML5AudioManager();
     }
 
     // No audio support available
