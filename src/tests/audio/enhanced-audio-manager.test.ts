@@ -225,7 +225,9 @@ describe('Enhanced Audio Manager', () => {
 
                 // Should have retried and eventually succeeded for all sounds
                 // First call fails, then all subsequent calls succeed
-                expect(mockFetch).toHaveBeenCalledTimes(10); // 9 sounds + 1 retry
+                // Note: With URL caching, duplicate URLs (VICTORY_SOUND and DOOR_SLAM) share requests
+                // So we expect 8 unique URLs + 1 retry = 9 total calls
+                expect(mockFetch).toHaveBeenCalledTimes(9); // 8 unique URLs + 1 retry
             });
 
             it('should handle decode errors', async () => {
@@ -252,7 +254,9 @@ describe('Enhanced Audio Manager', () => {
 
                 // Should have tried multiple URLs for assets with multiple sources
                 // First call fails, then all subsequent calls succeed
-                expect(mockFetch).toHaveBeenCalledTimes(10); // 9 sounds + 1 retry for first sound
+                // Note: With URL caching, duplicate URLs (VICTORY_SOUND and DOOR_SLAM) share requests
+                // So we expect 8 unique URLs + 1 retry = 9 total calls
+                expect(mockFetch).toHaveBeenCalledTimes(9); // 8 unique URLs + 1 retry for first sound
             });
         });
     });

@@ -31,6 +31,9 @@ export class AssetLoader {
     private progressCallbacks: Set<(progress: LoadingProgress) => void> = new Set();
     private options: AssetLoaderOptions;
 
+    // Cache for loaded audio buffers by URL to avoid duplicate fetches
+    private urlBufferCache = new Map<string, Promise<AudioBuffer>>();
+
     constructor(options: Partial<AssetLoaderOptions> = {}) {
         this.loadingState = {
             isLoading: false,
@@ -241,10 +244,21 @@ export class AssetLoader {
                     status: 'loading'
                 });
 
-                const buffer = await this.loadAudioFile(soundId, url, audioContext);
+                // Check if we already have a cached promise for this URL
+                let bufferPromise = this.urlBufferCache.get(url);
+                if (!bufferPromise) {
+                    // Create and cache the promise for this URL
+                    bufferPromise = this.loadAudioFile(soundId, url, audioContext);
+                    this.urlBufferCache.set(url, bufferPromise);
+                }
+
+                const buffer = await bufferPromise;
                 return buffer;
             } catch (error) {
                 console.warn(`Failed to load ${soundId} from ${url}:`, error);
+
+                // Remove failed promise from cache
+                this.urlBufferCache.delete(url);
 
                 // If this was the last source, record the error
                 if (i === sources.length - 1) {
@@ -271,6 +285,9 @@ export class AssetLoader {
         audioContext: AudioContext
     ): Promise<Map<string, AudioBuffer>> {
         const preloadAssets = Object.entries(assets).filter(([, asset]) => asset.preload);
+
+        // Clear URL cache at the start of a new loading session
+        this.urlBufferCache.clear();
 
         this.loadingState = {
             isLoading: true,
@@ -376,6 +393,7 @@ export class AssetLoader {
      */
     cleanup(): void {
         this.progressCallbacks.clear();
+        this.urlBufferCache.clear();
         this.loadingState = {
             isLoading: false,
             loadedCount: 0,
