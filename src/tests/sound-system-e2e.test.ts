@@ -62,7 +62,7 @@ class E2EMockAudioContext {
             onended: null as (() => void) | null,
             addEventListener: vi.fn((event: string, callback: () => void) => {
                 if (event === 'ended') {
-                    this.onended = callback;
+                    source.onended = callback;
                 }
             }),
             removeEventListener: vi.fn()
@@ -129,6 +129,10 @@ class E2EMockAudioContext {
 
     getGainNodes() {
         return this.gainNodes;
+    }
+
+    clearBufferSources() {
+        this.bufferSources = [];
     }
 
     simulateAudioContextSuspension() {
@@ -209,7 +213,9 @@ class E2EMockAudio {
 
 // Mock fetch with realistic network simulation
 const createE2EMockFetch = (networkDelay = 10, failureRate = 0) => {
-    return vi.fn((url: string) => {
+    return vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (Math.random() < failureRate) {
@@ -219,12 +225,12 @@ const createE2EMockFetch = (networkDelay = 10, failureRate = 0) => {
                         ok: false,
                         status: 404,
                         statusText: 'Not Found'
-                    });
+                    } as Response);
                 } else {
                     resolve({
                         ok: true,
                         arrayBuffer: () => Promise.resolve(new ArrayBuffer(1000))
-                    });
+                    } as Response);
                 }
             }, networkDelay);
         });
@@ -272,7 +278,16 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
             writable: true
         });
 
-        global.performance = performance;
+        global.performance = {
+            now: performance.now.bind(performance),
+            mark: vi.fn(),
+            measure: vi.fn(),
+            clearMarks: vi.fn(),
+            clearMeasures: vi.fn(),
+            getEntries: vi.fn(() => []),
+            getEntriesByName: vi.fn(() => []),
+            getEntriesByType: vi.fn(() => [])
+        } as any;
         E2EMockAudio.clearInstances();
     });
 
@@ -626,7 +641,7 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
             }
 
             // Clear any existing buffer sources to get accurate count
-            mockAudioContext.bufferSources = [];
+            mockAudioContext.clearBufferSources();
 
             // Play multiple sounds
             for (let i = 0; i < 10; i++) {

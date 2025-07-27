@@ -31,6 +31,19 @@ const createMockAudioManager = (): AudioManager => ({
   stopAllSounds: vi.fn(),
   setGlobalVolume: vi.fn(),
   setCategoryVolume: vi.fn(),
+  getLoadingState: vi
+    .fn()
+    .mockReturnValue({ loaded: 0, total: 0, isComplete: true }),
+  onLoadingProgress: vi.fn(),
+  getOptimizationReport: vi.fn().mockReturnValue({
+    totalSounds: 0,
+    loadedSounds: 0,
+    failedSounds: 0,
+    memoryUsage: 0,
+  }),
+  getGlobalVolume: vi.fn().mockReturnValue(0.8),
+  getCategoryVolume: vi.fn().mockReturnValue(0.8),
+  getAllCategoryVolumes: vi.fn().mockReturnValue({}),
 });
 
 // Mock the audio manager factory
@@ -69,7 +82,16 @@ describe("React Sound System Integration Tests", () => {
     mockLocalStorage.getItem.mockReturnValue(null);
 
     // Mock performance for timing tests
-    global.performance = performance;
+    global.performance = {
+      now: performance.now.bind(performance),
+      mark: vi.fn(),
+      measure: vi.fn(),
+      clearMarks: vi.fn(),
+      clearMeasures: vi.fn(),
+      getEntries: vi.fn(() => []),
+      getEntriesByName: vi.fn(() => []),
+      getEntriesByType: vi.fn(() => [])
+    } as any;
   });
 
   afterEach(() => {
