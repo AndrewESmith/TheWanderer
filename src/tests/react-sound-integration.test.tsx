@@ -767,7 +767,7 @@ describe("React Sound System Integration Tests", () => {
 
       it("should handle multiple component instances efficiently", async () => {
         // Clear any previous calls
-        mockAudioManager.preloadSounds.mockClear();
+        vi.clearAllMocks();
 
         const hooks = [];
 
