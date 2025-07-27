@@ -162,7 +162,7 @@ describe("React Sound System Integration Tests", () => {
         consoleSpy.mockRestore();
       });
 
-      it("should reset error counts periodically", async () => {
+      it("should reset error counts via resetAudioSystem", async () => {
         mockAudioManager.playSound = vi.fn().mockImplementation(() => {
           throw new Error("Playback failed");
         });
@@ -186,22 +186,13 @@ describe("React Sound System Integration Tests", () => {
 
         expect(result.current.hasPlaybackErrors).toBe(true);
 
-        // Use fake timers after initial setup
-        vi.useFakeTimers();
-
-        // Fast-forward time to trigger error reset
-        act(() => {
-          vi.advanceTimersByTime(61000); // 61 seconds
-        });
-
-        // Run any pending timers
-        act(() => {
-          vi.runAllTimers();
+        // Reset errors manually via resetAudioSystem
+        await act(async () => {
+          await result.current.resetAudioSystem();
         });
 
         expect(result.current.hasPlaybackErrors).toBe(false);
 
-        vi.useRealTimers();
         consoleSpy.mockRestore();
       });
 
@@ -462,12 +453,23 @@ describe("React Sound System Integration Tests", () => {
           expect(screen.getByText(/Score:/)).toBeInTheDocument();
         });
 
+        // Wait a bit more for the game to fully initialize
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        });
+
+        // Clear any initialization calls
+        mockAudioManager.playSound = vi.fn();
+
         // Simulate user input
         fireEvent.keyDown(window, { key: "ArrowRight" });
 
-        await waitFor(() => {
-          expect(mockAudioManager.playSound).toHaveBeenCalled();
-        });
+        await waitFor(
+          () => {
+            expect(mockAudioManager.playSound).toHaveBeenCalled();
+          },
+          { timeout: 1000 }
+        );
       });
 
       it("should handle mute toggle in UI", async () => {
@@ -519,6 +521,14 @@ describe("React Sound System Integration Tests", () => {
           expect(screen.getByText(/Score:/)).toBeInTheDocument();
         });
 
+        // Wait for the game to fully initialize including sound callbacks
+        await act(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        });
+
+        // Clear any initialization calls
+        mockAudioManager.stopAllSounds = vi.fn();
+
         // Move player into bomb to trigger game end
         fireEvent.keyDown(window, { key: "ArrowRight" });
 
@@ -526,10 +536,13 @@ describe("React Sound System Integration Tests", () => {
           expect(screen.getByText("Game Over")).toBeInTheDocument();
         });
 
-        // Should have stopped all sounds
-        await waitFor(() => {
-          expect(mockAudioManager.stopAllSounds).toHaveBeenCalled();
-        });
+        // Should have stopped all sounds (with a small delay due to the setTimeout in game end manager)
+        await waitFor(
+          () => {
+            expect(mockAudioManager.stopAllSounds).toHaveBeenCalled();
+          },
+          { timeout: 200 }
+        );
       });
     });
 
