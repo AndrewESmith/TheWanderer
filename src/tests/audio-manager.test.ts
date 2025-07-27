@@ -495,8 +495,20 @@ describe('Audio Manager', () => {
         it('should handle playback errors gracefully', () => {
             const manager = new WebAudioManager();
 
-            // Mock console.error to suppress error output during test
-            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+            // Disable performance mode to enable error logging
+            (manager as any).ENABLE_PERFORMANCE_MODE = false;
+
+            // Mock console.warn to capture the actual error message
+            const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
+
+            // Mock that sound is loaded with a valid buffer
+            const mockBuffer = {
+                length: 1000,
+                sampleRate: 44100,
+                numberOfChannels: 2,
+                duration: 1.0
+            };
+            (manager as any).state.soundBuffers.set('test_sound', mockBuffer);
 
             // Mock audio context to throw during source creation
             const mockContext = (manager as any).state.audioContext;
@@ -506,22 +518,14 @@ describe('Audio Manager', () => {
                 });
             }
 
-            // Mock that sound is loaded
-            (manager as any).state.soundBuffers.set('test_sound', {
-                length: 1000,
-                sampleRate: 44100,
-                numberOfChannels: 2,
-                duration: 1.0
-            });
-
             // Should not throw
             expect(() => manager.playSound('test_sound')).not.toThrow();
 
-            // Verify that error was logged
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Play error for test_sound:', expect.any(Error));
+            // Verify that error was logged by getSourceNodeFromPool
+            expect(consoleWarnSpy).toHaveBeenCalledWith('Failed to create buffer source node:', expect.any(Error));
 
-            // Restore console.error
-            consoleErrorSpy.mockRestore();
+            // Restore console.warn
+            consoleWarnSpy.mockRestore();
         });
     });
 });

@@ -423,12 +423,21 @@ describe('Comprehensive Sound System Test Suite', () => {
             });
 
             it('should have consistent sound IDs across configuration', () => {
-                Object.values(SOUND_IDS).forEach(soundId => {
-                    expect(SOUND_ASSETS[soundId]).toBeDefined();
+                // Check that every SOUND_IDS key has a corresponding SOUND_ASSETS entry
+                Object.keys(SOUND_IDS).forEach(soundKey => {
+                    expect(SOUND_ASSETS[soundKey]).toBeDefined();
                 });
 
+                // Check that every SOUND_ASSETS key has a corresponding SOUND_IDS entry
                 Object.keys(SOUND_ASSETS).forEach(assetKey => {
-                    expect(Object.values(SOUND_IDS)).toContain(assetKey);
+                    expect(SOUND_IDS[assetKey as keyof typeof SOUND_IDS]).toBeDefined();
+                });
+
+                // Check that the ID values in SOUND_ASSETS match the values in SOUND_IDS
+                Object.keys(SOUND_IDS).forEach(soundKey => {
+                    const soundIdValue = SOUND_IDS[soundKey as keyof typeof SOUND_IDS];
+                    const assetIdValue = SOUND_ASSETS[soundKey]?.id;
+                    expect(assetIdValue).toBe(soundIdValue);
                 });
             });
 
