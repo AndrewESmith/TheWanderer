@@ -5,14 +5,14 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     // Player movement sounds
     PLAYER_WALK: {
         id: 'player_walk',
-        src: ['sounds/player/walk.mp3'],
+        src: ['/sounds/player/walk.mp3'],
         volume: 0.6,
         loop: false,
         preload: true
     },
     PLAYER_DIG: {
         id: 'player_dig',
-        src: ['sounds/player/dig.mp3'],
+        src: ['/sounds/player/dig.mp3'],
         volume: 0.7,
         loop: false,
         preload: true
@@ -21,7 +21,7 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     // Boulder movement sounds
     BOULDER_MOVE: {
         id: 'boulder_move',
-        src: ['sounds/boulder/Whoosh.mp3'], // Note: capital W in filename
+        src: ['/sounds/boulder/Whoosh.mp3'], // Note: capital W in filename
         volume: 0.8,
         loop: false,
         preload: true
@@ -30,7 +30,7 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     // Arrow movement sounds
     ARROW_MOVE: {
         id: 'arrow_move',
-        src: ['sounds/arrow/twang.mp3'],
+        src: ['/sounds/arrow/twang.mp3'],
         volume: 0.7,
         loop: false,
         preload: true
@@ -39,7 +39,7 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     // Collision sounds
     COLLISION_THUD: {
         id: 'collision_thud',
-        src: ['sounds/arrow/thud.mp3'], // Using existing thud.mp3 from arrow folder
+        src: ['/sounds/arrow/thud.mp3'], // Using existing thud.mp3 from arrow folder
         volume: 0.8,
         loop: false,
         preload: true
@@ -48,28 +48,28 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     // Game state sounds
     DEATH_SOUND: {
         id: 'death_sound',
-        src: ['sounds/player/death.mp3'], // Using existing death.mp3
+        src: ['/sounds/player/death.mp3'], // Using existing death.mp3
         volume: 0.9,
         loop: false,
         preload: true
     },
     VICTORY_SOUND: {
         id: 'victory_sound',
-        src: ['sounds/environment/door-slam.mp3'], // Using existing file as placeholder
+        src: ['/sounds/environment/door-slam.mp3'], // Using existing file as placeholder
         volume: 0.8,
         loop: false,
         preload: true
     },
     DOOR_SLAM: {
         id: 'door_slam',
-        src: ['sounds/environment/door-slam.mp3'],
+        src: ['/sounds/environment/door-slam.mp3'],
         volume: 0.8,
         loop: false,
         preload: true
     },
     DIAMOND_COLLECT: {
         id: 'diamond_collect',
-        src: ['sounds/diamond/collect.mp3'], // replaced placeholder with collect.mp3
+        src: ['/sounds/diamond/collect.mp3'], // replaced placeholder with collect.mp3
         volume: 0.7,
         loop: false,
         preload: true

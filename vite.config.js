@@ -25,10 +25,16 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    // Configure MIME types for audio files
+    middlewareMode: false,
+    fs: {
+      // Allow serving files from one level up to the project root
+      allow: ['..']
+    }
   },
   // Handle static assets
   publicDir: 'public',
-  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.svg', '**/*.gif', '**/*.ico'],
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.svg', '**/*.gif', '**/*.ico', '**/*.mp3', '**/*.wav', '**/*.ogg'],
   // CSS configuration
   css: {
     // Enable CSS modules for files ending with .module.css

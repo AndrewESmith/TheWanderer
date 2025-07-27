@@ -163,9 +163,15 @@ export class AssetLoader {
                 reject(new Error(`Timeout loading ${url} after ${this.options.timeout}ms`));
             }, this.options.timeout);
 
+            console.log(`[AssetLoader] Attempting to load: ${url}`);
+            console.log(`[AssetLoader] Current location: ${window.location.href}`);
+            console.log(`[AssetLoader] Base URL: ${window.location.origin}`);
+
             fetch(url, { signal: controller.signal })
                 .then(response => {
                     clearTimeout(timeoutId);
+                    console.log(`[AssetLoader] Response for ${url}:`, response.status, response.statusText);
+                    console.log(`[AssetLoader] Response headers:`, Object.fromEntries(response.headers.entries()));
 
                     if (!response || !response.ok) {
                         throw new Error(`HTTP ${response?.status || 'Unknown'}: ${response?.statusText || 'Network error'}`);
@@ -184,6 +190,7 @@ export class AssetLoader {
                 })
                 .catch(async (error) => {
                     clearTimeout(timeoutId);
+                    console.error(`[AssetLoader] Error loading ${url}:`, error);
 
                     if (attempt < this.options.maxRetries) {
                         console.warn(`Retry ${attempt}/${this.options.maxRetries} for ${url}:`, error);

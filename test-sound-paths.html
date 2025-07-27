@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sound Path Test</title>
+  </head>
+  <body>
+    <h1>Sound Path Test</h1>
+    <div id="results"></div>
+
+    <script>
+      const soundPaths = [
+        "/sounds/player/walk.mp3",
+        "/sounds/player/dig.mp3",
+        "/sounds/boulder/Whoosh.mp3",
+        "/sounds/arrow/twang.mp3",
+        "/sounds/arrow/thud.mp3",
+        "/sounds/diamond/collect.mp3",
+        "/sounds/environment/door-slam.mp3",
+      ];
+
+      const results = document.getElementById("results");
+
+      async function testPath(path) {
+        try {
+          const response = await fetch(path);
+          const status = response.ok ? "OK" : `Error ${response.status}`;
+          const div = document.createElement("div");
+          div.innerHTML = `<strong>${path}</strong>: ${status}`;
+          div.style.color = response.ok ? "green" : "red";
+          results.appendChild(div);
+          return response.ok;
+        } catch (error) {
+          const div = document.createElement("div");
+          div.innerHTML = `<strong>${path}</strong>: ${error.message}`;
+          div.style.color = "red";
+          results.appendChild(div);
+          return false;
+        }
+      }
+
+      async function testAllPaths() {
+        results.innerHTML = "<p>Testing sound file paths...</p>";
+
+        for (const path of soundPaths) {
+          await testPath(path);
+        }
+
+        results.innerHTML += "<p>Test complete!</p>";
+      }
+
+      testAllPaths();
+    </script>
+  </body>
+</html>

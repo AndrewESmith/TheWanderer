@@ -13,24 +13,118 @@ import { AudioErrorDisplay } from "./audio/components/audio-error-display";
 
 // Test-specific maze with a bomb right next to the player for testing
 const testBombMaze: MazeCell[][] = [
-  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
-  [CELL.ROCK, CELL.PLAYER, CELL.BOMB, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.DIAMOND, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.ROCK, CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.ROCK, CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.EMPTY, CELL.DIAMOND, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.EMPTY, CELL.BOMB, CELL.EMPTY, CELL.ROCK],
-  [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
+  [
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.PLAYER,
+    CELL.BOMB,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.DIAMOND,
+    CELL.EMPTY,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.DIAMOND,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.EMPTY,
+    CELL.BOMB,
+    CELL.EMPTY,
+    CELL.ROCK,
+  ],
+  [
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+    CELL.ROCK,
+  ],
 ];
 
 const GameComponent: React.FC = () => {
-  const { playSound, stopAllSounds, resetAudioSystem, hasPlaybackErrors, fallbackMode } = useSound();
+  const {
+    playSound,
+    stopAllSounds,
+    resetAudioSystem,
+    hasPlaybackErrors,
+    fallbackMode,
+  } = useSound();
 
   // Check URL parameters for test-specific maze
   const useTestMaze = React.useMemo(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('testMaze') === 'bomb';
+      return urlParams.get("testMaze") === "bomb";
     }
     return false;
   }, []);
@@ -39,7 +133,7 @@ const GameComponent: React.FC = () => {
     createGameState(useTestMaze ? { maze: testBombMaze } : undefined)
   );
 
-  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
 
   // Set up sound event callback and game end sound manager
   React.useEffect(() => {
@@ -73,23 +167,19 @@ const GameComponent: React.FC = () => {
   // Handle keyboard input
   React.useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (gameState.gameState !== 'playing') return;
+      if (gameState.gameState !== "playing") return;
       if (["ArrowUp", "w", "W"].includes(e.key)) movePlayer(0, -1);
       if (["ArrowDown", "s", "S"].includes(e.key)) movePlayer(0, 1);
       if (["ArrowLeft", "a", "A"].includes(e.key)) movePlayer(-1, 0);
       if (["ArrowRight", "d", "D"].includes(e.key)) movePlayer(1, 0);
     };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
   }, [movePlayer, gameState.gameState]);
 
   // Render cell (reuse previous Cell component)
   const Cell: React.FC<{ type: MazeCell }> = ({ type }) => {
-    return (
-      <div className={`cell ${type}`}>
-        {ICONS[type]}
-      </div>
-    );
+    return <div className={`cell ${type}`}>{ICONS[type]}</div>;
   };
 
   // Handle audio system reset
@@ -97,7 +187,7 @@ const GameComponent: React.FC = () => {
     try {
       await resetAudioSystem();
     } catch (error) {
-      console.error('Failed to reset audio system:', error);
+      console.error("Failed to reset audio system:", error);
     }
   }, [resetAudioSystem]);
 
@@ -106,7 +196,9 @@ const GameComponent: React.FC = () => {
       <AudioErrorDisplay />
       <div className="maze-grid">
         {gameState.maze.map((row: MazeCell[], y: number) =>
-          row.map((cell: MazeCell, x: number) => <Cell key={`${y}-${x}`} type={cell} />)
+          row.map((cell: MazeCell, x: number) => (
+            <Cell key={`${y}-${x}`} type={cell} />
+          ))
         )}
       </div>
       <div className="hud">
@@ -115,11 +207,11 @@ const GameComponent: React.FC = () => {
           <span>Diamonds left: {gameState.diamonds}</span>
           <span>Moves: {gameState.moves}</span>
           <span>
-            {gameState.gameState === 'dead' && 'Game Over'}
-            {gameState.gameState === 'won' && 'You Win!'}
+            {gameState.gameState === "dead" && "Game Over"}
+            {gameState.gameState === "won" && "You Win!"}
           </span>
           {fallbackMode && (
-            <span style={{ color: '#ffa500', fontSize: '0.8em' }}>
+            <span style={{ color: "#ffa500", fontSize: "0.8em" }}>
               Audio: Fallback Mode
             </span>
           )}
@@ -127,17 +219,17 @@ const GameComponent: React.FC = () => {
         <div className="hud-right">
           <AudioControl />
           {hasPlaybackErrors && (
-            <button 
+            <button
               onClick={handleAudioReset}
-              style={{ 
-                marginLeft: '8px', 
-                padding: '4px 8px', 
-                fontSize: '0.8em',
-                backgroundColor: '#ff6b6b',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
+              style={{
+                marginLeft: "8px",
+                padding: "4px 8px",
+                fontSize: "0.8em",
+                backgroundColor: "#ff6b6b",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
               }}
               title="Reset audio system due to playback errors"
             >
