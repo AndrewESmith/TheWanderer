@@ -9,25 +9,25 @@
 - [x] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
 - [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
 
+## Presentation - Stop Coding and get presentation dafted
 
-## Version 2 - Add another dynamic
+- [ ] Use Chat, Onenote and prompt to build a presentation out line
+- [ ] Experimement with running game from git hub from a certain commit eg POC to show progress instead of using video.
+- [ ] Use gamma.app to create our presentation
+- [ ] invite family property team to review
+
+## Version 2
+
+- [ ] Deploy the game!
+  
+## Version 3 - Add another dynamic
 
 ~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
 
 - [ ] Boulders should be able to be pushed by player
 - [ ] Boulders should move and potentially kill the player.
 
-## Presentation - Stop Coding and get presentation dafted
-
-- [ ] Use Chat, Onenote and prompt to build a presentation out line
-- [ ] Use gamma.app to create our presentation
-- [ ] invite family property team aka Nick to review
-
 ## Road Map for future versions
-
-## Version 3
-
-- [ ] Deploy the game!
 
 ## Version 4
 
@@ -47,6 +47,7 @@
 ## Version 7
 
 - [ ] Introduce slopes (aka logs)
+- [ ] Zombies!
 
 ## Version 8 Bonus Stretch Goal
 
@@ -55,8 +56,8 @@
 
 ## Version 9 AI at run time?
 
-- [ ] can the game call AI to create a new level...? 
-- [ ] or Ask AI for hint? 
+- [ ] can the game call AI to create a new level...?
+- [ ] or Ask AI for hint?
 
 ## Done
 
