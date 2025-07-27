@@ -375,9 +375,8 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
     describe('Audio Manager Fallback Workflow', () => {
         it('should gracefully fallback from WebAudio to HTML5 to Silent', async () => {
             // Test WebAudio failure -> HTML5 fallback
-            global.AudioContext = vi.fn(() => {
-                throw new Error('WebAudio not supported');
-            }) as any;
+            // Completely remove WebAudio support
+            delete (global as any).AudioContext;
             delete (global as any).webkitAudioContext;
 
             let manager = createAudioManager();

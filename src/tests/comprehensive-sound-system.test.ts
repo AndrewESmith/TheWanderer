@@ -69,10 +69,10 @@ class ComprehensiveMockAudioContext {
         };
     }
 
-    decodeAudioData(arrayBuffer: ArrayBuffer) {
+    decodeAudioData = vi.fn((arrayBuffer: ArrayBuffer) => {
         const buffer = this.createBuffer(2, 44100, 44100);
         return Promise.resolve(buffer);
-    }
+    });
 
     resume() {
         this.state = 'running';
@@ -193,12 +193,13 @@ class ComprehensiveMockAudio {
 
 // Mock fetch for sound file loading
 const createMockFetch = (shouldFail = false, delay = 0) => {
-    return vi.fn((url: string) => {
+    return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
+                const url = typeof input === 'string' ? input : input.toString();
                 if (shouldFail) {
                     reject(new Error('Network error'));
-                } else if (typeof url === 'string' && url.includes('.ogg')) {
+                } else if (url.includes('.ogg')) {
                     resolve({
                         ok: false,
                         status: 404,
