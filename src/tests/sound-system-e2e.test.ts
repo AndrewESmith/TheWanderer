@@ -53,7 +53,10 @@ class E2EMockAudioContext {
             loop: false,
             playbackRate: { value: 1 },
             connect: vi.fn(),
-            start: vi.fn(),
+            start: vi.fn().mockImplementation(() => {
+                // Mark this source as started when start() is called
+                (source as any)._started = true;
+            }),
             stop: vi.fn(),
             disconnect: vi.fn(),
             onended: null as (() => void) | null,
@@ -121,7 +124,11 @@ class E2EMockAudioContext {
 
     // E2E test utilities
     getPlayedSounds() {
-        return this.bufferSources.filter(source => source.start.mock.calls.length > 0);
+        return this.bufferSources.filter(source => (source as any)._started === true);
+    }
+
+    getGainNodes() {
+        return this.gainNodes;
     }
 
     simulateAudioContextSuspension() {
@@ -604,11 +611,22 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
             const manager = new WebAudioManager();
             await manager.preloadSounds();
 
-            // Mock sounds as loaded
-            Object.keys(SOUND_ASSETS).forEach(soundId => {
-                const mockBuffer = mockAudioContext.createBuffer(2, 44100, 44100);
-                (manager as any).state.soundBuffers.set(soundId, mockBuffer);
-            });
+            // Ensure we have a valid sound buffer to work with
+            const mockBuffer = mockAudioContext.createBuffer(2, 44100, 44100);
+
+            // Mock the sound as loaded in the manager's internal state
+            // The WebAudioManager stores buffers in state.soundBuffers
+            if ((manager as any).state && (manager as any).state.soundBuffers) {
+                (manager as any).state.soundBuffers.set(SOUND_IDS.PLAYER_WALK, mockBuffer);
+            }
+
+            // Also ensure the sound is marked as loaded
+            if ((manager as any).state && (manager as any).state.loadedSounds) {
+                (manager as any).state.loadedSounds.add(SOUND_IDS.PLAYER_WALK);
+            }
+
+            // Clear any existing buffer sources to get accurate count
+            mockAudioContext.bufferSources = [];
 
             // Play multiple sounds
             for (let i = 0; i < 10; i++) {

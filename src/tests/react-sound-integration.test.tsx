@@ -35,10 +35,11 @@ const createMockAudioManager = (): AudioManager => ({
 
 // Mock the audio manager factory
 let mockAudioManager: AudioManager;
-vi.mock("../audio/managers/audio-manager-factory", () => ({
-  createAudioManager: () => mockAudioManager,
-  createSpecificAudioManager: () => mockAudioManager,
-}));
+const mockFactory = {
+  createAudioManager: vi.fn(() => mockAudioManager),
+  createSpecificAudioManager: vi.fn(() => mockAudioManager),
+};
+vi.mock("../audio/managers/audio-manager-factory", () => mockFactory);
 
 // Mock audio utils
 vi.mock("../audio/utils/audio-utils", () => ({
@@ -672,11 +673,12 @@ describe("React Sound System Integration Tests", () => {
 
       it("should recover from temporary errors", async () => {
         let shouldFail = true;
-        mockAudioManager.playSound = vi.fn().mockImplementation(() => {
+        const originalPlaySound = vi.fn().mockImplementation(() => {
           if (shouldFail) {
             throw new Error("Temporary failure");
           }
         });
+        mockAudioManager.playSound = originalPlaySound;
 
         const { result } = renderHook(() => useSound(), {
           wrapper: TestWrapper,
@@ -695,14 +697,18 @@ describe("React Sound System Integration Tests", () => {
 
         // Fix the error and reset
         shouldFail = false;
-        mockAudioManager.playSound = vi.fn();
 
-        act(() => {
-          result.current.resetAudioSystem();
-        });
+        // Create a new mock for after reset - this will be used by the new manager instance
+        const newPlaySoundMock = vi.fn();
+
+        // Update the mock manager that will be returned by the factory
+        mockAudioManager = {
+          ...createMockAudioManager(),
+          playSound: newPlaySoundMock,
+        };
 
         await act(async () => {
-          await new Promise((resolve) => setTimeout(resolve, 0));
+          await result.current.resetAudioSystem();
         });
 
         // Should work now
@@ -710,10 +716,7 @@ describe("React Sound System Integration Tests", () => {
           result.current.playSound("test-sound");
         });
 
-        expect(mockAudioManager.playSound).toHaveBeenCalledWith(
-          "test-sound",
-          undefined
-        );
+        expect(newPlaySoundMock).toHaveBeenCalledWith("test-sound", undefined);
       });
     });
 
