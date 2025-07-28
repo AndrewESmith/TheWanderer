@@ -275,6 +275,9 @@ describe('Audio Error Handling and Fallbacks', () => {
                 .mockRejectedValueOnce(new Error('Network error'))
                 .mockResolvedValueOnce({
                     ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    headers: new Map([['content-type', 'audio/mpeg']]),
                     arrayBuffer: () => Promise.resolve(new ArrayBuffer(1024))
                 });
 

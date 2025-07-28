@@ -198,12 +198,10 @@ export class AssetLoader {
                         // Wait before retry
                         await new Promise(resolve => setTimeout(resolve, this.options.retryDelay));
 
-                        try {
-                            const result = await this.loadAudioFile(soundId, url, audioContext, attempt + 1);
-                            resolve(result);
-                        } catch (retryError) {
-                            reject(retryError);
-                        }
+                        // Recursively call loadAudioFile and handle its promise
+                        this.loadAudioFile(soundId, url, audioContext, attempt + 1)
+                            .then(result => resolve(result))
+                            .catch(retryError => reject(retryError));
                     } else {
                         reject(error);
                     }
