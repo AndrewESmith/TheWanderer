@@ -98,6 +98,9 @@ describe('AssetLoader', () => {
         it('should successfully load audio buffer from first source', async () => {
             mockFetch.mockResolvedValueOnce({
                 ok: true,
+                status: 200,
+                statusText: 'OK',
+                headers: new Map([['content-type', 'audio/mpeg']]),
                 arrayBuffer: () => Promise.resolve(mockArrayBuffer)
             });
 
@@ -116,6 +119,9 @@ describe('AssetLoader', () => {
                 .mockRejectedValueOnce(new Error('Network error'))
                 .mockResolvedValueOnce({
                     ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    headers: new Map([['content-type', 'audio/ogg']]),
                     arrayBuffer: () => Promise.resolve(mockArrayBuffer)
                 });
 
@@ -166,7 +172,8 @@ describe('AssetLoader', () => {
             mockFetch.mockResolvedValueOnce({
                 ok: false,
                 status: 404,
-                statusText: 'Not Found'
+                statusText: 'Not Found',
+                headers: new Map([['content-type', 'text/html']])
             });
 
             await expect(
@@ -189,6 +196,9 @@ describe('AssetLoader', () => {
 
             mockFetch.mockResolvedValueOnce({
                 ok: true,
+                status: 200,
+                statusText: 'OK',
+                headers: new Map([['content-type', 'audio/mpeg']]),
                 arrayBuffer: () => Promise.resolve(mockArrayBuffer)
             });
             mockAudioContext.decodeAudioData.mockRejectedValueOnce(new Error('Invalid audio data'));
@@ -249,6 +259,9 @@ describe('AssetLoader', () => {
         it('should load all preload assets', async () => {
             mockFetch.mockResolvedValue({
                 ok: true,
+                status: 200,
+                statusText: 'OK',
+                headers: new Map([['content-type', 'audio/mpeg']]),
                 arrayBuffer: () => Promise.resolve(mockArrayBuffer)
             });
 
@@ -273,6 +286,9 @@ describe('AssetLoader', () => {
             mockFetch
                 .mockResolvedValueOnce({
                     ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    headers: new Map([['content-type', 'audio/mpeg']]),
                     arrayBuffer: () => Promise.resolve(mockArrayBuffer)
                 })
                 .mockRejectedValueOnce(new Error('Network error'));
@@ -306,6 +322,9 @@ describe('AssetLoader', () => {
 
             mockFetch.mockResolvedValueOnce({
                 ok: true,
+                status: 200,
+                statusText: 'OK',
+                headers: new Map([['content-type', 'audio/mpeg']]),
                 arrayBuffer: () => Promise.resolve(mockArrayBuffer)
             });
 
@@ -358,6 +377,9 @@ describe('AssetLoader', () => {
 
             mockFetch.mockResolvedValueOnce({
                 ok: true,
+                status: 200,
+                statusText: 'OK',
+                headers: new Map([['content-type', 'audio/mpeg']]),
                 arrayBuffer: () => Promise.resolve(mockArrayBuffer)
             });
 

@@ -81,6 +81,9 @@ describe('Enhanced Audio Manager', () => {
         // Setup default mocks
         mockFetch.mockResolvedValue({
             ok: true,
+            status: 200,
+            statusText: 'OK',
+            headers: new Map([['content-type', 'audio/mpeg']]),
             arrayBuffer: () => Promise.resolve(mockArrayBuffer)
         });
 
@@ -127,6 +130,8 @@ describe('Enhanced Audio Manager', () => {
                     return Promise.resolve({
                         ok: true,
                         status: 200,
+                        statusText: 'OK',
+                        headers: new Map([['content-type', 'audio/mpeg']]),
                         arrayBuffer: () => Promise.resolve(mockArrayBuffer)
                     });
                 });
