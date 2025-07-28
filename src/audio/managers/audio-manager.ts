@@ -293,6 +293,9 @@ export class WebAudioManager implements AudioManager {
 
                 // Emit success event
                 this.emitErrorEvent('AUDIO_CONTEXT_RESUMED', new Error('Context resumed'), source);
+
+                // Now that context is resumed, try to preload sounds if they haven't been loaded
+                this.preloadSoundsAfterResume();
             } catch (error) {
                 console.warn(`Failed to resume audio context from ${source}:`, error);
                 this.handleResumeFailure(error as Error, source);
@@ -596,11 +599,47 @@ export class WebAudioManager implements AudioManager {
     // Public AudioManager interface methods
 
     /**
+     * Preload sounds after audio context is resumed
+     */
+    private async preloadSoundsAfterResume(): Promise<void> {
+        if (!this.state.audioContext || this.state.audioContext.state !== 'running') {
+            return;
+        }
+
+        // Only preload if we haven't loaded sounds yet
+        if (this.state.soundBuffers.size === 0) {
+            try {
+                console.log('Preloading sounds after audio context resume...');
+                const buffers = await this.assetLoader.loadAssets(SOUND_ASSETS, this.state.audioContext);
+
+                // Store loaded buffers
+                buffers.forEach((buffer, soundId) => {
+                    this.state.soundBuffers.set(soundId, buffer);
+                    this.state.loadedSounds.add(soundId);
+                });
+
+                console.log(`Successfully preloaded ${buffers.size} sounds after resume`);
+            } catch (error) {
+                console.warn('Failed to preload sounds after resume:', error);
+            }
+        }
+    }
+
+    /**
      * Play a sound with the given options
      */
     playSound(soundId: string, options: PlaySoundOptions = {}): void {
         // Fast path checks for performance
         if (this.errorHandling.fallbackMode || !this.state.isInitialized || !this.state.audioContext || !this.gainNode) {
+            return;
+        }
+
+        // Check if audio context is suspended and try to resume
+        if (this.state.audioContext.state === 'suspended') {
+            console.warn('AudioContext is suspended, cannot play sound until user interaction');
+            this.emitErrorEvent('AUDIO_CONTEXT_SUSPENDED',
+                new Error('AudioContext suspended - user interaction required'),
+                soundId);
             return;
         }
 
@@ -681,6 +720,37 @@ export class WebAudioManager implements AudioManager {
     }
 
     /**
+     * Check if audio context is ready for playback
+     */
+    private isAudioContextReady(): boolean {
+        return this.state.audioContext !== null &&
+            this.state.audioContext.state === 'running' &&
+            this.gainNode !== null;
+    }
+
+    /**
+     * Manually resume audio context (for user gesture handling)
+     */
+    async resumeAudioContext(): Promise<void> {
+        if (!this.state.audioContext) {
+            throw new Error('Audio context not available');
+        }
+
+        if (this.state.audioContext.state === 'suspended') {
+            try {
+                await this.state.audioContext.resume();
+                console.log('Audio context resumed manually');
+
+                // Trigger preload after resume
+                await this.preloadSoundsAfterResume();
+            } catch (error) {
+                console.error('Failed to resume audio context manually:', error);
+                throw error;
+            }
+        }
+    }
+
+    /**
      * Attempt to load a sound on-demand when it's not found in the buffer
      */
     private async attemptOnDemandLoad(soundId: string, options: PlaySoundOptions = {}): Promise<void> {
@@ -695,6 +765,13 @@ export class WebAudioManager implements AudioManager {
             return;
         }
 
+        // Check if audio context is suspended
+        if (this.state.audioContext.state === 'suspended') {
+            const error = new Error(`Cannot load sound ${soundId}: Audio context suspended - user interaction required`);
+            this.emitErrorEvent('SOUND_LOAD_ERROR', error, soundId);
+            return;
+        }
+
         const asset = SOUND_ASSETS[soundId];
         if (!asset) {
             const error = new Error(`Sound asset not found: ${soundId}`);
@@ -705,10 +782,21 @@ export class WebAudioManager implements AudioManager {
         try {
             const buffer = await this.assetLoader.loadAudioBuffer(soundId, asset, this.state.audioContext);
             if (buffer) {
-                this.state.soundBuffers.set(soundId, buffer);
+                // Apply optimization to the loaded buffer
+                try {
+                    const optimizedBuffer = this.optimizer.normalizeAudioBuffer(buffer);
+                    this.state.soundBuffers.set(soundId, optimizedBuffer);
+                } catch (optimizationError) {
+                    console.warn(`Failed to optimize ${soundId}, using original buffer:`, optimizationError);
+                    this.state.soundBuffers.set(soundId, buffer);
+                }
+
                 this.state.loadedSounds.add(soundId);
-                // Now try to play the sound again
-                this.playSound(soundId, options);
+
+                // Now try to play the sound again if audio context is ready
+                if (this.isAudioContextReady()) {
+                    this.playSound(soundId, options);
+                }
             } else {
                 throw new Error(`Failed to load audio buffer for ${soundId}`);
             }
@@ -878,6 +966,12 @@ export class WebAudioManager implements AudioManager {
 
         if (this.errorHandling.fallbackMode) {
             console.warn('Audio manager in fallback mode, skipping preload');
+            return;
+        }
+
+        // If audio context is suspended, don't try to preload yet
+        if (this.state.audioContext.state === 'suspended') {
+            console.log('Audio context suspended, deferring sound preloading until user interaction');
             return;
         }
 

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sound Path Test</title>
   </head>
   <body>
@@ -14,41 +16,71 @@
         "/sounds/boulder/Whoosh.mp3",
         "/sounds/arrow/twang.mp3",
         "/sounds/arrow/thud.mp3",
-        "/sounds/diamond/collect.mp3",
         "/sounds/environment/door-slam.mp3",
+        "/sounds/diamond/collect.mp3",
       ];
 
       const results = document.getElementById("results");
 
-      async function testPath(path) {
-        try {
-          const response = await fetch(path);
-          const status = response.ok ? "OK" : `Error ${response.status}`;
-          const div = document.createElement("div");
-          div.innerHTML = `<strong>${path}</strong>: ${status}`;
-          div.style.color = response.ok ? "green" : "red";
-          results.appendChild(div);
-          return response.ok;
-        } catch (error) {
-          const div = document.createElement("div");
-          div.innerHTML = `<strong>${path}</strong>: ${error.message}`;
-          div.style.color = "red";
-          results.appendChild(div);
-          return false;
-        }
-      }
-
-      async function testAllPaths() {
-        results.innerHTML = "<p>Testing sound file paths...</p>";
+      async function testSoundPaths() {
+        results.innerHTML = "<h2>Testing sound file accessibility...</h2>";
 
         for (const path of soundPaths) {
-          await testPath(path);
+          try {
+            const response = await fetch(path);
+            const status = response.ok ? "✅" : "❌";
+            const statusText = response.ok
+              ? "OK"
+              : `${response.status} ${response.statusText}`;
+
+            results.innerHTML += `<p>${status} ${path} - ${statusText}</p>`;
+
+            if (response.ok) {
+              const contentType = response.headers.get("content-type");
+              const contentLength = response.headers.get("content-length");
+              results.innerHTML += `<p style="margin-left: 20px; color: #666;">Type: ${contentType}, Size: ${contentLength} bytes</p>`;
+            }
+          } catch (error) {
+            results.innerHTML += `<p>❌ ${path} - Network Error: ${error.message}</p>`;
+          }
         }
 
-        results.innerHTML += "<p>Test complete!</p>";
+        results.innerHTML += "<h2>Testing AudioContext creation...</h2>";
+
+        try {
+          const AudioContextClass =
+            window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) {
+            results.innerHTML += "<p>❌ Web Audio API not supported</p>";
+            return;
+          }
+
+          const audioContext = new AudioContextClass();
+          results.innerHTML += `<p>✅ AudioContext created - State: ${audioContext.state}</p>`;
+
+          if (audioContext.state === "suspended") {
+            results.innerHTML +=
+              "<p>⚠️ AudioContext is suspended - click anywhere to resume</p>";
+
+            document.addEventListener(
+              "click",
+              async () => {
+                try {
+                  await audioContext.resume();
+                  results.innerHTML += `<p>✅ AudioContext resumed - State: ${audioContext.state}</p>`;
+                } catch (error) {
+                  results.innerHTML += `<p>❌ Failed to resume AudioContext: ${error.message}</p>`;
+                }
+              },
+              { once: true }
+            );
+          }
+        } catch (error) {
+          results.innerHTML += `<p>❌ AudioContext creation failed: ${error.message}</p>`;
+        }
       }
 
-      testAllPaths();
+      testSoundPaths();
     </script>
   </body>
 </html>

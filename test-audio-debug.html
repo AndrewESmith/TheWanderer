@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audio Debug Test</title>
+  </head>
+  <body>
+    <h1>Audio Debug Test</h1>
+    <button id="testAudioContext">Test AudioContext Creation</button>
+    <button id="testSoundLoad">Test Sound Loading</button>
+    <button id="testUserGesture">Test User Gesture Resume</button>
+    <div id="output"></div>
+
+    <script>
+      const output = document.getElementById("output");
+
+      function log(message) {
+        console.log(message);
+        output.innerHTML += "<p>" + message + "</p>";
+      }
+
+      // Test 1: AudioContext creation
+      document
+        .getElementById("testAudioContext")
+        .addEventListener("click", () => {
+          log("Testing AudioContext creation...");
+
+          try {
+            const AudioContextClass =
+              window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+              log("❌ Web Audio API not supported");
+              return;
+            }
+
+            const audioContext = new AudioContextClass();
+            log("✅ AudioContext created successfully");
+            log("State: " + audioContext.state);
+
+            if (audioContext.state === "suspended") {
+              log("⚠️ AudioContext is suspended - user gesture required");
+
+              // Try to resume
+              audioContext
+                .resume()
+                .then(() => {
+                  log("✅ AudioContext resumed successfully");
+                })
+                .catch((error) => {
+                  log("❌ Failed to resume AudioContext: " + error.message);
+                });
+            }
+          } catch (error) {
+            log("❌ Error creating AudioContext: " + error.message);
+          }
+        });
+
+      // Test 2: Sound loading
+      document
+        .getElementById("testSoundLoad")
+        .addEventListener("click", async () => {
+          log("Testing sound loading...");
+
+          const testUrls = [
+            "/sounds/player/walk.mp3",
+            "/sounds/boulder/Whoosh.mp3",
+            "/sounds/diamond/collect.mp3",
+          ];
+
+          for (const url of testUrls) {
+            try {
+              log("Testing: " + url);
+              const response = await fetch(url);
+              if (response.ok) {
+                log("✅ " + url + " - HTTP " + response.status);
+                log("   Content-Type: " + response.headers.get("content-type"));
+                log(
+                  "   Content-Length: " + response.headers.get("content-length")
+                );
+              } else {
+                log(
+                  "❌ " +
+                    url +
+                    " - HTTP " +
+                    response.status +
+                    " " +
+                    response.statusText
+                );
+              }
+            } catch (error) {
+              log("❌ " + url + " - Network error: " + error.message);
+            }
+          }
+        });
+
+      // Test 3: User gesture resume
+      document
+        .getElementById("testUserGesture")
+        .addEventListener("click", async () => {
+          log("Testing user gesture audio resume...");
+
+          try {
+            const AudioContextClass =
+              window.AudioContext || window.webkitAudioContext;
+            const audioContext = new AudioContextClass();
+
+            log("Initial state: " + audioContext.state);
+
+            if (audioContext.state === "suspended") {
+              log("Attempting to resume with user gesture...");
+              await audioContext.resume();
+              log("✅ AudioContext resumed to state: " + audioContext.state);
+
+              // Test playing a simple sound
+              const buffer = audioContext.createBuffer(
+                1,
+                audioContext.sampleRate * 0.1,
+                audioContext.sampleRate
+              );
+              const source = audioContext.createBufferSource();
+              source.buffer = buffer;
+              source.connect(audioContext.destination);
+              source.start();
+
+              log("✅ Test sound played successfully");
+            } else {
+              log("✅ AudioContext already running");
+            }
+          } catch (error) {
+            log("❌ Error with user gesture resume: " + error.message);
+          }
+        });
+    </script>
+  </body>
+</html>

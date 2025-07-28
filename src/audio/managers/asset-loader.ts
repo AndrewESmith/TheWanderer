@@ -166,6 +166,7 @@ export class AssetLoader {
             console.log(`[AssetLoader] Attempting to load: ${url}`);
             console.log(`[AssetLoader] Current location: ${window.location.href}`);
             console.log(`[AssetLoader] Base URL: ${window.location.origin}`);
+            console.log(`[AssetLoader] Full URL: ${new URL(url, window.location.origin).href}`);
 
             fetch(url, { signal: controller.signal })
                 .then(response => {
