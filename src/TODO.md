@@ -7,8 +7,8 @@
 ~~- [ ] How might we use cursor rules?~~ Lets look at Agent Steering
 - [x] Setup Agent Steering documentation
 - [x] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
-- [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
-- [ ] Get playwright running for claude.
+- [x] Add sound see .\instructions\gamebehaviour.md for sound rules.
+- [x] Get playwright running for claude.
 - [ ] Can I keep the audio diagnostics and have them in settings?
 
 ## Presentation - Stop Coding and get presentation dafted
@@ -21,6 +21,12 @@
 ## Version 2
 
 - [ ] Deploy the game!
+
+## Version 3 - Improve sound
+
+- [ ] Arrow sound should only play if arrow moves (note there are no arrows!)
+- [ ] Add bomb sound
+- [ ] Stop active sound if player presses a key.
   
 ## Version 3 - Add another dynamic
 

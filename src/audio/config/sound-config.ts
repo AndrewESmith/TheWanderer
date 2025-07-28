@@ -55,7 +55,7 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
     },
     VICTORY_SOUND: {
         id: 'victory_sound',
-        src: ['/sounds/environment/door-slam.mp3'], // Using existing file as placeholder
+        src: ['/sounds/environment/victory.mp3'], // Using existing file as placeholder
         volume: 0.8,
         loop: false,
         preload: true
@@ -73,7 +73,14 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
         volume: 0.7,
         loop: false,
         preload: true
-    }
+    },
+    BOMB_SOUND: {
+        id: 'bomb_sound',
+        src: ['/sounds/environment/bomb.mp3'], // replaced placeholder with collect.mp3
+        volume: 0.7,
+        loop: false,
+        preload: true
+    }   
 };
 
 // Sound configuration organized by categories

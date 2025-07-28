@@ -87,7 +87,7 @@ export function useSound(): UseSoundHook {
             console.warn(`Skipping sound ${soundId} due to multiple playback errors`);
             return;
         }
-
+        soundId = soundId.toUpperCase();
         try {
             audioManager.playSound(soundId, options);
         } catch (err) {

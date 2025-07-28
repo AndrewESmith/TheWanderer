@@ -29,6 +29,7 @@ export function AudioDebug() {
   }, [audioManager]);
 
   const testSound = (soundId: string) => {
+    soundId = soundId.toUpperCase();
     console.log(`Testing sound: ${soundId}`);
     playSound(soundId, { volume: 0.5 });
   };
