@@ -218,6 +218,9 @@ describe('Enhanced Audio Manager', () => {
                     .mockRejectedValueOnce(new Error('Network error'))
                     .mockResolvedValue({
                         ok: true,
+                        status: 200,
+                        statusText: 'OK',
+                        headers: new Map([['content-type', 'audio/mpeg']]),
                         arrayBuffer: () => Promise.resolve(mockArrayBuffer)
                     });
 
@@ -226,7 +229,9 @@ describe('Enhanced Audio Manager', () => {
                 // Should have retried and eventually succeeded for all sounds
                 // First call fails, then all subsequent calls succeed
                 // Note: With URL caching, duplicate URLs (VICTORY_SOUND and DOOR_SLAM) share requests
-                // So we expect 8 unique URLs + 1 retry = 9 total calls
+                // The first call to walk.mp3 fails, then retries and succeeds
+                // All other sounds succeed on first try
+                // So we expect: 8 unique URLs + 1 retry for walk.mp3 = 9 total calls
                 expect(mockFetch).toHaveBeenCalledTimes(9); // 8 unique URLs + 1 retry
             });
 
