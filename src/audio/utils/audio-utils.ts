@@ -37,7 +37,6 @@ export function isWebAudioSupported(): boolean {
             return false;
         }
     } catch (e) {
-        console.warn('Web Audio API check failed:', e);
         return false;
     }
 }
@@ -69,7 +68,6 @@ export function isHTML5AudioSupported(): boolean {
             return false;
         }
     } catch (e) {
-        console.warn('HTML5 Audio check failed:', e);
         return false;
     }
 }
@@ -97,7 +95,7 @@ export function getSupportedAudioFormat(formats: string[]): string | null {
             }
         }
     } catch (e) {
-        console.warn('Error checking audio format support:', e);
+        // Format support check failed
     }
 
     return null;
@@ -137,7 +135,6 @@ export function createAudioContext(): AudioContext | null {
     try {
         const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
         if (!AudioContextClass) {
-            console.warn('AudioContext not supported');
             return null;
         }
 

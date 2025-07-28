@@ -1,10 +1,10 @@
-import React, {
+import {
   createContext,
   useContext,
   useEffect,
   useState,
   useCallback,
-  ReactNode,
+  type ReactNode,
 } from "react";
 import type { AudioManager } from "../../Interfaces/IAudioManager";
 import {
@@ -13,7 +13,6 @@ import {
 } from "../managers/audio-manager-factory";
 import { canAutoplay } from "../utils/audio-utils";
 import { SOUND_CONFIG } from "../config/sound-config";
-import { runSoundDiagnostics } from "../utils/sound-diagnostics";
 
 interface AudioSettings {
   isMuted: boolean;
@@ -127,11 +126,7 @@ export function AudioProvider({
       const allowed = await canAutoplay();
       setState((prev) => ({ ...prev, autoplayAllowed: allowed }));
 
-      if (!allowed) {
-        console.warn(
-          "Autoplay not allowed - user interaction will be required to play audio"
-        );
-      }
+      // Autoplay status is now tracked in state
     };
 
     checkAutoplay();
@@ -140,9 +135,7 @@ export function AudioProvider({
   // Listen for audio errors
   useEffect(() => {
     const handleAudioError = (event: CustomEvent) => {
-      const { type, error, details } = event.detail;
-
-      console.warn(`Audio error event: ${type}`, error, details);
+      const { type, error } = event.detail;
 
       // Update error state
       setState((prev) => ({
@@ -157,9 +150,7 @@ export function AudioProvider({
     };
 
     const handleAudioFallback = (event: CustomEvent) => {
-      const { from, to } = event.detail;
-
-      console.warn(`Audio fallback event: ${from} -> ${to}`);
+      const { to } = event.detail;
 
       // Switch to the appropriate fallback
       if (to === "HTML5Audio") {
@@ -206,15 +197,10 @@ export function AudioProvider({
 
       // Check if the manager is supported
       if (!manager.isSupported()) {
-        console.warn("Selected audio manager not supported, falling back");
-
         // Try HTML5 fallback
         manager = createSpecificAudioManager("html5");
 
         if (!manager.isSupported()) {
-          console.warn(
-            "HTML5 audio not supported, falling back to silent mode"
-          );
           manager = createSpecificAudioManager("silent");
 
           setState((prev) => ({
@@ -290,10 +276,7 @@ export function AudioProvider({
         try {
           await fallbackManager.preloadSounds();
         } catch (preloadError) {
-          console.warn(
-            `Error preloading sounds in ${type} fallback:`,
-            preloadError
-          );
+          // Preload errors are handled gracefully by the manager
         }
 
         setState((prev) => ({
@@ -306,7 +289,7 @@ export function AudioProvider({
           autoplayAllowed: type === "silent" ? false : prev.autoplayAllowed,
         }));
 
-        console.log(`Switched to ${type} audio manager`);
+        // Successfully switched to fallback manager
       } catch (error) {
         console.error(`Failed to switch to ${type} fallback:`, error);
 
@@ -337,10 +320,7 @@ export function AudioProvider({
 
   // Initialize audio on mount
   useEffect(() => {
-    // Run diagnostics first
-    runSoundDiagnostics().then(() => {
-      initializeAudio();
-    });
+    initializeAudio();
 
     // Cleanup on unmount
     return () => {

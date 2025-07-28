@@ -187,7 +187,7 @@ const GameComponent: React.FC = () => {
     try {
       await resetAudioSystem();
     } catch (error) {
-      console.error("Failed to reset audio system:", error);
+      // Audio reset errors are handled by the audio system
     }
   }, [resetAudioSystem]);
 
