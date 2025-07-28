@@ -204,16 +204,37 @@ const createMockFetch = (shouldFail = false, delay = 0) => {
                         ok: false,
                         status: 404,
                         statusText: 'Not Found',
-                        headers: new Map()
-                    } as Response);
+                        headers: new Map(),
+                        redirected: false,
+                        type: 'basic',
+                        url: url,
+                        clone: vi.fn(),
+                        body: null,
+                        bodyUsed: false,
+                        arrayBuffer: vi.fn(),
+                        blob: vi.fn(),
+                        formData: vi.fn(),
+                        json: vi.fn(),
+                        text: vi.fn()
+                    } as unknown as Response);
                 } else {
                     resolve({
                         ok: true,
                         status: 200,
                         statusText: 'OK',
                         headers: new Map([['content-type', 'audio/mpeg']]),
-                        arrayBuffer: () => Promise.resolve(new ArrayBuffer(1000))
-                    } as Response);
+                        redirected: false,
+                        type: 'basic',
+                        url: url,
+                        clone: vi.fn(),
+                        body: null,
+                        bodyUsed: false,
+                        arrayBuffer: () => Promise.resolve(new ArrayBuffer(1000)),
+                        blob: vi.fn(),
+                        formData: vi.fn(),
+                        json: vi.fn(),
+                        text: vi.fn()
+                    } as unknown as Response);
                 }
             }, delay);
         });
