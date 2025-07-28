@@ -205,6 +205,12 @@ const createPerformanceMockFetch = (responseTime = 10) => {
                 const responseDelay = performance.now() - start;
                 resolve({
                     ok: true,
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {
+                        entries: () => [['content-type', 'audio/mpeg']],
+                        get: (name: string) => name === 'content-type' ? 'audio/mpeg' : null
+                    },
                     arrayBuffer: () => {
                         const bufferStart = performance.now();
                         return new Promise(bufferResolve => {
