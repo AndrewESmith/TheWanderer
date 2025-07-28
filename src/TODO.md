@@ -9,7 +9,10 @@
 - [x] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
 - [x] Add sound see .\instructions\gamebehaviour.md for sound rules.
 - [x] Get playwright running for claude.
+- [ ] Fix unit tests
+- [ ] Fix typescript syntax errors
 - [ ] Can I keep the audio diagnostics and have them in settings?
+- [ ] Bump version, tag, create branch for sound.
 
 ## Presentation - Stop Coding and get presentation dafted
 
@@ -25,10 +28,10 @@
 ## Version 3 - Improve sound
 
 - [ ] Arrow sound should only play if arrow moves (note there are no arrows!)
-- [ ] Add bomb sound
+- [ ] Add bomb sound on collision
 - [ ] Stop active sound if player presses a key.
   
-## Version 3 - Add another dynamic
+## Version 4 - Add another dynamic
 
 ~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
 
@@ -37,32 +40,32 @@
 
 ## Road Map for future versions
 
-## Version 4
+## Version 5
 
 - [ ] Improve Graphics
 
-## Version 5
+## Version 6
 
 - [ ] Introduce Arrows
 
-## Version 6
+## Version 7
 
 - [ ] Create more maze levels
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze
 - [ ] Use password for player to jump to another level
 
-## Version 7
+## Version 8
 
 - [ ] Introduce slopes (aka logs)
 - [ ] Zombies!
 
-## Version 8 Bonus Stretch Goal
+## Version 9 Bonus Stretch Goal
 
 - [ ] Can AI create a maze can we ensure all diamonds reachable?
 - [ ] Add maze layout rules to .\instructions\maze.md
 
-## Version 9 AI at run time?
+## Version 10 AI at run time?
 
 - [ ] can the game call AI to create a new level...?
 - [ ] or Ask AI for hint?
