@@ -407,6 +407,7 @@ describe('Enhanced Audio Manager', () => {
         });
 
         it('should maintain existing playSound functionality', () => {
+            
             // Manually add a sound buffer to the manager's state since preloading might not have worked
             (manager as any).state.soundBuffers.set('player_walk', mockAudioBuffer);
 

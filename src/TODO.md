@@ -9,6 +9,7 @@
 - [x] After setting up Agent Steering can I get the agent to review the code to see if it meets criteria? If not will it suggest improvements?
 - [ ] Add sound see .\instructions\gamebehaviour.md for sound rules.
 - [ ] Get playwright running for claude.
+- [ ] Can I keep the audio diagnostics and have them in settings?
 
 ## Presentation - Stop Coding and get presentation dafted
 

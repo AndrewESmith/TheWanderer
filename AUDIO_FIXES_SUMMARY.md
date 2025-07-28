@@ -8,11 +8,13 @@
 ## Root Causes
 
 ### Issue 1: AudioContext Suspension
+
 - Modern browsers require user interaction before allowing audio playback (autoplay policy)
 - The audio system was trying to play sounds before the AudioContext was properly resumed
 - No clear user interface to handle the suspended state
 
 ### Issue 2: Sound Asset Loading
+
 - The audio system was attempting to load sounds while the AudioContext was suspended
 - Asset loading was failing because the context wasn't ready for audio operations
 - Missing proper error handling for suspended context during loading
@@ -66,6 +68,7 @@
 ## How the Fixes Work
 
 ### Startup Flow
+
 1. AudioContext is created but may be suspended due to browser policy
 2. If suspended, AudioInitialization component shows user prompt
 3. User clicks "Enable Audio" button, triggering `resumeAudioContext()`
@@ -73,6 +76,7 @@
 5. Audio system is now ready for normal operation
 
 ### Runtime Flow
+
 1. Game attempts to play sound via `playSound()`
 2. Method checks if AudioContext is ready (`isAudioContextReady()`)
 3. If suspended, emits appropriate error and skips playback
@@ -80,6 +84,7 @@
 5. On-demand loading handles missing sounds with proper context checks
 
 ### Error Recovery
+
 1. Audio errors are properly categorized and logged
 2. Suspended context errors don't spam the console
 3. User can manually reset audio system if needed
@@ -109,6 +114,7 @@ After implementing these fixes:
 ## Browser Compatibility
 
 These fixes work with:
+
 - Chrome/Chromium (primary target)
 - Firefox
 - Safari

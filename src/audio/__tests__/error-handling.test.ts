@@ -66,7 +66,7 @@ describe('Audio Error Handling and Fallbacks', () => {
 
         // Reset global mocks
         global.fetch = mockFetch;
-        global.localStorage = mockLocalStorage;
+        (global as any).localStorage = mockLocalStorage;
 
         // Mock window.Audio
         global.Audio = vi.fn(() => mockAudio) as any;
@@ -113,7 +113,7 @@ describe('Audio Error Handling and Fallbacks', () => {
             // Remove all audio support
             delete (global as any).AudioContext;
             delete (global as any).webkitAudioContext;
-            delete global.Audio;
+            delete (global as any).Audio;
 
             const manager = createAudioManager();
 
