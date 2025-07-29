@@ -30,7 +30,7 @@
 
 ## Version 3 - Improve sound
 
-- [ ] Arrow sound should only play if arrow moves (note there are no arrows!)
+- [x] Arrow sound should only play if arrow moves (note there are no arrows!)
 - [ ] Add bomb sound on collision
 - [x] Stop active sound if player presses a key.
   
@@ -38,37 +38,41 @@
 
 ~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
 
-- [ ] Boulders should be able to be pushed by player
-- [ ] Boulders should move and potentially kill the player.
+- [ ] Boulders should only move when player next to boulder. If player moves away from boulder and boulder moving down lands on player it kills the player 
 
-## Road Map for future versions
+## Version 5 - Maze levels
 
-## Version 5
-
-- [ ] Improve Graphics
+- [ ] Add support for multiple maze levels
+- [ ] Create 5 maze levels
 
 ## Version 6
 
-- [ ] Introduce Arrows
+- [ ] Improve Graphics
+
+## Road Map for future versions
 
 ## Version 7
 
-- [ ] Create more maze levels
+- [ ] Introduce Arrows
+
+## Version 8
+
+- [ ] Boulders should be able to be pushed by player
 - [ ] Assign a random password to each maze
 - [ ] Share password with player when exiting current maze
 - [ ] Use password for player to jump to another level
 
-## Version 8
+## Version 9
 
 - [ ] Introduce slopes (aka logs)
 - [ ] Zombies!
 
-## Version 9 Bonus Stretch Goal
+## Version 10 Bonus Stretch Goal
 
 - [ ] Can AI create a maze can we ensure all diamonds reachable?
 - [ ] Add maze layout rules to .\instructions\maze.md
 
-## Version 10 AI at run time?
+## Version 11 AI at run time?
 
 - [ ] can the game call AI to create a new level...?
 - [ ] or Ask AI for hint?
