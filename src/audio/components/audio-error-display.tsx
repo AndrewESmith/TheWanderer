@@ -15,6 +15,20 @@ export function AudioErrorDisplay({ showAlways = false }: AudioErrorDisplayProps
     const { resetAudioSystem, hasPlaybackErrors } = useSound();
     const [dismissed, setDismissed] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile device
+    useEffect(() => {
+        const checkMobile = () => {
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmallScreen = window.innerWidth <= 800;
+            setIsMobile(isTouch || isSmallScreen);
+        };
+        
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Reset dismissed state when errors change
     useEffect(() => {
@@ -74,7 +88,7 @@ export function AudioErrorDisplay({ showAlways = false }: AudioErrorDisplayProps
                 </div>
             )}
 
-            {!autoplayAllowed && !error && !fallbackMode && (
+            {!autoplayAllowed && !error && !fallbackMode && !isMobile && (
                 <div className="audio-autoplay">
                     <p style={{ fontWeight: 'bold', color: '#0288d1' }}>
                         Audio Interaction Required
