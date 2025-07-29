@@ -183,9 +183,11 @@ describe('Audio Error Handling and Fallbacks', () => {
 
             // Test async methods
             await expect(manager.preloadSounds()).resolves.toBeUndefined();
-
             // Test loading state
-            expect(manager.getLoadingState().status).toBe('complete');
+            const loadingState = manager.getLoadingState();
+            expect(loadingState.isLoading).toBe(false);
+            expect(loadingState.loadedCount).toBe(1);
+            expect(loadingState.totalCount).toBe(1);
 
             // Test volume methods
             expect(() => manager.setGlobalVolume(0.5)).not.toThrow();
@@ -205,9 +207,9 @@ describe('Audio Error Handling and Fallbacks', () => {
             manager.preloadSounds();
 
             expect(callback).toHaveBeenCalledWith(expect.objectContaining({
+                soundId: expect.any(String),
                 progress: expect.any(Number),
-                loaded: expect.any(Number),
-                total: expect.any(Number)
+                status: expect.stringMatching(/loading|loaded/)
             }));
 
             // Test unsubscribe

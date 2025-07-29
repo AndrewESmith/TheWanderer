@@ -8,7 +8,7 @@ import type { LoadingState, LoadingProgress } from './asset-loader';
  */
 export class SilentAudioManager implements AudioManager {
     private muted: boolean = false;
-    private loadingState: LoadingState = { status: 'idle', progress: 0, total: 0, loaded: 0 };
+    private loadingState: LoadingState = { isLoading: false, loadedCount: 0, totalCount: 0, failedSounds: [], errors: new Map() };
     private progressCallbacks: Array<(progress: LoadingProgress) => void> = [];
 
     constructor() {
@@ -27,12 +27,12 @@ export class SilentAudioManager implements AudioManager {
      */
     async preloadSounds(): Promise<void> {
         // Update loading state to simulate normal flow
-        this.loadingState = { status: 'loading', progress: 0, total: 1, loaded: 0 };
-        this.notifyProgressCallbacks({ progress: 0, loaded: 0, total: 1 });
+        this.loadingState = { isLoading: true, loadedCount: 0, totalCount: 1, failedSounds: [], errors: new Map() };
+        this.notifyProgressCallbacks({ soundId: 'silent', progress: 0, status: 'loading' });
 
         // Simulate immediate completion
-        this.loadingState = { status: 'complete', progress: 1, total: 1, loaded: 1 };
-        this.notifyProgressCallbacks({ progress: 1, loaded: 1, total: 1 });
+        this.loadingState = { isLoading: false, loadedCount: 1, totalCount: 1, failedSounds: [], errors: new Map() };
+        this.notifyProgressCallbacks({ soundId: 'silent', progress: 1, status: 'loaded' });
 
         return Promise.resolve();
     }

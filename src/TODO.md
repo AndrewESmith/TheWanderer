@@ -24,7 +24,6 @@
 
 ## Version 2
 
-- [ ] Clean up code with npx tsc --noEmit
 - [x] Deploy the game!
 - [x] Configure for Mobile
 - [x] Add icon

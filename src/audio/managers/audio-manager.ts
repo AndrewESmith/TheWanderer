@@ -86,7 +86,7 @@ export class WebAudioManager implements AudioManager {
     private initializeAudioContext(): void {
         try {
             // Check for Web Audio API support
-            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+            const AudioContextClass = (typeof window !== 'undefined' && window.AudioContext) || (typeof window !== 'undefined' && (window as any).webkitAudioContext);
 
             if (!AudioContextClass) {
                 this.handleAudioContextError(new Error('Web Audio API not supported'), 'UNSUPPORTED_API');
@@ -266,6 +266,12 @@ export class WebAudioManager implements AudioManager {
      * Emit error events for external error handling
      */
     private emitErrorEvent(type: string, error: Error, details?: string): void {
+        // Check if window exists (for test environments)
+        if (typeof window === 'undefined') {
+            console.warn('Cannot dispatch audio error event: window is not defined');
+            return;
+        }
+        
         const errorEvent = new CustomEvent('audioError', {
             detail: { type, error, details, timestamp: Date.now() }
         });
@@ -505,7 +511,9 @@ export class WebAudioManager implements AudioManager {
                 timestamp: Date.now()
             }
         });
-        window.dispatchEvent(fallbackEvent);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(fallbackEvent);
+        }
 
         console.log('Switched to HTML5 Audio fallback mode');
     }
@@ -527,7 +535,9 @@ export class WebAudioManager implements AudioManager {
                 timestamp: Date.now()
             }
         });
-        window.dispatchEvent(silentEvent);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(silentEvent);
+        }
 
         this.stopAllSounds();
         this.cleanup();
@@ -1265,7 +1275,7 @@ export class SilentAudioManager implements AudioManager {
  */
 export function createAudioManager(): AudioManager {
     // Check for Web Audio API support
-    if (window.AudioContext || (window as any).webkitAudioContext) {
+    if (typeof window !== 'undefined' && (window.AudioContext || (window as any).webkitAudioContext)) {
         return new WebAudioManager();
     }
 
@@ -1282,7 +1292,9 @@ export function createAudioManager(): AudioManager {
                 timestamp: Date.now()
             }
         });
-        window.dispatchEvent(fallbackEvent);
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(fallbackEvent);
+        }
 
         return new SophisticatedHTML5AudioManager();
     }
@@ -1299,7 +1311,9 @@ export function createAudioManager(): AudioManager {
             timestamp: Date.now()
         }
     });
-    window.dispatchEvent(silentEvent);
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(silentEvent);
+    }
 
     return new SilentAudioManager();
 }
