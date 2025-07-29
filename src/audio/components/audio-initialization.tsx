@@ -9,6 +9,20 @@ export function AudioInitialization({ children }: AudioInitializationProps) {
   const { audioManager, isInitialized, error } = useAudioContext();
   const [showAudioPrompt, setShowAudioPrompt] = useState(false);
   const [audioContextState, setAudioContextState] = useState<string>("unknown");
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth <= 800;
+      setIsMobile(isTouch || isSmallScreen);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Monitor audio context state
   useEffect(() => {
@@ -21,8 +35,8 @@ export function AudioInitialization({ children }: AudioInitializationProps) {
         const state = manager.state.audioContext.state;
         setAudioContextState(state);
 
-        // Show prompt if context is suspended
-        if (state === "suspended" && isInitialized) {
+        // Show prompt if context is suspended and not on mobile
+        if (state === "suspended" && isInitialized && !isMobile) {
           setShowAudioPrompt(true);
         } else if (state === "running") {
           setShowAudioPrompt(false);
@@ -36,7 +50,7 @@ export function AudioInitialization({ children }: AudioInitializationProps) {
     // Listen for audio context state changes
     const handleAudioError = (event: CustomEvent) => {
       const { type } = event.detail;
-      if (type === "AUDIO_CONTEXT_SUSPENDED") {
+      if (type === "AUDIO_CONTEXT_SUSPENDED" && !isMobile) {
         setShowAudioPrompt(true);
       } else if (type === "AUDIO_CONTEXT_RESUMED") {
         setShowAudioPrompt(false);
@@ -55,7 +69,7 @@ export function AudioInitialization({ children }: AudioInitializationProps) {
       );
       clearInterval(intervalId);
     };
-  }, [audioManager, isInitialized]);
+  }, [audioManager, isInitialized, isMobile]);
 
   const handleEnableAudio = async () => {
     if (!audioManager) return;
