@@ -137,6 +137,13 @@ const GameComponent: React.FC = () => {
 
   const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
 
+  const [showMobileControls, setShowMobileControls] = React.useState(false);
+  React.useEffect(() => {
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen = window.innerWidth <= 800;
+    setShowMobileControls(isTouch || isSmallScreen);
+  }, []);
+
   // Set up sound event callback and game end sound manager
   React.useEffect(() => {
     const soundEmitter = getSoundEventEmitter();
@@ -204,6 +211,16 @@ const GameComponent: React.FC = () => {
           ))
         )}
       </div>
+      {showMobileControls && (
+        <div className="mobile-controls">
+          <button className="mobile-btn up" onClick={() => movePlayer(0, -1)} aria-label="Up">▲</button>
+          <div>
+            <button className="mobile-btn left" onClick={() => movePlayer(-1, 0)} aria-label="Left">◀</button>
+            <button className="mobile-btn down" onClick={() => movePlayer(0, 1)} aria-label="Down">▼</button>
+            <button className="mobile-btn right" onClick={() => movePlayer(1, 0)} aria-label="Right">▶</button>
+          </div>
+        </div>
+      )}
       <div className="hud">
         <div className="hud-left">
           <span>Score: {gameState.score}</span>

@@ -69,3 +69,27 @@
     justify-content: center;
   }
 }
+
+.mobile-controls {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin: 16px 0;
+}
+.mobile-btn {
+  font-size: 2rem;
+  padding: 16px;
+  margin: 4px;
+  border-radius: 8px;
+  border: 1px solid #888;
+  background: #222;
+  color: #fff;
+  min-width: 56px;
+  min-height: 56px;
+  touch-action: manipulation;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  .mobile-controls {
+    display: flex;
+  }
+}
