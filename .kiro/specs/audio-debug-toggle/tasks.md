@@ -44,6 +44,10 @@
   - _Requirements: 1.2, 1.3, 3.2_
 
 - [ ] 6. Write comprehensive tests for debug panel toggle functionality
+
+
+
+
   - Create unit tests for AudioSettings interface extension and default values
   - Write tests for AudioContext debug panel state management functions
   - Add tests for useAudioSettings hook debug panel properties
