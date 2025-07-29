@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Favicon Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .output {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f0f0f0;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        margin: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Favicon Generator for Mobile</h1>
+    <p>Upload your favicon.ico to generate mobile-compatible versions:</p>
+
+    <input type="file" id="fileInput" accept=".ico,.png,.jpg,.jpeg" />
+    <button onclick="generateFavicons()">Generate All Favicons</button>
+
+    <div id="output"></div>
+
+    <script>
+      function generateFavicons() {
+        const file = document.getElementById("fileInput").files[0];
+        if (!file) {
+          alert("Please select a file first");
+          return;
+        }
+
+        const sizes = [
+          { name: "favicon-16x16.png", size: 16 },
+          { name: "favicon-32x32.png", size: 32 },
+          { name: "apple-touch-icon.png", size: 180 },
+          { name: "apple-touch-icon-152x152.png", size: 152 },
+          { name: "apple-touch-icon-144x144.png", size: 144 },
+          { name: "apple-touch-icon-120x120.png", size: 120 },
+          { name: "apple-touch-icon-114x114.png", size: 114 },
+          { name: "apple-touch-icon-76x76.png", size: 76 },
+          { name: "apple-touch-icon-72x72.png", size: 72 },
+          { name: "apple-touch-icon-60x60.png", size: 60 },
+          { name: "apple-touch-icon-57x57.png", size: 57 },
+        ];
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onload = function () {
+            const output = document.getElementById("output");
+            output.innerHTML = "<h3>Generated Favicons:</h3>";
+
+            sizes.forEach(({ name, size }) => {
+              const canvas = document.createElement("canvas");
+              canvas.width = size;
+              canvas.height = size;
+              const ctx = canvas.getContext("2d");
+
+              // Draw with white background
+              ctx.fillStyle = "white";
+              ctx.fillRect(0, 0, size, size);
+
+              // Draw the image
+              ctx.drawImage(img, 0, 0, size, size);
+
+              // Create download link
+              canvas.toBlob(function (blob) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = name;
+                link.textContent = `Download ${name}`;
+                link.style.display = "block";
+                link.style.margin = "5px 0";
+                output.appendChild(link);
+              });
+
+              output.appendChild(canvas);
+            });
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    </script>
+  </body>
+</html>
