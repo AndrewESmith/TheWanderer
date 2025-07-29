@@ -6,7 +6,7 @@ describe('Sound System Infrastructure', () => {
     describe('Sound Configuration', () => {
         it('should have all required sound assets defined', () => {
             expect(SOUND_ASSETS).toBeDefined();
-            expect(Object.keys(SOUND_ASSETS)).toHaveLength(9);
+            expect(Object.keys(SOUND_ASSETS)).toHaveLength(10);
 
             // Check that all expected sounds are present
             expect(SOUND_ASSETS.PLAYER_WALK).toBeDefined();
@@ -18,6 +18,7 @@ describe('Sound System Infrastructure', () => {
             expect(SOUND_ASSETS.VICTORY_SOUND).toBeDefined();
             expect(SOUND_ASSETS.DOOR_SLAM).toBeDefined();
             expect(SOUND_ASSETS.DIAMOND_COLLECT).toBeDefined();
+            expect(SOUND_ASSETS.BOMB_SOUND).toBeDefined();
         });
 
         it('should have proper sound asset structure', () => {

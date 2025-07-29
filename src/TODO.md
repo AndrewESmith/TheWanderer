@@ -13,6 +13,7 @@
 - [ ] Fix typescript syntax errors
 - [ ] Can I keep the audio diagnostics and have them in settings?
 - [ ] Bump version, tag, create branch for sound.
+- [ ] Fix mute audio toggle
 
 ## Presentation - Stop Coding and get presentation dafted
 

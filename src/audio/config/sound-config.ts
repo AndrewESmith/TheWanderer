@@ -80,7 +80,7 @@ export const SOUND_ASSETS: Record<string, SoundAsset> = {
         volume: 0.7,
         loop: false,
         preload: true
-    }   
+    }
 };
 
 // Sound configuration organized by categories
@@ -128,7 +128,8 @@ export const SOUND_IDS = {
     DEATH_SOUND: 'death_sound',
     VICTORY_SOUND: 'victory_sound',
     DOOR_SLAM: 'door_slam',
-    DIAMOND_COLLECT: 'diamond_collect'
+    DIAMOND_COLLECT: 'diamond_collect',
+    BOMB_SOUND: 'bomb_sound'
 } as const;
 
 export type SoundId = typeof SOUND_IDS[keyof typeof SOUND_IDS];
