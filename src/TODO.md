@@ -11,9 +11,9 @@
 - [x] Get playwright running for claude.
 - [x] Fix unit tests
 - [x] Fix typescript syntax errors
-- [ ] Can I keep the audio diagnostics and have them in settings?
-- [ ] Bump version, tag, create branch for sound.
-- [ ] Fix mute audio toggle
+- [x] Can I keep the audio diagnostics and have them in settings?
+- [x] Bump version, tag, create branch for sound.
+- [ ] Fix mute audio toggle and debug toggles
 
 ## Presentation - Stop Coding and get presentation dafted
 
