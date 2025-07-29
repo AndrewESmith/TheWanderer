@@ -19,16 +19,18 @@
 - [x] 3. Extend useAudioSettings hook with debug panel controls
 
 
-
-
-
   - Add showDebugPanel property to the hook's return interface
   - Add setShowDebugPanel function to the hook's return interface
   - Extract showDebugPanel from settings in the hook implementation
   - Extract setShowDebugPanel from context in the hook implementation
   - _Requirements: 1.1, 4.4_
 
-- [ ] 4. Add debug panel toggle to AudioSettings component
+- [x] 4. Add debug panel toggle to AudioSettings component
+
+
+
+
+
   - Create a new "Developer Options" setting group that only renders in development mode
   - Add checkbox input with toggle slider styling for "Show Audio Debug Panel"
   - Connect checkbox to showDebugPanel state and setShowDebugPanel handler

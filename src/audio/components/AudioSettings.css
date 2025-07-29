@@ -89,15 +89,17 @@
     color: #888;
 }
 
-/* Mute Toggle Switch */
-.mute-toggle {
+/* Toggle Switch Styles (shared by mute and debug toggles) */
+.mute-toggle,
+.debug-toggle {
     display: flex;
     align-items: center;
     cursor: pointer;
     user-select: none;
 }
 
-.mute-toggle input[type="checkbox"] {
+.mute-toggle input[type="checkbox"],
+.debug-toggle input[type="checkbox"] {
     display: none;
 }
 
@@ -127,7 +129,12 @@
     background-color: #ff4444;
 }
 
-.mute-toggle input[type="checkbox"]:checked + .toggle-slider::before {
+.debug-toggle input[type="checkbox"]:checked + .toggle-slider {
+    background-color: #4CAF50;
+}
+
+.mute-toggle input[type="checkbox"]:checked + .toggle-slider::before,
+.debug-toggle input[type="checkbox"]:checked + .toggle-slider::before {
     transform: translateX(26px);
 }
 

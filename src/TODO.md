@@ -24,6 +24,7 @@
 
 ## Version 2
 
+- [ ] Clean up code with npx tsc --noEmit
 - [ ] Deploy the game!
 
 ## Version 3 - Improve sound
