@@ -165,12 +165,14 @@ const GameComponent: React.FC = () => {
 
   const movePlayer = React.useCallback(
     (dx: number, dy: number) => {
+      // Stop all currently playing sounds before the player moves
+      stopAllSounds();
       // Call the GameState method
       gameState.movePlayer(dx, dy);
       // Force re-render
       forceUpdate();
     },
-    [gameState, forceUpdate]
+    [gameState, forceUpdate, stopAllSounds]
   );
 
   // Handle keyboard input
