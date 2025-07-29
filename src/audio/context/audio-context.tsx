@@ -41,6 +41,7 @@ interface AudioContextValue extends AudioContextState {
   setCategoryVolume: (category: string, volume: number) => void;
   toggleMute: () => void;
   resetToDefaults: () => void;
+  setShowDebugPanel: (show: boolean) => void;
 }
 
 const AudioContext = createContext<AudioContextValue | null>(null);
@@ -375,6 +376,13 @@ export function AudioProvider({
     }));
   }, []);
 
+  const setShowDebugPanel = useCallback((show: boolean) => {
+    setState((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, showDebugPanel: show },
+    }));
+  }, []);
+
   // Set up keyboard shortcut for mute toggle
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -400,6 +408,7 @@ export function AudioProvider({
     setCategoryVolume,
     toggleMute,
     resetToDefaults,
+    setShowDebugPanel,
   };
 
   return (

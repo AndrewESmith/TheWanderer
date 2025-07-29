@@ -2,20 +2,17 @@
 
 - [x] 1. Extend AudioSettings interface and default configuration
 
-
-
-
-
-
-
-
-
   - Modify the AudioSettings interface in audio-context.tsx to include showDebugPanel boolean property
   - Update DEFAULT_SETTINGS constant to include showDebugPanel: false
   - Update loadAudioSettings function to handle the new property with backward compatibility
   - _Requirements: 1.4, 2.2_
 
-- [ ] 2. Add debug panel state management to AudioContext
+- [x] 2. Add debug panel state management to AudioContext
+
+
+
+
+
   - Create setShowDebugPanel callback function in AudioProvider component
   - Add setShowDebugPanel to the AudioContextValue interface
   - Include setShowDebugPanel in the context value object
