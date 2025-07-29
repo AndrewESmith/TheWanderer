@@ -18,6 +18,7 @@ interface AudioSettings {
   isMuted: boolean;
   globalVolume: number;
   categoryVolumes: Record<string, number>;
+  showDebugPanel: boolean;
 }
 
 interface AudioContextState {
@@ -53,6 +54,7 @@ const DEFAULT_SETTINGS: AudioSettings = {
       category.volume,
     ])
   ),
+  showDebugPanel: false,
 };
 
 const STORAGE_KEY = "wanderer-audio-settings";
@@ -73,6 +75,7 @@ function loadAudioSettings(): AudioSettings {
           ...DEFAULT_SETTINGS.categoryVolumes,
           ...parsed.categoryVolumes,
         },
+        showDebugPanel: Boolean(parsed.showDebugPanel),
       };
     }
   } catch (error) {
