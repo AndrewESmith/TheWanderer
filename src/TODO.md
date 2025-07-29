@@ -32,7 +32,7 @@
 
 - [ ] Arrow sound should only play if arrow moves (note there are no arrows!)
 - [ ] Add bomb sound on collision
-- [ ] Stop active sound if player presses a key.
+- [x] Stop active sound if player presses a key.
   
 ## Version 4 - Add another dynamic
 

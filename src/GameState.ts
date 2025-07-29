@@ -127,7 +127,10 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   // Simulate physics after player movement (boulder gravity, etc.)
   const physicsResult = simulatePhysicsStep(newMaze);
   const finalMaze = physicsResult.newMaze;
-  const physicsSoundEvents = physicsResult.soundEvents;
+  
+  // Only include physics sound events if this is not the first move (when moves = 54)
+  // This prevents initial boulder sounds from playing on the first move
+  const physicsSoundEvents = gameState.moves === 55 ? [] : physicsResult.soundEvents;
 
   // Handle game end sounds separately to ensure movement sounds are stopped
   if (newGameState !== 'playing' && previousGameState === 'playing') {
