@@ -28,9 +28,6 @@
 - [x] 4. Add debug panel toggle to AudioSettings component
 
 
-
-
-
   - Create a new "Developer Options" setting group that only renders in development mode
   - Add checkbox input with toggle slider styling for "Show Audio Debug Panel"
   - Connect checkbox to showDebugPanel state and setShowDebugPanel handler
@@ -38,6 +35,10 @@
   - _Requirements: 1.1, 3.1, 4.1, 4.2_
 
 - [ ] 5. Modify AudioDebug component to respect visibility setting
+
+
+
+
   - Import useAudioSettings hook in AudioDebug component
   - Extract showDebugPanel from useAudioSettings
   - Update conditional rendering logic to check both development mode and showDebugPanel setting

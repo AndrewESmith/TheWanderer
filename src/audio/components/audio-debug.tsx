@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSound } from "../hooks/use-sound";
 import { useAudioContext } from "../context/audio-context";
+import { useAudioSettings } from "../hooks/use-audio-settings";
 import { SOUND_IDS } from "../config/sound-config";
 
 export function AudioDebug() {
   const { playSound, isLoading, error, fallbackMode } = useSound();
   const { audioManager, isInitialized } = useAudioContext();
+  const { showDebugPanel } = useAudioSettings();
   const [audioContextState, setAudioContextState] = useState<string>("unknown");
   const [loadedSounds, setLoadedSounds] = useState<string[]>([]);
 
@@ -34,7 +36,7 @@ export function AudioDebug() {
     playSound(soundId, { volume: 0.5 });
   };
 
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NODE_ENV !== "development" || !showDebugPanel) {
     return null;
   }
 
