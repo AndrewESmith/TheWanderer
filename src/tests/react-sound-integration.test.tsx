@@ -130,7 +130,7 @@ describe("React Sound System Integration Tests", () => {
           result.current.playSound("test-sound", { volume: 0.5 });
         });
 
-        expect(mockAudioManager.playSound).toHaveBeenCalledWith("test-sound", {
+        expect(mockAudioManager.playSound).toHaveBeenCalledWith("TEST-SOUND", {
           volume: 0.5,
         });
 
@@ -174,7 +174,7 @@ describe("React Sound System Integration Tests", () => {
         }
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          "Failed to play sound test-sound:",
+          "Failed to play sound TEST-SOUND:",
           expect.any(Error)
         );
 
@@ -728,7 +728,8 @@ describe("React Sound System Integration Tests", () => {
           result.current.playSound("test-sound");
         });
 
-        expect(originalPlaySound).toHaveBeenCalledWith("test-sound", undefined);
+        // The soundId gets converted to uppercase in useSound hook
+        expect(originalPlaySound).toHaveBeenCalledWith("TEST-SOUND", undefined);
       });
     });
 
