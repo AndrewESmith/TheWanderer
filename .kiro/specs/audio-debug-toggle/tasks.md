@@ -10,16 +10,18 @@
 - [x] 2. Add debug panel state management to AudioContext
 
 
-
-
-
   - Create setShowDebugPanel callback function in AudioProvider component
   - Add setShowDebugPanel to the AudioContextValue interface
   - Include setShowDebugPanel in the context value object
   - Update resetToDefaults function to reset debug panel visibility to false
   - _Requirements: 1.2, 1.3, 4.3_
 
-- [ ] 3. Extend useAudioSettings hook with debug panel controls
+- [x] 3. Extend useAudioSettings hook with debug panel controls
+
+
+
+
+
   - Add showDebugPanel property to the hook's return interface
   - Add setShowDebugPanel function to the hook's return interface
   - Extract showDebugPanel from settings in the hook implementation

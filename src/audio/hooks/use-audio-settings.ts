@@ -8,6 +8,8 @@ export function useAudioSettings(): UseAudioSettingsHook & {
     setGlobalVolume: (volume: number) => void;
     toggleMute: () => void;
     resetToDefaults: () => void;
+    showDebugPanel: boolean;
+    setShowDebugPanel: (show: boolean) => void;
 } {
     const {
         settings,
@@ -15,14 +17,16 @@ export function useAudioSettings(): UseAudioSettingsHook & {
         setGlobalVolume,
         setCategoryVolume,
         toggleMute,
-        resetToDefaults
+        resetToDefaults,
+        setShowDebugPanel
     } = useAudioContext();
 
     // Defensive programming: ensure settings is always defined
     const safeSettings = settings || {
         isMuted: false,
         globalVolume: 0.8,
-        categoryVolumes: {}
+        categoryVolumes: {},
+        showDebugPanel: false
     };
 
     return {
@@ -30,11 +34,13 @@ export function useAudioSettings(): UseAudioSettingsHook & {
         volume: safeSettings.globalVolume,
         globalVolume: safeSettings.globalVolume,
         categoryVolumes: safeSettings.categoryVolumes,
+        showDebugPanel: safeSettings.showDebugPanel,
         setMuted,
         setVolume: setGlobalVolume,
         setGlobalVolume,
         setCategoryVolume,
         toggleMute,
-        resetToDefaults
+        resetToDefaults,
+        setShowDebugPanel
     };
 }
