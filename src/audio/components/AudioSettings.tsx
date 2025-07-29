@@ -2,6 +2,7 @@ import React from "react";
 import { useAudioSettings } from "../hooks/use-audio-settings";
 import { SOUND_CONFIG } from "../config/sound-config";
 import "./AudioSettings.css";
+import type { JSX } from "react/jsx-runtime";
 
 interface AudioSettingsProps {
   isOpen: boolean;
@@ -72,7 +73,7 @@ export function AudioSettings({
                 onChange={handleMuteToggle}
               />
               <span className="toggle-slider"></span>
-              Mute All Sounds
+              <span className="toggle-label">Mute All Sounds</span>
             </label>
             <small>Keyboard shortcut: Ctrl/Cmd + M</small>
           </div>
@@ -132,7 +133,7 @@ export function AudioSettings({
                   onChange={handleDebugPanelToggle}
                 />
                 <span className="toggle-slider"></span>
-                Show Audio Debug Panel
+                <span className="toggle-label">Show Audio Debug Panel</span>
               </label>
             </div>
           )}
