@@ -6,7 +6,7 @@ import { AudioDebug } from "../../../audio/components/audio-debug";
 const mockUseSound = {
   playSound: vi.fn(),
   isLoading: false,
-  error: null,
+  error: null as string | null,
   fallbackMode: false,
 };
 
@@ -15,8 +15,8 @@ const mockUseAudioContext = {
     state: {
       audioContext: { state: "running" },
       loadedSounds: new Set(["MOVE", "COLLECT_DIAMOND"]),
-    },
-  },
+    } as any,
+  } as any,
   isInitialized: true,
 };
 
