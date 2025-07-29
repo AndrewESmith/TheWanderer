@@ -76,7 +76,17 @@ function loadAudioSettings(): AudioSettings {
           ...DEFAULT_SETTINGS.categoryVolumes,
           ...parsed.categoryVolumes,
         },
-        showDebugPanel: Boolean(parsed.showDebugPanel),
+        showDebugPanel: (() => {
+          const value = parsed.showDebugPanel;
+          if (value === null || value === undefined) return false;
+          if (typeof value === "boolean") return value;
+          if (typeof value === "string") {
+            if (value === "false" || value === "") return false;
+            return true; // Any other string is truthy
+          }
+          if (typeof value === "number") return value !== 0;
+          return Boolean(value); // Fallback for other types
+        })(),
       };
     }
   } catch (error) {

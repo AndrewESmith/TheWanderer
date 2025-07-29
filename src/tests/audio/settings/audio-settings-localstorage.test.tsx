@@ -284,7 +284,7 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
         { stored: true, expected: true },
         { stored: false, expected: false },
         { stored: "true", expected: true }, // String "true" is truthy
-        { stored: "false", expected: true }, // String "false" is truthy
+        { stored: "false", expected: false }, // String "false" should be converted to false
         { stored: 1, expected: true },
         { stored: 0, expected: false },
         { stored: null, expected: false },
