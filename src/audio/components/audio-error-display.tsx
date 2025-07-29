@@ -37,6 +37,11 @@ export function AudioErrorDisplay({ showAlways = false }: AudioErrorDisplayProps
         }
     }, [error, fallbackMode]);
 
+    // Don't show anything on mobile devices
+    if (isMobile) {
+        return null;
+    }
+
     // Don't show anything if no errors and not in fallback mode (unless showAlways is true)
     if (!showAlways && !error && (!fallbackMode || dismissed) && !hasPlaybackErrors && autoplayAllowed) {
         return null;
@@ -88,7 +93,7 @@ export function AudioErrorDisplay({ showAlways = false }: AudioErrorDisplayProps
                 </div>
             )}
 
-            {!autoplayAllowed && !error && !fallbackMode && !isMobile && (
+            {!autoplayAllowed && !error && !fallbackMode && (
                 <div className="audio-autoplay">
                     <p style={{ fontWeight: 'bold', color: '#0288d1' }}>
                         Audio Interaction Required
