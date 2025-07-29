@@ -91,11 +91,12 @@ export class HTML5AudioManager implements AudioManager {
             let audio = this.audioElements.get(soundId);
 
             if (!audio || audio.error) {
-                audio = this.createAudioElement(soundId, asset.src);
-                if (!audio) {
+                const newAudio = this.createAudioElement(soundId, asset.src);
+                if (!newAudio) {
                     this.errorHandling.onPlayError(soundId, new Error('Failed to create audio element'));
                     return;
                 }
+                audio = newAudio;
             }
 
             // Reset audio if it's already playing
@@ -263,7 +264,7 @@ export class HTML5AudioManager implements AudioManager {
                 failedSounds: [],
                 errors: new Map()
             };
-            this.notifyProgressCallbacks({ progress: 1, loaded: 0, total: 0 });
+            // No sounds to load, so no progress callbacks needed
             return Promise.resolve();
         }
 
@@ -275,10 +276,13 @@ export class HTML5AudioManager implements AudioManager {
             errors: new Map()
         };
 
-        this.notifyProgressCallbacks({
-            progress: 0,
-            loaded: 0,
-            total: soundsToLoad.length
+        // Emit initial progress for each sound
+        soundsToLoad.forEach(asset => {
+            this.notifyProgressCallbacks({
+                soundId: asset.id,
+                progress: 0,
+                status: 'loading'
+            });
         });
 
         let loadedCount = 0;
@@ -307,9 +311,9 @@ export class HTML5AudioManager implements AudioManager {
                         };
 
                         this.notifyProgressCallbacks({
-                            progress,
-                            loaded: loadedCount,
-                            total: soundsToLoad.length
+                            soundId: asset.id,
+                            progress: 1,
+                            status: 'loaded'
                         });
 
                         audio.removeEventListener('canplaythrough', onLoaded);
@@ -322,6 +326,12 @@ export class HTML5AudioManager implements AudioManager {
                         this.loadingState.failedSounds.push(asset.id);
                         this.loadingState.errors.set(asset.id, error);
                         this.errorHandling.onLoadError(asset.id, error);
+                        this.notifyProgressCallbacks({
+                            soundId: asset.id,
+                            progress: 0,
+                            status: 'failed',
+                            error
+                        });
                         audio.removeEventListener('error', onError);
                         resolve();
                     };
@@ -340,6 +350,12 @@ export class HTML5AudioManager implements AudioManager {
                                 const error = new Error(`Timeout preloading ${asset.id}`);
                                 this.loadingState.failedSounds.push(asset.id);
                                 this.loadingState.errors.set(asset.id, error);
+                                this.notifyProgressCallbacks({
+                                    soundId: asset.id,
+                                    progress: 0,
+                                    status: 'failed',
+                                    error
+                                });
                                 audio.removeEventListener('canplaythrough', onLoaded);
                                 audio.removeEventListener('error', onError);
                                 resolve();
@@ -351,6 +367,12 @@ export class HTML5AudioManager implements AudioManager {
                     this.loadingState.failedSounds.push(asset.id);
                     this.loadingState.errors.set(asset.id, error as Error);
                     this.errorHandling.onLoadError(asset.id, error as Error);
+                    this.notifyProgressCallbacks({
+                        soundId: asset.id,
+                        progress: 0,
+                        status: 'failed',
+                        error: error as Error
+                    });
                     resolve();
                 }
             });
@@ -366,11 +388,7 @@ export class HTML5AudioManager implements AudioManager {
             errors: this.loadingState.errors
         };
 
-        this.notifyProgressCallbacks({
-            progress: 1,
-            loaded: loadedCount,
-            total: soundsToLoad.length
-        });
+        // Final progress notifications are handled per-sound above
 
         console.log(`HTML5 Audio preloaded ${loadedCount}/${soundsToLoad.length} sounds`);
     }
@@ -537,7 +555,10 @@ export class HTML5AudioManager implements AudioManager {
      */
     private getCategoryForSound(soundId: string): string | null {
         for (const [category, config] of Object.entries(SOUND_CONFIG.categories)) {
-            if (Object.keys(config.sounds).some(key => config.sounds[key].id === soundId)) {
+            if (Object.keys(config.sounds).some(key => {
+                const sound = config.sounds[key];
+                return sound && sound.id === soundId;
+            })) {
                 return category;
             }
         }
