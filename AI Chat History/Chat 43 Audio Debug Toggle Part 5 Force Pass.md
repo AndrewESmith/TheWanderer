@@ -1,0 +1,1 @@
+I checked the check box. Session kept being displayed as too large

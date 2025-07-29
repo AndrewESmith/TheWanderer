@@ -34,9 +34,7 @@
   - Apply consistent styling using existing CSS classes for toggle switches
   - _Requirements: 1.1, 3.1, 4.1, 4.2_
 
-- [ ] 5. Modify AudioDebug component to respect visibility setting
-
-
+- [x] 5. Modify AudioDebug component to respect visibility setting
 
 
   - Import useAudioSettings hook in AudioDebug component
