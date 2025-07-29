@@ -25,9 +25,9 @@
 ## Version 2
 
 - [ ] Clean up code with npx tsc --noEmit
-- [ ] Deploy the game!
-- [ ] Configure for Mobile
-- [ ] Add icon
+- [x] Deploy the game!
+- [x] Configure for Mobile
+- [x] Add icon
 
 ## Version 3 - Improve sound
 
