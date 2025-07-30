@@ -24,7 +24,8 @@ export function mapPlayerMovementToSound(
         };
     }
 
-    // Regular movement (empty cells) should play walk sound
+    // Regular movement (empty cells, diamonds, exits, and bombs) should play walk sound
+    // Bomb explosion sound is handled separately by the game end manager
     if (toCell === CELL.EMPTY || toCell === CELL.DIAMOND || toCell === CELL.EXIT || toCell === CELL.BOMB) {
         return {
             type: 'movement',
@@ -94,12 +95,6 @@ export function mapExitInteractionToSound(
                 source: 'system',
                 priority: 'high',
                 volume: 0.8
-            },
-            {
-                type: 'victory',
-                source: 'system',
-                priority: 'high',
-                volume: 0.8
             }
         ];
     }
@@ -137,6 +132,9 @@ export function mapSoundEventToId(event: SoundEvent): string {
 
         case 'door_slam':
             return SOUND_IDS.DOOR_SLAM;
+
+        case 'bomb_explode':
+            return SOUND_IDS.BOMB_SOUND;
     }
 
     // Fallback - should not happen with proper typing

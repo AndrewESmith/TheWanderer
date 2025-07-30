@@ -63,14 +63,14 @@ describe('Sound Event Mapper', () => {
             });
         });
 
-        it('should return walk sound event when player moves to bomb', () => {
+        it('should return bomb explosion sound event when player moves to bomb', () => {
             const result = mapPlayerMovementToSound(CELL.EMPTY, CELL.BOMB);
 
             expect(result).toEqual({
-                type: 'movement',
+                type: 'bomb_explode',
                 source: 'player',
-                priority: 'low',
-                volume: 0.6
+                priority: 'high',
+                volume: 0.9
             });
         });
 
@@ -264,6 +264,17 @@ describe('Sound Event Mapper', () => {
             expect(result).toBe(SOUND_IDS.DOOR_SLAM);
         });
 
+        it('should map bomb_explode event to bomb sound ID', () => {
+            const event: SoundEvent = {
+                type: 'bomb_explode',
+                source: 'player',
+                priority: 'high'
+            };
+
+            const result = mapSoundEventToId(event);
+            expect(result).toBe(SOUND_IDS.BOMB_SOUND);
+        });
+
         it('should throw error for unknown event type', () => {
             const event = {
                 type: 'unknown',
@@ -311,10 +322,10 @@ describe('Sound Event Mapper', () => {
 
             expect(events).toHaveLength(2);
             expect(events[0]).toEqual({
-                type: 'movement',
+                type: 'bomb_explode',
                 source: 'player',
-                priority: 'low',
-                volume: 0.6
+                priority: 'high',
+                volume: 0.9
             });
             expect(events[1]).toEqual({
                 type: 'death',

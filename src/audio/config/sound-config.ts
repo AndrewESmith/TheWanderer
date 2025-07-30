@@ -110,7 +110,8 @@ export const SOUND_CONFIG: SoundConfiguration = {
                 DEATH_SOUND: SOUND_ASSETS['DEATH_SOUND']!,
                 VICTORY_SOUND: SOUND_ASSETS['VICTORY_SOUND']!,
                 DOOR_SLAM: SOUND_ASSETS['DOOR_SLAM']!,
-                DIAMOND_COLLECT: SOUND_ASSETS['DIAMOND_COLLECT']!
+                DIAMOND_COLLECT: SOUND_ASSETS['DIAMOND_COLLECT']!,
+                BOMB_SOUND: SOUND_ASSETS['BOMB_SOUND']!
             }
         }
     },

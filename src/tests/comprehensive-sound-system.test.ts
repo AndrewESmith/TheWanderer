@@ -291,7 +291,7 @@ describe('Comprehensive Sound System Test Suite', () => {
                     { from: CELL.EMPTY, to: CELL.EMPTY, expected: { type: 'movement', priority: 'low', volume: 0.6 } },
                     { from: CELL.EMPTY, to: CELL.DIAMOND, expected: { type: 'movement', priority: 'low', volume: 0.6 } },
                     { from: CELL.EMPTY, to: CELL.EXIT, expected: { type: 'movement', priority: 'low', volume: 0.6 } },
-                    { from: CELL.EMPTY, to: CELL.BOMB, expected: { type: 'movement', priority: 'low', volume: 0.6 } },
+                    { from: CELL.EMPTY, to: CELL.BOMB, expected: { type: 'bomb_explode', priority: 'high', volume: 0.9 } },
                     { from: CELL.EMPTY, to: CELL.ROCK, expected: null }
                 ];
 
@@ -339,7 +339,7 @@ describe('Comprehensive Sound System Test Suite', () => {
                     CELL.EMPTY, CELL.BOMB, 'dead', 'playing', 3
                 );
                 expect(deathEvents).toHaveLength(2);
-                expect(deathEvents[0]?.type).toBe('movement');
+                expect(deathEvents[0]?.type).toBe('bomb_explode');
                 expect(deathEvents[1]?.type).toBe('death');
 
                 // Test victory sequence

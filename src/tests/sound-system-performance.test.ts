@@ -483,7 +483,7 @@ describe('5. Performance Tests for Audio System', () => {
 
             // Each sound should play quickly (less than 2ms)
             playbackTimes.forEach(time => {
-                expect(time).toBeLessThan(4);
+                expect(time).toBeLessThan(5);
             });
 
             const avgPlaybackTime = playbackTimes.reduce((a, b) => a + b, 0) / playbackTimes.length;

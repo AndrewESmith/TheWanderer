@@ -392,7 +392,7 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
             const deathEvents = generatePlayerMoveEvents(CELL.EMPTY, CELL.BOMB, 'dead', 'playing', 3);
             emitter.emitMultiple(deathEvents);
 
-            expect(deathSequence).toContain(SOUND_IDS.PLAYER_WALK);
+            expect(deathSequence).toContain(SOUND_IDS.BOMB_SOUND);
             expect(deathSequence).toContain(SOUND_IDS.DEATH_SOUND);
 
             // Should stop all sounds after death

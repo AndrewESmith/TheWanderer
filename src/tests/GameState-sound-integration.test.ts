@@ -3,7 +3,7 @@ import { movePlayer, createInitialGameState } from '../GameState';
 import { getSoundEventEmitter } from '../audio/events/sound-event-emitter';
 import { CELL } from '../maze';
 import { SOUND_IDS } from '../audio/config/sound-config';
-import type { SoundEvent } from '../Interfaces/ISoundEvent';
+
 
 describe('GameState Sound Integration', () => {
     let mockCallback: ReturnType<typeof vi.fn>;
