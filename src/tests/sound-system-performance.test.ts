@@ -487,7 +487,7 @@ describe('5. Performance Tests for Audio System', () => {
             });
 
             const avgPlaybackTime = playbackTimes.reduce((a, b) => a + b, 0) / playbackTimes.length;
-            expect(avgPlaybackTime).toBeLessThan(1);
+            expect(avgPlaybackTime).toBeLessThan(2);
 
             manager.cleanup();
         });

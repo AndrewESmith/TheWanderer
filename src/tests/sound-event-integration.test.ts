@@ -133,18 +133,12 @@ describe('Sound Event Mapper', () => {
     });
 
     describe('mapExitInteractionToSound', () => {
-        it('should return door slam and victory sound events when player can exit', () => {
+        it('should return door slam sound event when player can exit', () => {
             const result = mapExitInteractionToSound(CELL.EXIT, true);
 
-            expect(result).toHaveLength(2);
+            expect(result).toHaveLength(1);
             expect(result[0]).toEqual({
                 type: 'door_slam',
-                source: 'system',
-                priority: 'high',
-                volume: 0.8
-            });
-            expect(result[1]).toEqual({
-                type: 'victory',
                 source: 'system',
                 priority: 'high',
                 volume: 0.8
@@ -344,7 +338,7 @@ describe('Sound Event Mapper', () => {
                 0
             );
 
-            expect(events).toHaveLength(4);
+            expect(events).toHaveLength(3);
             expect(events[0]).toEqual({
                 type: 'movement',
                 source: 'player',
@@ -358,12 +352,6 @@ describe('Sound Event Mapper', () => {
                 volume: 0.8
             });
             expect(events[2]).toEqual({
-                type: 'victory',
-                source: 'system',
-                priority: 'high',
-                volume: 0.8
-            });
-            expect(events[3]).toEqual({
                 type: 'victory',
                 source: 'system',
                 priority: 'high',

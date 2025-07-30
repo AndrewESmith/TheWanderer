@@ -244,11 +244,11 @@ describe('Game State Sound Transitions', () => {
 
             expect(newState.gameState).toBe('dead');
 
-            // Should have emitted movement sound immediately (not filtered)
-            const movementCalls = mockCallback.mock.calls.filter(call =>
-                call[0] === SOUND_IDS.PLAYER_WALK
+            // Should have emitted bomb sound immediately (not filtered)
+            const bombCalls = mockCallback.mock.calls.filter(call =>
+                call[0] === SOUND_IDS.BOMB_SOUND
             );
-            expect(movementCalls.length).toBe(1);
+            expect(bombCalls.length).toBe(1);
 
             // Should not have emitted death sound immediately (handled by game end manager)
             const immediateDeatCalls = mockCallback.mock.calls.filter(call =>

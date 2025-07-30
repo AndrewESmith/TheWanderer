@@ -2,12 +2,6 @@ import type { SoundEvent } from '../../Interfaces/ISoundEvent';
 import type { MazeCell } from '../../maze';
 import { CELL } from '../../maze';
 import { SOUND_IDS } from '../config/sound-config';
-import {
-    mapBoulderCollisionToSound,
-    mapArrowCollisionToSound,
-    mapBoulderMovementToSound,
-    mapArrowMovementToSound
-} from './collision-sound-mapper';
 
 // Pure function to map player movement to sound events
 export function mapPlayerMovementToSound(
@@ -24,9 +18,18 @@ export function mapPlayerMovementToSound(
         };
     }
 
-    // Regular movement (empty cells, diamonds, exits, and bombs) should play walk sound
-    // Bomb explosion sound is handled separately by the game end manager
-    if (toCell === CELL.EMPTY || toCell === CELL.DIAMOND || toCell === CELL.EXIT || toCell === CELL.BOMB) {
+    // Player hitting bomb should play bomb explosion sound
+    if (toCell === CELL.BOMB) {
+        return {
+            type: 'bomb_explode',
+            source: 'player',
+            priority: 'high',
+            volume: 0.9
+        };
+    }
+
+    // Regular movement (empty cells, diamonds, exits) should play walk sound
+    if (toCell === CELL.EMPTY || toCell === CELL.DIAMOND || toCell === CELL.EXIT) {
         return {
             type: 'movement',
             source: 'player',

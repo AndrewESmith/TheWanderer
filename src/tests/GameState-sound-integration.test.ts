@@ -18,7 +18,7 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState();
 
         // Move player right (assuming there's an empty cell)
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         expect(mockCallback).toHaveBeenCalledWith(
             SOUND_IDS.PLAYER_WALK,
@@ -42,7 +42,7 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState(customMaze);
 
         // Move player right into soil
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         expect(mockCallback).toHaveBeenCalledWith(
             SOUND_IDS.PLAYER_DIG,
@@ -66,7 +66,7 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState(customMaze);
 
         // Move player right to collect diamond
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         // Should emit both walk and collection sounds
         expect(mockCallback).toHaveBeenCalledTimes(2);
@@ -99,15 +99,17 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState(customMaze);
 
         // Move player right into bomb
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
-        // Should emit walk sound immediately (death sound is handled by game end manager)
+        // Should emit bomb explosion sound immediately (death sound is handled by game end manager)
         expect(mockCallback).toHaveBeenCalledTimes(1);
         expect(mockCallback).toHaveBeenNthCalledWith(1,
-            SOUND_IDS.PLAYER_WALK,
+            SOUND_IDS.BOMB_SOUND,
             expect.objectContaining({
-                type: 'movement',
-                source: 'player'
+                type: 'bomb_explode',
+                source: 'player',
+                priority: 'high',
+                volume: 0.9
             })
         );
 
@@ -138,7 +140,7 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState(customMaze);
 
         // Move player right to exit
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         // Should emit walk and door slam sounds immediately (victory sound handled by game end manager)
         expect(mockCallback).toHaveBeenCalledTimes(2);
@@ -182,7 +184,7 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState(customMaze);
 
         // Try to move player right into rock (should be blocked)
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         // No sounds should be emitted for blocked movement
         expect(mockCallback).not.toHaveBeenCalled();
@@ -195,7 +197,7 @@ describe('GameState Sound Integration', () => {
         };
 
         // Try to move player when game is over
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         // No sounds should be emitted when game is not playing
         expect(mockCallback).not.toHaveBeenCalled();
@@ -215,7 +217,7 @@ describe('GameState Sound Integration', () => {
         };
 
         // Move player right (this will be the last move)
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         // Should emit walk sound immediately (death sound handled by game end manager)
         expect(mockCallback).toHaveBeenCalledTimes(1);
@@ -255,7 +257,7 @@ describe('GameState Sound Integration', () => {
         const gameState = createInitialGameState(customMaze);
 
         // Try to move player right to exit (should be blocked due to diamonds)
-        const newState = movePlayer(gameState, 1, 0);
+        movePlayer(gameState, 1, 0);
 
         // No sounds should be emitted for blocked exit
         expect(mockCallback).not.toHaveBeenCalled();
