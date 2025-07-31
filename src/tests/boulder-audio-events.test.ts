@@ -339,21 +339,12 @@ describe('Boulder Audio Events', () => {
                     []
                 );
 
-                // Debug: log boulder state before simulation
-                console.log(`${description} test - boulder state:`, Array.from(boulderStateManager.boulders.values()));
-                console.log(`${description} test - moving boulder count:`, boulderStateManager.movingBoulderCount);
-
                 const result = simulateGravityWithState(testMaze, boulderStateManager, 2);
-
-                // Debug: log all sound events
-                console.log(`${description} test - all sound events:`, result.soundEvents);
 
                 // These objects generate special sound events when boulder hits them
                 const specialSounds = result.soundEvents.filter(
                     event => event.type === expectedSoundType && event.source === 'boulder'
                 );
-
-                console.log(`${description} test - filtered sounds:`, specialSounds);
                 expect(specialSounds).toHaveLength(1);
             });
         });

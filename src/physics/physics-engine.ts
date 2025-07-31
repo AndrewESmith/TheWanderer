@@ -103,13 +103,7 @@ export function simulateGravityWithState(
         array.findIndex(b => b.x === boulder.x && b.y === boulder.y) === index
     );
 
-    // Debug logging (remove after fixing)
-    if (process.env.NODE_ENV === 'test') {
-        console.log('Debug simulateGravityWithState:');
-        console.log('  triggeredBoulders:', triggeredBoulders);
-        console.log('  currentlyMovingBoulders:', currentlyMovingBoulders);
-        console.log('  uniqueMovingBoulders:', uniqueMovingBoulders);
-    }
+
 
     // Add BOULDER_MOVE sound for newly triggered boulders
     for (const boulder of triggeredBoulders) {
@@ -127,6 +121,11 @@ export function simulateGravityWithState(
 
     for (const boulder of sortedMovingBoulders) {
         const result = simulateBoulderFall(currentMaze, boulder);
+
+
+
+        // Add sound events from boulder fall simulation
+        allSoundEvents.push(...result.soundEvents);
 
         // Check if boulder actually moved
         const hasMoved = result.newPosition.x !== boulder.x || result.newPosition.y !== boulder.y;
@@ -150,18 +149,8 @@ export function simulateGravityWithState(
             // Boulder stopped moving (collision or reached bottom)
             completedBoulders.push(boulder);
 
-            // Check if there were collision events from simulateBoulderFall
-            const hasCollisionEvents = result.soundEvents.some(event => event.type === 'collision');
-
-            // If boulder tried to move but couldn't (collision), add COLLISION_THUD sound
-            if (hasCollisionEvents || !canBoulderFall(currentMaze, boulder)) {
-                allSoundEvents.push({
-                    type: 'collision',
-                    source: 'boulder',
-                    priority: 'high',
-                    volume: 0.9
-                });
-            }
+            // Note: Collision sounds are now handled by simulateBoulderFall
+            // No need to add duplicate collision sounds here
         }
     }
 

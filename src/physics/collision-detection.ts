@@ -189,7 +189,7 @@ export function detectBoulderCollision(
                     type: 'collision',
                     source: 'boulder',
                     priority: 'medium',
-                    volume: 0.7
+                    volume: 0.9
                 }
             };
 
@@ -322,8 +322,19 @@ export function simulateEnhancedBoulderFall(
 ): BoulderFallResult {
     const soundEvents: SoundEvent[] = [];
 
+
+
     // Check if boulder can fall
     if (!canBoulderFall(maze, boulderPosition)) {
+        // Boulder can't fall, but check if it would collide with something below
+        // This handles the case where a moving boulder encounters a solid obstacle
+        const belowPosition = { x: boulderPosition.x, y: boulderPosition.y + 1 };
+        const collision = detectBoulderCollision(maze, belowPosition);
+
+        if (collision.hasCollision && collision.soundEvent) {
+            soundEvents.push(collision.soundEvent);
+        }
+
         return {
             newMaze: maze,
             newPosition: boulderPosition,
@@ -342,6 +353,8 @@ export function simulateEnhancedBoulderFall(
 
     // Check collision at new position using enhanced detection
     const collision = detectBoulderCollision(maze, newPosition);
+
+
 
     if (collision.hasCollision) {
         // Boulder hits something
@@ -366,6 +379,9 @@ export function simulateEnhancedBoulderFall(
         if (collision.shouldTriggerBombExplosion) {
             // Boulder hits bomb - boulder moves to bomb position, bomb explodes
             newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
+
+
+
             return {
                 newMaze,
                 newPosition,
@@ -390,13 +406,8 @@ export function simulateEnhancedBoulderFall(
     // Move boulder to new position
     newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
 
-    // Add movement sound
-    soundEvents.push({
-        type: 'movement',
-        source: 'boulder',
-        priority: 'medium',
-        volume: 0.8
-    });
+    // Note: Movement sounds are handled by the physics engine, not here
+    // This avoids duplicate sound generation
 
     return {
         newMaze,
