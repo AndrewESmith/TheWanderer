@@ -59,19 +59,7 @@ export function simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult {
         currentMaze = result.newMaze;
         newBoulderPositions.push(result.newPosition);
 
-        // Check if boulder actually moved and generate movement sound
-        const hasMoved = result.newPosition.x !== boulder.x || result.newPosition.y !== boulder.y;
-        if (hasMoved) {
-            // Add movement sound for boulder
-            allSoundEvents.push({
-                type: 'movement',
-                source: 'boulder',
-                priority: 'medium',
-                volume: 0.8
-            });
-        }
-
-        // Add any collision sounds from the fall simulation
+        // Add sound events from the fall simulation (includes movement and collision sounds)
         allSoundEvents.push(...result.soundEvents);
     }
 
