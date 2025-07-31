@@ -359,12 +359,18 @@ describe('GameState Movement Constraints Integration', () => {
 
     describe('Performance considerations', () => {
         it('should handle large numbers of boulders efficiently', () => {
-            // Create a maze with many boulders
+            // Create a deterministic maze with many boulders
             const largeMaze: MazeCell[][] = Array(20).fill(null).map((_, y) =>
                 Array(20).fill(null).map((_, x) => {
                     if (y === 0 || y === 19 || x === 0 || x === 19) return CELL.ROCK;
                     if (x === 10 && y === 10) return CELL.PLAYER;
-                    return Math.random() < 0.3 ? CELL.BOULDER : CELL.EMPTY;
+                    // Create a deterministic pattern of boulders, ensuring path is clear for player movement
+                    if (x === 11 && y === 10) return CELL.EMPTY; // Ensure player can move right
+                    if (x === 9 && y === 10) return CELL.EMPTY; // Ensure player can move left
+                    if (x === 10 && y === 9) return CELL.EMPTY; // Ensure player can move up
+                    if (x === 10 && y === 11) return CELL.EMPTY; // Ensure player can move down
+                    // Place boulders in a deterministic pattern (every 3rd cell)
+                    return (x + y) % 3 === 0 ? CELL.BOULDER : CELL.EMPTY;
                 })
             );
 
