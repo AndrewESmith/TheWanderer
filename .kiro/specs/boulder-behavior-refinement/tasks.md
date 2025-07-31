@@ -1,6 +1,7 @@
 # Implementation Plan
 
-- [ ] 1. Create boulder state management infrastructure
+- [x] 1. Create boulder state management infrastructure
+
   - Implement `BoulderStateManager` interface and core data structures for tracking boulder states
   - Create utility functions for boulder position tracking and state transitions
   - Write unit tests for boulder state management functionality
