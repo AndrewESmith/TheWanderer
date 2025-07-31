@@ -25,6 +25,14 @@ export function isPassableCell(cell: MazeCell): boolean {
     return cell === CELL.EMPTY || cell === CELL.SOIL;
 }
 
+// Enhanced collision result interface for boulder-specific interactions
+export interface BoulderCollisionResult extends CollisionResult {
+    targetCell?: MazeCell;
+    isPlayerCollision: boolean;
+    shouldTriggerBombExplosion: boolean;
+    shouldStopBoulder: boolean;
+}
+
 // Pure function to detect collision between a moving object and the maze
 export function detectCollision(
     maze: MazeCell[][],
@@ -95,18 +103,223 @@ export function detectCollision(
     };
 }
 
+// Enhanced function to detect boulder collision with all game objects
+export function detectBoulderCollision(
+    maze: MazeCell[][],
+    position: Position
+): BoulderCollisionResult {
+    // Check bounds
+    if (position.y < 0 || position.y >= maze.length ||
+        position.x < 0 || position.x >= (maze[position.y]?.length ?? 0)) {
+        return {
+            hasCollision: true,
+            collisionType: 'wall',
+            targetCell: undefined,
+            isPlayerCollision: false,
+            shouldTriggerBombExplosion: false,
+            shouldStopBoulder: true,
+            soundEvent: {
+                type: 'collision',
+                source: 'boulder',
+                priority: 'medium',
+                volume: 0.8
+            }
+        };
+    }
+
+    const targetCell = maze[position.y]?.[position.x];
+    if (targetCell === undefined) {
+        return {
+            hasCollision: true,
+            collisionType: 'wall',
+            targetCell: undefined,
+            isPlayerCollision: false,
+            shouldTriggerBombExplosion: false,
+            shouldStopBoulder: true,
+            soundEvent: {
+                type: 'collision',
+                source: 'boulder',
+                priority: 'medium',
+                volume: 0.8
+            }
+        };
+    }
+
+    // Handle specific collision types based on target cell
+    switch (targetCell) {
+        case CELL.EMPTY:
+            // No collision with empty space
+            return {
+                hasCollision: false,
+                collisionType: 'none',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: false
+            };
+
+        case CELL.ROCK:
+        case CELL.BOULDER:
+            // Solid objects - boulder stops and makes collision sound
+            return {
+                hasCollision: true,
+                collisionType: 'object',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: true,
+                soundEvent: {
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'high',
+                    volume: 0.9
+                }
+            };
+
+        case CELL.SOIL:
+            // Boulder stops on soil with ground collision sound
+            return {
+                hasCollision: true,
+                collisionType: 'ground',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: true,
+                soundEvent: {
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'medium',
+                    volume: 0.7
+                }
+            };
+
+        case CELL.DIAMOND:
+            // Boulder stops on diamond with collision sound
+            return {
+                hasCollision: true,
+                collisionType: 'object',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: true,
+                soundEvent: {
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'medium',
+                    volume: 0.8
+                }
+            };
+
+        case CELL.BOMB:
+            // Boulder hits bomb and triggers explosion, boulder stops at bomb position
+            return {
+                hasCollision: true,
+                collisionType: 'object',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: true,
+                shouldStopBoulder: true, // Boulder stops at bomb position
+                soundEvent: {
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'high',
+                    volume: 0.9
+                }
+            };
+
+        case CELL.PLAYER:
+            // Boulder hits player - causes death, boulder stops at player position
+            return {
+                hasCollision: true,
+                collisionType: 'object',
+                targetCell,
+                isPlayerCollision: true,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: true, // Boulder stops at player position
+                soundEvent: {
+                    type: 'death',
+                    source: 'boulder',
+                    priority: 'high',
+                    volume: 1.0
+                }
+            };
+
+        case CELL.EXIT:
+            // Boulder stops at exit
+            return {
+                hasCollision: true,
+                collisionType: 'object',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: true,
+                soundEvent: {
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'medium',
+                    volume: 0.8
+                }
+            };
+
+        default:
+            // Unknown cell type - treat as solid object
+            return {
+                hasCollision: true,
+                collisionType: 'object',
+                targetCell,
+                isPlayerCollision: false,
+                shouldTriggerBombExplosion: false,
+                shouldStopBoulder: true,
+                soundEvent: {
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'medium',
+                    volume: 0.8
+                }
+            };
+    }
+}
+
 // Pure function to check if boulder can fall (has empty space below)
 export function canBoulderFall(maze: MazeCell[][], position: Position): boolean {
     const belowPosition = { x: position.x, y: position.y + 1 };
-    const collision = detectCollision(maze, belowPosition, 'boulder');
-    return !collision.hasCollision;
+    const collision = detectBoulderCollision(maze, belowPosition);
+
+    // Boulder can fall if there's no collision, OR if it's a special collision
+    // that allows the boulder to move (player death, bomb explosion)
+    return !collision.hasCollision ||
+        collision.isPlayerCollision ||
+        collision.shouldTriggerBombExplosion;
 }
 
-// Pure function to simulate boulder falling one step
+// Enhanced boulder fall simulation result
+export interface BoulderFallResult {
+    newMaze: MazeCell[][];
+    newPosition: Position;
+    soundEvents: SoundEvent[];
+    playerCollision: boolean;
+    bombExplosion: boolean;
+    targetCell?: MazeCell;
+}
+
+// Pure function to simulate boulder falling one step with enhanced collision detection
 export function simulateBoulderFall(
     maze: MazeCell[][],
     boulderPosition: Position
 ): { newMaze: MazeCell[][]; newPosition: Position; soundEvents: SoundEvent[] } {
+    const result = simulateEnhancedBoulderFall(maze, boulderPosition);
+    return {
+        newMaze: result.newMaze,
+        newPosition: result.newPosition,
+        soundEvents: result.soundEvents
+    };
+}
+
+// Enhanced function to simulate boulder falling with detailed collision information
+export function simulateEnhancedBoulderFall(
+    maze: MazeCell[][],
+    boulderPosition: Position
+): BoulderFallResult {
     const soundEvents: SoundEvent[] = [];
 
     // Check if boulder can fall
@@ -114,7 +327,9 @@ export function simulateBoulderFall(
         return {
             newMaze: maze,
             newPosition: boulderPosition,
-            soundEvents
+            soundEvents,
+            playerCollision: false,
+            bombExplosion: false
         };
     }
 
@@ -125,19 +340,50 @@ export function simulateBoulderFall(
     // Clear old position
     newMaze[boulderPosition.y]![boulderPosition.x] = CELL.EMPTY;
 
-    // Check collision at new position
-    const collision = detectCollision(maze, newPosition, 'boulder');
+    // Check collision at new position using enhanced detection
+    const collision = detectBoulderCollision(maze, newPosition);
 
     if (collision.hasCollision) {
-        // Boulder hits something, add collision sound
+        // Boulder hits something
         if (collision.soundEvent) {
             soundEvents.push(collision.soundEvent);
         }
-        // Boulder stays at original position
+
+        // Handle special collision cases where boulder moves to target position
+        if (collision.isPlayerCollision) {
+            // Boulder hits player - player dies, boulder moves to player position
+            newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
+            return {
+                newMaze,
+                newPosition,
+                soundEvents,
+                playerCollision: true,
+                bombExplosion: false,
+                targetCell: collision.targetCell
+            };
+        }
+
+        if (collision.shouldTriggerBombExplosion) {
+            // Boulder hits bomb - boulder moves to bomb position, bomb explodes
+            newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
+            return {
+                newMaze,
+                newPosition,
+                soundEvents,
+                playerCollision: false,
+                bombExplosion: true,
+                targetCell: collision.targetCell
+            };
+        }
+
+        // Regular collision - boulder stays at original position
         return {
             newMaze: maze,
             newPosition: boulderPosition,
-            soundEvents
+            soundEvents,
+            playerCollision: false,
+            bombExplosion: false,
+            targetCell: collision.targetCell
         };
     }
 
@@ -155,7 +401,9 @@ export function simulateBoulderFall(
     return {
         newMaze,
         newPosition,
-        soundEvents
+        soundEvents,
+        playerCollision: false,
+        bombExplosion: false
     };
 }
 

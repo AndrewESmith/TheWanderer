@@ -89,17 +89,27 @@ export function simulateGravityWithState(
     const triggeredBoulders = getTriggeredBouldersForMove(boulderStateManager, currentMoveNumber);
 
     // Get all boulders that are currently moving or should start moving
+    const currentlyMovingBoulders = Array.from(boulderStateManager.boulders.values())
+        .filter(state => state.isMoving)
+        .map(state => state.position);
+
     const allMovingBoulders = [
         ...triggeredBoulders,
-        ...Array.from(boulderStateManager.boulders.values())
-            .filter(state => state.isMoving)
-            .map(state => state.position)
+        ...currentlyMovingBoulders
     ];
 
     // Remove duplicates based on position
     const uniqueMovingBoulders = allMovingBoulders.filter((boulder, index, array) =>
         array.findIndex(b => b.x === boulder.x && b.y === boulder.y) === index
     );
+
+    // Debug logging (remove after fixing)
+    if (process.env.NODE_ENV === 'test') {
+        console.log('Debug simulateGravityWithState:');
+        console.log('  triggeredBoulders:', triggeredBoulders);
+        console.log('  currentlyMovingBoulders:', currentlyMovingBoulders);
+        console.log('  uniqueMovingBoulders:', uniqueMovingBoulders);
+    }
 
     // Add BOULDER_MOVE sound for newly triggered boulders
     for (const boulder of triggeredBoulders) {

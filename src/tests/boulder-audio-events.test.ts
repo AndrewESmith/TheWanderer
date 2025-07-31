@@ -287,15 +287,13 @@ describe('Boulder Audio Events', () => {
             // Note: The physics engine generates collision sounds with volume 0.9 regardless of target
             expect(soilCollisionSounds[0]?.volume).toBe(0.9);
 
-            // Test truly non-solid objects that don't generate collision sounds
-            const nonSolidTestCases = [
-                { cell: CELL.DIAMOND, description: 'diamond' },
-                { cell: CELL.BOMB, description: 'bomb' },
-                { cell: CELL.EXIT, description: 'exit' },
-                { cell: CELL.PLAYER, description: 'player' }
+            // Test objects that generate collision sounds when boulder hits them
+            const solidObjectTestCases = [
+                { cell: CELL.DIAMOND, description: 'diamond', expectedSoundType: 'collision' },
+                { cell: CELL.EXIT, description: 'exit', expectedSoundType: 'collision' }
             ];
 
-            nonSolidTestCases.forEach(({ cell, description }) => {
+            solidObjectTestCases.forEach(({ cell, description, expectedSoundType }) => {
                 const testMaze: MazeCell[][] = [
                     [CELL.ROCK, CELL.ROCK, CELL.ROCK],
                     [CELL.ROCK, CELL.BOULDER, CELL.ROCK],
@@ -312,12 +310,51 @@ describe('Boulder Audio Events', () => {
 
                 const result = simulateGravityWithState(testMaze, boulderStateManager, 2);
 
-                // These objects don't generate collision sounds because boulder moves through them
+                // These objects generate collision sounds when boulder hits them
                 const collisionSounds = result.soundEvents.filter(
-                    event => event.type === 'collision' && event.source === 'boulder'
+                    event => event.type === expectedSoundType && event.source === 'boulder'
                 );
 
-                expect(collisionSounds).toHaveLength(0);
+                expect(collisionSounds).toHaveLength(1);
+            });
+
+            // Test special collision cases
+            const specialCollisionTestCases = [
+                { cell: CELL.BOMB, description: 'bomb', expectedSoundType: 'collision' },
+                { cell: CELL.PLAYER, description: 'player', expectedSoundType: 'death' }
+            ];
+
+            specialCollisionTestCases.forEach(({ cell, description, expectedSoundType }) => {
+                const testMaze: MazeCell[][] = [
+                    [CELL.ROCK, CELL.ROCK, CELL.ROCK],
+                    [CELL.ROCK, CELL.BOULDER, CELL.ROCK],
+                    [CELL.ROCK, cell, CELL.ROCK]
+                ];
+
+                // Create boulder state manager with moving boulder
+                let boulderStateManager = createBoulderStateManager(testMaze, 1);
+                boulderStateManager = updateBoulderMovement(
+                    boulderStateManager,
+                    [{ x: 1, y: 1 }], // moving boulder
+                    []
+                );
+
+                // Debug: log boulder state before simulation
+                console.log(`${description} test - boulder state:`, Array.from(boulderStateManager.boulders.values()));
+                console.log(`${description} test - moving boulder count:`, boulderStateManager.movingBoulderCount);
+
+                const result = simulateGravityWithState(testMaze, boulderStateManager, 2);
+
+                // Debug: log all sound events
+                console.log(`${description} test - all sound events:`, result.soundEvents);
+
+                // These objects generate special sound events when boulder hits them
+                const specialSounds = result.soundEvents.filter(
+                    event => event.type === expectedSoundType && event.source === 'boulder'
+                );
+
+                console.log(`${description} test - filtered sounds:`, specialSounds);
+                expect(specialSounds).toHaveLength(1);
             });
         });
     });

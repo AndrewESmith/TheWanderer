@@ -33,17 +33,14 @@
 
 - [x] 5. Implement boulder movement audio events
 
-
-
-
-
   - Add BOULDER_MOVE sound event generation when boulders start moving
   - Implement COLLISION_THUD sound events for boulder collisions
   - Ensure audio events respect global mute settings
   - Write unit tests for boulder audio event generation
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 6. Create enhanced collision detection for boulders
+- [x] 6. Create enhanced collision detection for boulders
+
   - Implement collision detection between boulders and all game objects
   - Add specific collision handling for boulder-player interactions
   - Create collision sound event mapping for different object types
