@@ -6,6 +6,9 @@ import { generatePlayerMoveEvents } from "./audio/events/sound-event-mapper";
 import { emitSoundEvents } from "./audio/events/sound-event-emitter";
 import { simulatePhysicsStep } from "./physics/physics-engine";
 import { handleGameEndSounds } from "./audio/events/game-end-sound-manager";
+import type { BoulderStateManager, MovementConstraint } from "./physics/boulder-state-manager";
+import { createBoulderStateManager, updatePlayerPosition } from "./physics/boulder-state-manager";
+import { shouldBlockPlayerMovement, updateMovementConstraints } from "./physics/movement-constraint-system";
 
 // Game state type following TypeScript standards
 export interface GameStateData {
@@ -15,6 +18,8 @@ export interface GameStateData {
   moves: number;
   diamonds: number;
   gameState: 'playing' | 'dead' | 'won';
+  boulderStateManager: BoulderStateManager;
+  movementConstraint: MovementConstraint;
 }
 
 // Pure function to count diamonds in maze
@@ -27,6 +32,8 @@ export function createInitialGameState(maze: MazeCell[][] = initialMaze): GameSt
   const mazeCopy = maze.map(row => [...row]);
   const playerPosition = getPlayerPosition(mazeCopy);
   const diamondCount = countDiamonds(mazeCopy);
+  const boulderStateManager = createBoulderStateManager(mazeCopy, 55);
+  const movementConstraint = updateMovementConstraints(boulderStateManager);
 
   return {
     maze: mazeCopy,
@@ -35,6 +42,8 @@ export function createInitialGameState(maze: MazeCell[][] = initialMaze): GameSt
     moves: 55,
     diamonds: diamondCount,
     gameState: 'playing',
+    boulderStateManager,
+    movementConstraint,
   };
 }
 
@@ -51,6 +60,11 @@ function isBlockingCell(cell: MazeCell): boolean {
 // Pure function to handle player movement
 export function movePlayer(gameState: GameStateData, dx: number, dy: number): GameStateData {
   if (gameState.gameState !== 'playing' || !gameState.player) {
+    return gameState;
+  }
+
+  // Check if player movement is blocked by boulder movement constraints
+  if (shouldBlockPlayerMovement(gameState.boulderStateManager)) {
     return gameState;
   }
 
@@ -127,7 +141,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   // Simulate physics after player movement (boulder gravity, etc.)
   const physicsResult = simulatePhysicsStep(newMaze);
   const finalMaze = physicsResult.newMaze;
-  
+
   // Only include physics sound events if this is not the first move (when moves = 54)
   // This prevents initial boulder sounds from playing on the first move
   const physicsSoundEvents = gameState.moves === 55 ? [] : physicsResult.soundEvents;
@@ -154,6 +168,15 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     }
   }
 
+  // Update boulder state manager with new player position
+  const updatedBoulderStateManager = updatePlayerPosition(
+    gameState.boulderStateManager,
+    { x: newX, y: newY }
+  );
+
+  // Update movement constraints based on current boulder states
+  const updatedMovementConstraint = updateMovementConstraints(updatedBoulderStateManager);
+
   return {
     maze: finalMaze,
     player: { x: newX, y: newY },
@@ -161,6 +184,8 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     moves: newMoves,
     diamonds: newDiamonds,
     gameState: newGameState,
+    boulderStateManager: updatedBoulderStateManager,
+    movementConstraint: updatedMovementConstraint,
   };
 }
 
@@ -189,6 +214,8 @@ export function createGameState(initialData?: Partial<GameStateData>): IGameStat
     get moves() { return currentState.moves; },
     get diamonds() { return currentState.diamonds; },
     get gameState() { return currentState.gameState; },
+    get boulderStateManager() { return currentState.boulderStateManager; },
+    get movementConstraint() { return currentState.movementConstraint; },
 
     movePlayer: (dx: number, dy: number) => {
       currentState = movePlayer(currentState, dx, dy);

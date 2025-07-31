@@ -168,6 +168,60 @@ describe('Boulder State Manager', () => {
             const adjacent = detectAdjacentBoulders(playerPos, boulderPositions);
             expect(adjacent).toHaveLength(0);
         });
+
+        it('should handle boundary edge cases correctly', () => {
+            // Test player at maze corner (0,0)
+            const cornerPlayerPos: Position = { x: 0, y: 0 };
+            const cornerBoulderPositions: Position[] = [
+                { x: 1, y: 0 }, // Right adjacent
+                { x: 0, y: 1 }, // Below adjacent
+                { x: 1, y: 1 }, // Diagonal adjacent
+                { x: 2, y: 2 }, // Not adjacent
+            ];
+
+            const cornerAdjacent = detectAdjacentBoulders(cornerPlayerPos, cornerBoulderPositions);
+            expect(cornerAdjacent).toHaveLength(3);
+            expect(cornerAdjacent).toContainEqual({ x: 1, y: 0 });
+            expect(cornerAdjacent).toContainEqual({ x: 0, y: 1 });
+            expect(cornerAdjacent).toContainEqual({ x: 1, y: 1 });
+            expect(cornerAdjacent).not.toContainEqual({ x: 2, y: 2 });
+        });
+
+        it('should handle all 8 adjacent positions correctly', () => {
+            const centerPos: Position = { x: 5, y: 5 };
+            const allAdjacentPositions: Position[] = [
+                { x: 4, y: 4 }, // Top-left diagonal
+                { x: 5, y: 4 }, // Top
+                { x: 6, y: 4 }, // Top-right diagonal
+                { x: 4, y: 5 }, // Left
+                { x: 6, y: 5 }, // Right
+                { x: 4, y: 6 }, // Bottom-left diagonal
+                { x: 5, y: 6 }, // Bottom
+                { x: 6, y: 6 }, // Bottom-right diagonal
+            ];
+
+            const adjacent = detectAdjacentBoulders(centerPos, allAdjacentPositions);
+            expect(adjacent).toHaveLength(8);
+
+            // Verify all positions are detected as adjacent
+            for (const pos of allAdjacentPositions) {
+                expect(adjacent).toContainEqual(pos);
+            }
+        });
+
+        it('should handle negative coordinates correctly', () => {
+            // Test with negative coordinates (edge case for position calculations)
+            const playerPos: Position = { x: 1, y: 1 };
+            const boulderPositions: Position[] = [
+                { x: 0, y: 0 }, // Adjacent diagonal
+                { x: -1, y: -1 }, // Not adjacent (too far)
+            ];
+
+            const adjacent = detectAdjacentBoulders(playerPos, boulderPositions);
+            expect(adjacent).toHaveLength(1);
+            expect(adjacent).toContainEqual({ x: 0, y: 0 });
+            expect(adjacent).not.toContainEqual({ x: -1, y: -1 });
+        });
     });
 
     describe('Triggered boulder identification', () => {
@@ -202,6 +256,35 @@ describe('Boulder State Manager', () => {
 
             const triggered = identifyTriggeredBoulders(null, currentPos, manager);
             expect(triggered).toHaveLength(3);
+            expect(triggered).toContainEqual({ x: 1, y: 1 });
+            expect(triggered).toContainEqual({ x: 3, y: 1 });
+            expect(triggered).toContainEqual({ x: 1, y: 3 });
+        });
+
+        it('should handle boundary edge cases for triggered boulder identification', () => {
+            // Create a manager with boulders at maze edges
+            const edgeMaze: MazeCell[][] = [
+                [CELL.BOULDER, CELL.EMPTY, CELL.BOULDER],
+                [CELL.EMPTY, CELL.PLAYER, CELL.EMPTY],
+                [CELL.BOULDER, CELL.EMPTY, CELL.BOULDER],
+            ];
+            const edgeManager = createBoulderStateManager(edgeMaze);
+
+            // Player moves from center to corner
+            const previousPos: Position = { x: 1, y: 1 }; // Center, adjacent to all 4 boulders
+            const currentPos: Position = { x: 0, y: 0 }; // Corner, only adjacent to boulder at (0,0)
+
+            const triggered = identifyTriggeredBoulders(previousPos, currentPos, edgeManager);
+            expect(triggered).toHaveLength(0); // No newly triggered boulders (was already adjacent to corner boulder)
+        });
+
+        it('should handle player movement across maze boundaries correctly', () => {
+            // Test player moving from far position to near boulders
+            const farPos: Position = { x: 10, y: 10 }; // Far from any boulder
+            const nearPos: Position = { x: 2, y: 2 }; // Near all test boulders
+
+            const triggered = identifyTriggeredBoulders(farPos, nearPos, manager);
+            expect(triggered).toHaveLength(3); // All boulders are newly triggered
             expect(triggered).toContainEqual({ x: 1, y: 1 });
             expect(triggered).toContainEqual({ x: 3, y: 1 });
             expect(triggered).toContainEqual({ x: 1, y: 3 });

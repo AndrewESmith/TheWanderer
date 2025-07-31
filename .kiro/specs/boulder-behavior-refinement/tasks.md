@@ -7,7 +7,8 @@
   - Write unit tests for boulder state management functionality
   - _Requirements: 6.1, 6.4_
 
-- [ ] 2. Implement proximity detection system
+- [x] 2. Implement proximity detection system
+
   - Create functions to detect when player is adjacent to boulders
   - Implement logic to identify newly triggered boulders based on player movement
   - Add validation for proximity detection edge cases (boundaries, corners)
@@ -15,6 +16,10 @@
   - _Requirements: 1.1, 1.5_
 
 - [ ] 3. Create movement constraint system
+
+
+
+
   - Implement logic to block player movement when boulders are moving
   - Create constraint state management for enabling/disabling player input
   - Add functions to check if any boulders are currently in motion
