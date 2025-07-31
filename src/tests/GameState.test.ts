@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { createGameState, movePlayer, createInitialGameState, type GameStateData } from "../GameState";
 import { CELL, type MazeCell } from "../maze";
 import type { IPlayerPos } from "../Interfaces/IPlayerPos";
+import { createBoulderStateManager } from "../physics/boulder-state-manager";
+import { updateMovementConstraints } from "../physics/movement-constraint-system";
 
 // Helper function to create test maze data following functional patterns
 function createTestGameState(
@@ -12,13 +14,19 @@ function createTestGameState(
     diamonds: number = 0,
     gameState: 'playing' | 'dead' | 'won' = 'playing'
 ): GameStateData {
+    const mazeCopy = maze.map(row => [...row]); // Deep copy
+    const boulderStateManager = createBoulderStateManager(mazeCopy, moves);
+    const movementConstraint = updateMovementConstraints(boulderStateManager);
+
     return {
-        maze: maze.map(row => [...row]), // Deep copy
+        maze: mazeCopy,
         player,
         score,
         moves,
         diamonds,
         gameState,
+        boulderStateManager,
+        movementConstraint,
     };
 }
 
