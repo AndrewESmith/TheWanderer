@@ -25,17 +25,18 @@
 
 - [x] 4. Enhance physics engine with boulder triggering
 
-
-
-
-
   - Extend `simulatePhysicsStep` to handle proximity-based boulder triggering
   - Modify boulder movement logic to respect trigger conditions
   - Update physics simulation to track moving vs stationary boulders
   - Write unit tests for enhanced physics engine functionality
   - _Requirements: 1.2, 1.3, 6.2_
 
-- [ ] 5. Implement boulder movement audio events
+- [x] 5. Implement boulder movement audio events
+
+
+
+
+
   - Add BOULDER_MOVE sound event generation when boulders start moving
   - Implement COLLISION_THUD sound events for boulder collisions
   - Ensure audio events respect global mute settings

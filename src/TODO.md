@@ -38,10 +38,9 @@
 
 ~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
 
-- [ ] Create rules for boulders.
-  - [ ] Boulders should only move when player next to boulder.
-  - [ ] If player moves away from boulder and boulder moving down lands on player it kills the player 
-  - [ ] Player cannot move until boulder finishes it's movement
+- [x] Create rules for boulders.
+- [ ] Implement Boulder Spec
+- [ ] Boulders should not be able to fall through soil - update requirements.
 - [ ] Increment build number each time the application is built
 
 ## Version 5 - Maze levels
