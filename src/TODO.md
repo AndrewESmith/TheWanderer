@@ -38,12 +38,20 @@
 
 ~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
 
-- [ ] Boulders should only move when player next to boulder. If player moves away from boulder and boulder moving down lands on player it kills the player 
+- [ ] Create rules for boulders.
+  - [ ] Boulders should only move when player next to boulder.
+  - [ ] If player moves away from boulder and boulder moving down lands on player it kills the player 
+  - [ ] Player cannot move until boulder finishes it's movement
+- [ ] Increment build number each time the application is built
 
 ## Version 5 - Maze levels
 
 - [ ] Add support for multiple maze levels
 - [ ] Create 5 maze levels
+- [ ] Create specification document for maze levels.
+  - [ ] When a maze is exited provide the password for the next maze level. Level 1 does not require a password
+  - [ ] Allow jumping to a maze level via an assigned password. Trigger password by running into rock 6 times in a row.
+  - [ ] Only play victory sound when last level is exited.
 
 ## Version 6
 
