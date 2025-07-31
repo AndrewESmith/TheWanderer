@@ -15,10 +15,7 @@
   - Write unit tests for proximity detection algorithms
   - _Requirements: 1.1, 1.5_
 
-- [ ] 3. Create movement constraint system
-
-
-
+- [x] 3. Create movement constraint system
 
   - Implement logic to block player movement when boulders are moving
   - Create constraint state management for enabling/disabling player input
@@ -26,7 +23,12 @@
   - Write unit tests for movement constraint functionality
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 4. Enhance physics engine with boulder triggering
+- [x] 4. Enhance physics engine with boulder triggering
+
+
+
+
+
   - Extend `simulatePhysicsStep` to handle proximity-based boulder triggering
   - Modify boulder movement logic to respect trigger conditions
   - Update physics simulation to track moving vs stationary boulders

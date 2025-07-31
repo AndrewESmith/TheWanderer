@@ -4,15 +4,26 @@ import type { SoundEvent } from '../Interfaces/ISoundEvent';
 import {
     simulateBoulderFall,
     simulateArrowMovement,
+    canBoulderFall,
     type Position
 } from './collision-detection';
+import type { BoulderStateManager } from './boulder-state-manager';
+import {
+    getTriggeredBouldersForMove,
+    updateBoulderMovement,
+    updateBoulderPositions,
+    createPositionKey
+} from './boulder-state-manager';
 
-// Physics simulation result
+// Enhanced physics simulation result
 export interface PhysicsSimulationResult {
     newMaze: MazeCell[][];
     soundEvents: SoundEvent[];
     boulderPositions: Position[];
     arrowPositions: Position[];
+    movingBoulders: Position[];
+    completedBoulders: Position[];
+    playerCollisions: Position[];
 }
 
 // Pure function to find all boulders in the maze
@@ -33,7 +44,7 @@ export function findBoulders(maze: MazeCell[][]): Position[] {
     return boulders;
 }
 
-// Pure function to simulate gravity for all boulders
+// Pure function to simulate gravity for all boulders (legacy version)
 export function simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult {
     const boulders = findBoulders(maze);
     let currentMaze = maze.map(row => [...row]);
@@ -54,8 +65,122 @@ export function simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult {
         newMaze: currentMaze,
         soundEvents: allSoundEvents,
         boulderPositions: newBoulderPositions,
-        arrowPositions: [] // No arrows in current implementation
+        arrowPositions: [], // No arrows in current implementation
+        movingBoulders: [],
+        completedBoulders: [],
+        playerCollisions: []
     };
+}
+
+// Enhanced function to simulate gravity with boulder state management
+export function simulateGravityWithState(
+    maze: MazeCell[][],
+    boulderStateManager: BoulderStateManager,
+    currentMoveNumber: number
+): PhysicsSimulationResult {
+    let currentMaze = maze.map(row => [...row]);
+    const allSoundEvents: SoundEvent[] = [];
+    const movingBoulders: Position[] = [];
+    const completedBoulders: Position[] = [];
+    const playerCollisions: Position[] = [];
+    const positionUpdates: Array<{ from: Position; to: Position }> = [];
+
+    // Get boulders that should start moving this turn
+    const triggeredBoulders = getTriggeredBouldersForMove(boulderStateManager, currentMoveNumber);
+
+    // Get all boulders that are currently moving or should start moving
+    const allMovingBoulders = [
+        ...triggeredBoulders,
+        ...Array.from(boulderStateManager.boulders.values())
+            .filter(state => state.isMoving)
+            .map(state => state.position)
+    ];
+
+    // Remove duplicates based on position
+    const uniqueMovingBoulders = allMovingBoulders.filter((boulder, index, array) =>
+        array.findIndex(b => b.x === boulder.x && b.y === boulder.y) === index
+    );
+
+    // Add BOULDER_MOVE sound for newly triggered boulders
+    for (const boulder of triggeredBoulders) {
+        allSoundEvents.push({
+            type: 'movement',
+            source: 'boulder',
+            priority: 'medium',
+            volume: 0.8
+        });
+        movingBoulders.push(boulder);
+    }
+
+    // Process boulder movement from bottom to top to avoid conflicts
+    const sortedMovingBoulders = [...uniqueMovingBoulders].sort((a, b) => b.y - a.y);
+
+    for (const boulder of sortedMovingBoulders) {
+        const result = simulateBoulderFall(currentMaze, boulder);
+
+        // Check if boulder actually moved
+        const hasMoved = result.newPosition.x !== boulder.x || result.newPosition.y !== boulder.y;
+
+        if (hasMoved) {
+            // Check for player collision at the new position BEFORE updating maze
+            const targetCell = currentMaze[result.newPosition.y]?.[result.newPosition.x];
+            if (targetCell === CELL.PLAYER) {
+                playerCollisions.push(result.newPosition);
+            }
+
+            // Boulder moved successfully
+            currentMaze = result.newMaze;
+            positionUpdates.push({ from: boulder, to: result.newPosition });
+
+            // If this wasn't a newly triggered boulder, it's still moving
+            if (!triggeredBoulders.some(tb => tb.x === boulder.x && tb.y === boulder.y)) {
+                movingBoulders.push(boulder);
+            }
+        } else {
+            // Boulder stopped moving (collision or reached bottom)
+            completedBoulders.push(boulder);
+
+            // Check if there were collision events from simulateBoulderFall
+            const hasCollisionEvents = result.soundEvents.some(event => event.type === 'collision');
+
+            // If boulder tried to move but couldn't (collision), add COLLISION_THUD sound
+            if (hasCollisionEvents || !canBoulderFall(currentMaze, boulder)) {
+                allSoundEvents.push({
+                    type: 'collision',
+                    source: 'boulder',
+                    priority: 'high',
+                    volume: 0.9
+                });
+            }
+        }
+    }
+
+    const finalBoulderPositions = findBoulders(currentMaze);
+
+    return {
+        newMaze: currentMaze,
+        soundEvents: allSoundEvents,
+        boulderPositions: finalBoulderPositions,
+        arrowPositions: [], // No arrows in current implementation
+        movingBoulders,
+        completedBoulders,
+        playerCollisions
+    };
+}
+
+// Helper function to find player position in maze
+function findPlayerPosition(maze: MazeCell[][]): Position | null {
+    for (let y = 0; y < maze.length; y++) {
+        const row = maze[y];
+        if (!row) continue;
+
+        for (let x = 0; x < row.length; x++) {
+            if (row[x] === CELL.PLAYER) {
+                return { x, y };
+            }
+        }
+    }
+    return null;
 }
 
 // Pure function to simulate arrow movement (for future use)
@@ -81,11 +206,14 @@ export function simulateArrows(
         newMaze: currentMaze,
         soundEvents: allSoundEvents,
         boulderPositions: findBoulders(currentMaze),
-        arrowPositions: newArrowPositions
+        arrowPositions: newArrowPositions,
+        movingBoulders: [],
+        completedBoulders: [],
+        playerCollisions: []
     };
 }
 
-// Pure function to run a complete physics simulation step
+// Pure function to run a complete physics simulation step (legacy version)
 export function simulatePhysicsStep(
     maze: MazeCell[][],
     arrows: Array<{ position: Position; direction: { dx: number; dy: number } }> = []
@@ -101,7 +229,35 @@ export function simulatePhysicsStep(
         newMaze: arrowResult.newMaze,
         soundEvents: [...gravityResult.soundEvents, ...arrowResult.soundEvents],
         boulderPositions: arrowResult.boulderPositions,
-        arrowPositions: arrowResult.arrowPositions
+        arrowPositions: arrowResult.arrowPositions,
+        movingBoulders: [],
+        completedBoulders: [],
+        playerCollisions: []
+    };
+}
+
+// Enhanced function to run physics simulation with boulder state management
+export function simulatePhysicsStepWithState(
+    maze: MazeCell[][],
+    boulderStateManager: BoulderStateManager,
+    currentMoveNumber: number,
+    arrows: Array<{ position: Position; direction: { dx: number; dy: number } }> = []
+): PhysicsSimulationResult {
+    // First simulate gravity for boulders with state management
+    const gravityResult = simulateGravityWithState(maze, boulderStateManager, currentMoveNumber);
+
+    // Then simulate arrow movement
+    const arrowResult = simulateArrows(gravityResult.newMaze, arrows);
+
+    // Combine results
+    return {
+        newMaze: arrowResult.newMaze,
+        soundEvents: [...gravityResult.soundEvents, ...arrowResult.soundEvents],
+        boulderPositions: arrowResult.boulderPositions,
+        arrowPositions: arrowResult.arrowPositions,
+        movingBoulders: gravityResult.movingBoulders,
+        completedBoulders: gravityResult.completedBoulders,
+        playerCollisions: gravityResult.playerCollisions
     };
 }
 
@@ -125,4 +281,59 @@ export function shouldContinuePhysics(
     }
 
     return false;
+}
+
+// Pure function to check if physics simulation should continue with state
+export function shouldContinuePhysicsWithState(
+    boulderStateManager: BoulderStateManager
+): boolean {
+    return boulderStateManager.movingBoulderCount > 0;
+}
+
+// Pure function to get all moving boulder positions
+export function getMovingBoulderPositions(
+    boulderStateManager: BoulderStateManager
+): Position[] {
+    return Array.from(boulderStateManager.boulders.values())
+        .filter(state => state.isMoving)
+        .map(state => state.position);
+}
+
+// Pure function to get all stationary boulder positions
+export function getStationaryBoulderPositions(
+    boulderStateManager: BoulderStateManager
+): Position[] {
+    return Array.from(boulderStateManager.boulders.values())
+        .filter(state => !state.isMoving && !state.isTriggered)
+        .map(state => state.position);
+}
+
+// Pure function to get all triggered but not yet moving boulder positions
+export function getTriggeredBoulderPositions(
+    boulderStateManager: BoulderStateManager
+): Position[] {
+    return Array.from(boulderStateManager.boulders.values())
+        .filter(state => state.isTriggered && !state.isMoving)
+        .map(state => state.position);
+}
+
+// Pure function to categorize boulders by their state
+export function categorizeBoulders(
+    boulderStateManager: BoulderStateManager
+): {
+    moving: Position[];
+    stationary: Position[];
+    triggered: Position[];
+    total: number;
+} {
+    const moving = getMovingBoulderPositions(boulderStateManager);
+    const stationary = getStationaryBoulderPositions(boulderStateManager);
+    const triggered = getTriggeredBoulderPositions(boulderStateManager);
+
+    return {
+        moving,
+        stationary,
+        triggered,
+        total: boulderStateManager.boulders.size
+    };
 }
