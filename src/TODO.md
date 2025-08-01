@@ -30,59 +30,47 @@
 
 ## Version 3 - Improve sound
 
-- [x] Arrow sound should only play if arrow moves (note there are no arrows!)
+- [x] Arrow sound should only play if arrow moves (note there are no arrows!) - See Version 7
 - [x] Add bomb sound on collision
 - [x] Stop active sound if player presses a key.
   
 ## Version 4 - Add another dynamic
 
-~~- [ ] Items in a maze should describe thems selves and their behaviour. Write a specification for the appropriate Interfaces, and methods.~~ Decided to let AI manage code. Also to look to Agent Steering
-
 - [x] Create rules for boulders.
 - [ ] Implement Boulder Spec
-- [ ] Boulders should not be able to fall through soil - update requirements.
-- [ ] Increment build number each time the application is built
 
 ## Version 5 - Maze levels
 
 - [ ] Add support for multiple maze levels
 - [ ] Create 5 maze levels
-- [ ] Create specification document for maze levels.
-  - [ ] When a maze is exited provide the password for the next maze level. Level 1 does not require a password
-  - [ ] Allow jumping to a maze level via an assigned password. Trigger password by running into rock 6 times in a row.
-  - [ ] Only play victory sound when last level is exited.
+- [ ] Only play victory sound when last level is exited.
 
 ## Version 6
 
 - [ ] Improve Graphics
 
-## Road Map for future versions
-
 ## Version 7
 
-- [ ] Introduce Arrows
+- [ ] Boulders should not be able to fall through soil - update requirements.
+- [ ] Assign passwords to maze levels to allow player jump to another maze level.
+- [ ] Missing Arrows. Original spec asked for arrows but where are they? They are mentioned in the code.
 
 ## Version 8
 
 - [ ] Boulders should be able to be pushed by player
-- [ ] Assign a random password to each maze
-- [ ] Share password with player when exiting current maze
-- [ ] Use password for player to jump to another level
 
 ## Version 9
 
-- [ ] Introduce slopes (aka logs)
-- [ ] Zombies!
+- [ ] Introduce slopes for boulders to roll down and cause arrows to slip along
 
-## Version 10 Bonus Stretch Goal
+## Version 10 AI at run time?
 
-- [ ] Can AI create a maze can we ensure all diamonds reachable?
-- [ ] Add maze layout rules to .\instructions\maze.md
-
-## Version 11 AI at run time?
-
-- [ ] can the game call AI to create a new level...?
+- [ ] can the game call AI to create a new level as requested by a player...?
 - [ ] or Ask AI for hint?
+
+## Version 10
+
+- [ ] Zombies!
 
 ## Done
 
