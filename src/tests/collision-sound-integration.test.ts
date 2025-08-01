@@ -153,7 +153,9 @@ describe('Collision Sound Integration Tests', () => {
             const result = simulateBoulderFall(maze, boulderPosition);
 
             expect(result.newPosition).toEqual(boulderPosition);
-            expect(result.soundEvents).toHaveLength(0); // No movement, but collision would be detected
+            expect(result.soundEvents).toHaveLength(1); // Collision sound when boulder hits solid object
+            expect(result.soundEvents[0]?.type).toBe('collision');
+            expect(result.soundEvents[0]?.source).toBe('boulder');
         });
 
         it('should correctly identify when boulder can fall', () => {

@@ -188,8 +188,8 @@ export function detectBoulderCollision(
                 soundEvent: {
                     type: 'collision',
                     source: 'boulder',
-                    priority: 'medium',
-                    volume: 0.7
+                    priority: 'high',
+                    volume: 0.9
                 }
             };
 
@@ -205,8 +205,8 @@ export function detectBoulderCollision(
                 soundEvent: {
                     type: 'collision',
                     source: 'boulder',
-                    priority: 'medium',
-                    volume: 0.8
+                    priority: 'high',
+                    volume: 0.9
                 }
             };
 
@@ -256,8 +256,8 @@ export function detectBoulderCollision(
                 soundEvent: {
                     type: 'collision',
                     source: 'boulder',
-                    priority: 'medium',
-                    volume: 0.8
+                    priority: 'high',
+                    volume: 0.9
                 }
             };
 

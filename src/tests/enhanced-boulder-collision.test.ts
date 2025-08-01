@@ -90,7 +90,7 @@ describe('Enhanced Boulder Collision Detection', () => {
             expect(result.shouldTriggerBombExplosion).toBe(false);
             expect(result.shouldStopBoulder).toBe(true);
             expect(result.targetCell).toBe(CELL.SOIL);
-            expect(result.soundEvent?.volume).toBe(0.7);
+            expect(result.soundEvent?.volume).toBe(0.9);
         });
 
         it('should detect collision with diamond', () => {
@@ -108,7 +108,7 @@ describe('Enhanced Boulder Collision Detection', () => {
             expect(result.shouldTriggerBombExplosion).toBe(false);
             expect(result.shouldStopBoulder).toBe(true);
             expect(result.targetCell).toBe(CELL.DIAMOND);
-            expect(result.soundEvent?.volume).toBe(0.8);
+            expect(result.soundEvent?.volume).toBe(0.9);
         });
 
         it('should detect collision with bomb and trigger explosion', () => {
@@ -166,7 +166,7 @@ describe('Enhanced Boulder Collision Detection', () => {
             expect(result.shouldTriggerBombExplosion).toBe(false);
             expect(result.shouldStopBoulder).toBe(true);
             expect(result.targetCell).toBe(CELL.EXIT);
-            expect(result.soundEvent?.volume).toBe(0.8);
+            expect(result.soundEvent?.volume).toBe(0.9);
         });
 
         it('should detect wall collision when out of bounds', () => {
@@ -219,7 +219,10 @@ describe('Enhanced Boulder Collision Detection', () => {
             expect(result.newPosition).toEqual(boulderPosition);
             expect(result.newMaze[0]![0]).toBe(CELL.BOULDER);
             expect(result.newMaze[1]![0]).toBe(CELL.ROCK);
-            expect(result.soundEvents).toHaveLength(0); // No collision sound in this case
+            expect(result.soundEvents).toHaveLength(1); // Collision sound when boulder hits rock
+            expect(result.soundEvents[0]?.type).toBe('collision');
+            expect(result.soundEvents[0]?.source).toBe('boulder');
+            expect(result.soundEvents[0]?.volume).toBe(0.9);
             expect(result.playerCollision).toBe(false);
             expect(result.bombExplosion).toBe(false);
         });
@@ -275,7 +278,10 @@ describe('Enhanced Boulder Collision Detection', () => {
 
             expect(result.newPosition).toEqual(boulderPosition);
             expect(result.newMaze).toEqual(maze);
-            expect(result.soundEvents).toHaveLength(0);
+            expect(result.soundEvents).toHaveLength(1); // Collision sound when boulder hits soil
+            expect(result.soundEvents[0]?.type).toBe('collision');
+            expect(result.soundEvents[0]?.source).toBe('boulder');
+            expect(result.soundEvents[0]?.volume).toBe(0.9);
             expect(result.playerCollision).toBe(false);
             expect(result.bombExplosion).toBe(false);
         });
@@ -600,16 +606,21 @@ describe('Enhanced Boulder Collision Integration Tests', () => {
 
     describe('Sound event generation for different collision types', () => {
         it('should generate appropriate sound events for each collision type', () => {
-            const testCases = [
+            const solidObjectTestCases = [
                 { cell: CELL.ROCK, expectedVolume: 0.9, expectedPriority: 'high' as const },
-                { cell: CELL.BOULDER, expectedVolume: 0.8, expectedPriority: 'high' as const },
-                { cell: CELL.SOIL, expectedVolume: 0.7, expectedPriority: 'medium' as const },
-                { cell: CELL.DIAMOND, expectedVolume: 0.8, expectedPriority: 'medium' as const },
-                { cell: CELL.BOMB, expectedVolume: 0.9, expectedPriority: 'high' as const },
-                { cell: CELL.EXIT, expectedVolume: 0.8, expectedPriority: 'medium' as const }
+                { cell: CELL.BOULDER, expectedVolume: 0.9, expectedPriority: 'high' as const },
+                { cell: CELL.SOIL, expectedVolume: 0.9, expectedPriority: 'high' as const },
+                { cell: CELL.DIAMOND, expectedVolume: 0.9, expectedPriority: 'high' as const },
+                { cell: CELL.EXIT, expectedVolume: 0.9, expectedPriority: 'high' as const }
             ];
 
-            testCases.forEach(({ cell, expectedVolume, expectedPriority }) => {
+            const specialCollisionTestCases = [
+                { cell: CELL.PLAYER, expectedVolume: 1.0, expectedPriority: 'high' as const, expectedType: 'death' as const },
+                { cell: CELL.BOMB, expectedVolume: 0.9, expectedPriority: 'high' as const, expectedType: 'collision' as const }
+            ];
+
+            // Test solid object collisions
+            solidObjectTestCases.forEach(({ cell, expectedVolume, expectedPriority }) => {
                 const maze: MazeCell[][] = [
                     [CELL.BOULDER],
                     [cell]
@@ -618,16 +629,32 @@ describe('Enhanced Boulder Collision Integration Tests', () => {
 
                 const result = simulateEnhancedBoulderFall(maze, boulderPosition);
 
-                // Should not move for solid objects (except player/bomb)
-                if (cell !== CELL.PLAYER && cell !== CELL.BOMB) {
-                    expect(result.newPosition).toEqual(boulderPosition);
-                    expect(result.soundEvents).toHaveLength(0); // No collision sound in this implementation
-                } else {
-                    expect(result.newPosition).toEqual({ x: 0, y: 1 });
-                    expect(result.soundEvents).toHaveLength(1);
-                    expect(result.soundEvents[0]?.volume).toBe(expectedVolume);
-                    expect(result.soundEvents[0]?.priority).toBe(expectedPriority);
-                }
+                // Should not move for solid objects
+                expect(result.newPosition).toEqual(boulderPosition);
+                expect(result.soundEvents).toHaveLength(1); // Collision sound when boulder hits solid objects
+                expect(result.soundEvents[0]?.type).toBe('collision');
+                expect(result.soundEvents[0]?.source).toBe('boulder');
+                expect(result.soundEvents[0]?.volume).toBe(expectedVolume);
+                expect(result.soundEvents[0]?.priority).toBe(expectedPriority);
+            });
+
+            // Test special collision cases (player/bomb)
+            specialCollisionTestCases.forEach(({ cell, expectedVolume, expectedPriority, expectedType }) => {
+                const maze: MazeCell[][] = [
+                    [CELL.BOULDER],
+                    [cell]
+                ];
+                const boulderPosition: Position = { x: 0, y: 0 };
+
+                const result = simulateEnhancedBoulderFall(maze, boulderPosition);
+
+                // Should move into player/bomb position
+                expect(result.newPosition).toEqual({ x: 0, y: 1 });
+                expect(result.soundEvents).toHaveLength(1);
+                expect(result.soundEvents[0]?.type).toBe(expectedType);
+                expect(result.soundEvents[0]?.source).toBe('boulder');
+                expect(result.soundEvents[0]?.volume).toBe(expectedVolume);
+                expect(result.soundEvents[0]?.priority).toBe(expectedPriority);
             });
         });
 
@@ -658,7 +685,9 @@ describe('Enhanced Boulder Collision Integration Tests', () => {
 
             // Boulder should not move (at bottom boundary)
             expect(result.newPosition).toEqual(boulderPosition);
-            expect(result.soundEvents).toHaveLength(0);
+            expect(result.soundEvents).toHaveLength(1); // Collision sound when boulder hits boundary
+            expect(result.soundEvents[0]?.type).toBe('collision');
+            expect(result.soundEvents[0]?.source).toBe('boulder');
         });
 
         it('should handle out of bounds collision detection', () => {
