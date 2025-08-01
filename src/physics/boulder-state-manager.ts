@@ -252,11 +252,11 @@ export function getTriggeredBouldersForMove(
     const triggeredBoulders: Position[] = [];
 
     for (const state of boulderStateManager.boulders.values()) {
-        // Boulder should start moving if it was triggered for this move
-        // and is not already moving
+        // Boulder should start moving if it was triggered on the previous move
+        // and is not already moving (boulders start moving on the move after being triggered)
         if (state.isTriggered &&
             !state.isMoving &&
-            state.triggeredOnMove === currentMoveNumber) {
+            state.triggeredOnMove === currentMoveNumber - 1) {
             triggeredBoulders.push(state.position);
         }
     }

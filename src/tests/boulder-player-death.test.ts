@@ -38,8 +38,8 @@ describe('Boulder Player Death', () => {
                 2 // Trigger for move 2
             );
 
-            // Simulate physics on move 2 (boulder should start moving and hit player)
-            const result = simulatePhysicsStepWithState(maze, boulderStateManager, 2);
+            // Simulate physics on move 3 (boulder triggered on move 2 should start moving on move 3)
+            const result = simulatePhysicsStepWithState(maze, boulderStateManager, 3);
 
             // Should detect player collision
             expect(result.playerCollisions).toHaveLength(1);
@@ -64,7 +64,7 @@ describe('Boulder Player Death', () => {
                 2 // Trigger for move 2
             );
 
-            const result = simulatePhysicsStepWithState(maze, boulderStateManager, 2);
+            const result = simulatePhysicsStepWithState(maze, boulderStateManager, 3);
 
             // Boulder should be at player position
             expect(result.newMaze[1]![0]).toBe(CELL.BOULDER);
@@ -111,7 +111,7 @@ describe('Boulder Player Death', () => {
             gameState.boulderStateManager = updateBoulderTriggers(
                 gameState.boulderStateManager,
                 [{ x: 1, y: 0 }],
-                9 // Trigger for move 9 so it starts moving on move 9
+                8 // Trigger for move 8 so it starts moving on move 9
             );
 
             // Move player right into the path where boulder will fall
@@ -139,7 +139,7 @@ describe('Boulder Player Death', () => {
             gameState.boulderStateManager = updateBoulderTriggers(
                 gameState.boulderStateManager,
                 [{ x: 1, y: 0 }],
-                9 // Trigger for move 9
+                8 // Trigger for move 8 so it starts moving on move 9
             );
 
             // Move player into boulder's path
@@ -161,7 +161,7 @@ describe('Boulder Player Death', () => {
             gameState.boulderStateManager = updateBoulderTriggers(
                 gameState.boulderStateManager,
                 [{ x: 1, y: 0 }],
-                9 // Trigger for move 9
+                8 // Trigger for move 8 so it starts moving on move 9
             );
 
             const afterMove = movePlayer(gameState, 1, 0);

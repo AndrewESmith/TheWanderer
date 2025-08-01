@@ -33,6 +33,9 @@
 
 - [x] 5. Implement boulder movement audio events
 
+
+
+
   - Add BOULDER_MOVE sound event generation when boulders start moving
   - Implement COLLISION_THUD sound events for boulder collisions
   - Ensure audio events respect global mute settings

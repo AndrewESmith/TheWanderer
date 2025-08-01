@@ -451,8 +451,8 @@ describe('Boulder State Manager', () => {
             const triggeredBoulders: Position[] = [{ x: 1, y: 1 }, { x: 1, y: 3 }];
             const updatedManager = updateBoulderTriggers(manager, triggeredBoulders, 5);
 
-            // Check for move 5 (should return boulders triggered on move 5)
-            const bouldersToMove = getTriggeredBouldersForMove(updatedManager, 5);
+            // Check for move 6 (should return boulders triggered on move 5)
+            const bouldersToMove = getTriggeredBouldersForMove(updatedManager, 6);
             expect(bouldersToMove).toHaveLength(2);
             expect(bouldersToMove).toContainEqual({ x: 1, y: 1 });
             expect(bouldersToMove).toContainEqual({ x: 1, y: 3 });
@@ -463,7 +463,7 @@ describe('Boulder State Manager', () => {
             let updatedManager = updateBoulderTriggers(manager, [{ x: 1, y: 1 }], 5);
             updatedManager = updateBoulderMovement(updatedManager, [{ x: 1, y: 1 }], []);
 
-            const bouldersToMove = getTriggeredBouldersForMove(updatedManager, 5);
+            const bouldersToMove = getTriggeredBouldersForMove(updatedManager, 6);
             expect(bouldersToMove).toHaveLength(0);
         });
 
@@ -471,7 +471,7 @@ describe('Boulder State Manager', () => {
             // Trigger boulder on move 3
             const updatedManager = updateBoulderTriggers(manager, [{ x: 1, y: 1 }], 3);
 
-            // Check for move 6 (boulder was triggered on move 3, not 5)
+            // Check for move 6 (boulder was triggered on move 3, should start moving on move 4, not 6)
             const bouldersToMove = getTriggeredBouldersForMove(updatedManager, 6);
             expect(bouldersToMove).toHaveLength(0);
         });
