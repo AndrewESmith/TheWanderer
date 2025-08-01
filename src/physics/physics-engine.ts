@@ -25,6 +25,7 @@ export interface PhysicsSimulationResult {
     movingBoulders: Position[];
     completedBoulders: Position[];
     playerCollisions: Position[];
+    positionUpdates: Array<{ from: Position; to: Position }>;
 }
 
 // Pure function to find all boulders in the maze
@@ -71,7 +72,8 @@ export function simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult {
         arrowPositions: [], // No arrows in current implementation
         movingBoulders: [],
         completedBoulders: [],
-        playerCollisions: []
+        playerCollisions: [],
+        positionUpdates: [] // Legacy function doesn't track position updates
     };
 }
 
@@ -154,7 +156,8 @@ export function simulateGravityWithState(
         arrowPositions: [], // No arrows in current implementation
         movingBoulders,
         completedBoulders,
-        playerCollisions
+        playerCollisions,
+        positionUpdates
     };
 }
 
@@ -199,7 +202,8 @@ export function simulateArrows(
         arrowPositions: newArrowPositions,
         movingBoulders: [],
         completedBoulders: [],
-        playerCollisions: []
+        playerCollisions: [],
+        positionUpdates: [] // Arrow simulation doesn't track boulder position updates
     };
 }
 
@@ -222,7 +226,8 @@ export function simulatePhysicsStep(
         arrowPositions: arrowResult.arrowPositions,
         movingBoulders: [],
         completedBoulders: [],
-        playerCollisions: []
+        playerCollisions: [],
+        positionUpdates: [] // Legacy function doesn't track position updates
     };
 }
 
@@ -247,7 +252,8 @@ export function simulatePhysicsStepWithState(
         arrowPositions: arrowResult.arrowPositions,
         movingBoulders: gravityResult.movingBoulders,
         completedBoulders: gravityResult.completedBoulders,
-        playerCollisions: gravityResult.playerCollisions
+        playerCollisions: gravityResult.playerCollisions,
+        positionUpdates: gravityResult.positionUpdates
     };
 }
 

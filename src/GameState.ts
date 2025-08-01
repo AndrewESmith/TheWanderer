@@ -190,6 +190,12 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     { x: newX, y: newY }
   );
 
+  // Update boulder positions based on physics results
+  updatedBoulderStateManager = updateBoulderPositions(
+    updatedBoulderStateManager,
+    physicsResult.positionUpdates
+  );
+
   // Update boulder movement states based on physics results
   updatedBoulderStateManager = updateBoulderMovement(
     updatedBoulderStateManager,
@@ -209,7 +215,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     updatedBoulderStateManager = updateBoulderTriggers(
       updatedBoulderStateManager,
       triggeredBoulders,
-      newMoves - 1 // Trigger for next move (newMoves - 1)
+      newMoves // Trigger on current move, will start moving on next move
     );
   }
 

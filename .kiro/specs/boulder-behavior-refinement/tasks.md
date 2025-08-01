@@ -63,6 +63,8 @@
 
 
 
+
+
   - Add logic to detect when moving boulder hits player
   - Implement immediate player death and game state transition
   - Ensure DEATH_SOUND plays on boulder collision death
