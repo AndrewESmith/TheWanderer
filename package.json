@@ -19,7 +19,7 @@
     "dev": "cross-env NODE_NO_WARNINGS=1 vite --mode development",
     "build": "vite build --mode production",
     "preview": "vite preview",
-    "test": "vitest run -c vitest.config.ts",
+    "test": "vitest run -c vitest.config.ts --bail=1",
     "test:watch": "vitest -c vitest.config.ts",
     "test:isolated": "node --experimental-vm-modules run-tests.js",
     "test:no-warnings": "cross-env NODE_NO_WARNINGS=1 vitest run -c vitest.config.ts",
