@@ -324,22 +324,14 @@ export function simulateEnhancedBoulderFall(
 
     // Check if boulder can fall
     if (!canBoulderFall(maze, boulderPosition)) {
-        // Boulder can't fall - check if it's trying to move (collision detection)
-        const belowPosition = { x: boulderPosition.x, y: boulderPosition.y + 1 };
-        const collision = detectBoulderCollision(maze, belowPosition);
-
-        // If there's a collision and it would generate a sound, add it
-        if (collision.hasCollision && collision.soundEvent) {
-            soundEvents.push(collision.soundEvent);
-        }
-
+        // Boulder can't fall - it's stationary, so no sound events should be generated
         return {
             newMaze: maze,
             newPosition: boulderPosition,
-            soundEvents,
+            soundEvents: [], // No sound events for stationary boulder
             playerCollision: false,
             bombExplosion: false,
-            targetCell: collision.targetCell
+            targetCell: undefined
         };
     }
 
@@ -409,8 +401,8 @@ export function simulateEnhancedBoulderFall(
     soundEvents.push({
         type: 'movement',
         source: 'boulder',
-        priority: 'low',
-        volume: 0.5
+        priority: 'medium',
+        volume: 0.8
     });
 
     return {

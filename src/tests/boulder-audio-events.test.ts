@@ -417,7 +417,7 @@ describe('Boulder Audio Events', () => {
             const testMaze: MazeCell[][] = [
                 [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
                 [CELL.ROCK, CELL.BOULDER, CELL.EMPTY, CELL.ROCK],
-                [CELL.ROCK, CELL.ROCK, CELL.EMPTY, CELL.ROCK],
+                [CELL.ROCK, CELL.EMPTY, CELL.EMPTY, CELL.ROCK],
                 [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK]
             ];
 
