@@ -3,6 +3,7 @@ import { CELL } from '../maze';
 import type { SoundEvent } from '../Interfaces/ISoundEvent';
 import {
     simulateBoulderFall,
+    simulateEnhancedBoulderFall,
     simulateArrowMovement,
     canBoulderFall,
     type Position
@@ -116,23 +117,20 @@ export function simulateGravityWithState(
     const sortedMovingBoulders = [...uniqueMovingBoulders].sort((a, b) => b.y - a.y);
 
     for (const boulder of sortedMovingBoulders) {
-        const result = simulateBoulderFall(currentMaze, boulder);
-
-
+        const result = simulateEnhancedBoulderFall(currentMaze, boulder);
 
         // Add sound events from boulder fall simulation
         allSoundEvents.push(...result.soundEvents);
+
+        // Check for player collision
+        if (result.playerCollision) {
+            playerCollisions.push(result.newPosition);
+        }
 
         // Check if boulder actually moved
         const hasMoved = result.newPosition.x !== boulder.x || result.newPosition.y !== boulder.y;
 
         if (hasMoved) {
-            // Check for player collision at the new position BEFORE updating maze
-            const targetCell = currentMaze[result.newPosition.y]?.[result.newPosition.x];
-            if (targetCell === CELL.PLAYER) {
-                playerCollisions.push(result.newPosition);
-            }
-
             // Boulder moved successfully
             currentMaze = result.newMaze;
             positionUpdates.push({ from: boulder, to: result.newPosition });
@@ -144,9 +142,6 @@ export function simulateGravityWithState(
         } else {
             // Boulder stopped moving (collision or reached bottom)
             completedBoulders.push(boulder);
-
-            // Note: Collision sounds are now handled by simulateBoulderFall
-            // No need to add duplicate collision sounds here
         }
     }
 

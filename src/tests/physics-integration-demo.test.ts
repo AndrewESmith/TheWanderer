@@ -84,23 +84,43 @@ describe('Physics Integration Demo', () => {
         ];
 
         console.log('Game integration test:');
-        console.log('Player moves right, boulder at (2,2) should fall to (2,3)');
+        console.log('Player moves right to trigger boulder, then moves again to make boulder fall');
 
         const gameState = createInitialGameState(testMaze);
 
-        // Player moves right
-        const newGameState = movePlayer(gameState, 1, 0);
+        console.log('Initial state:');
+        console.log('Player position:', gameState.player);
+        console.log('Moves:', gameState.moves);
+        console.log('Boulder state manager boulders:', Array.from(gameState.boulderStateManager.boulders.entries()));
 
-        // Verify player moved
-        expect(newGameState.player?.x).toBe(2);
-        expect(newGameState.player?.y).toBe(1);
+        // Move 1: Player moves right (triggers boulder)
+        const gameStateAfterMove1 = movePlayer(gameState, 1, 0);
+
+        console.log('After move 1 (trigger):');
+        console.log('Player position:', gameStateAfterMove1.player);
+        console.log('Moves:', gameStateAfterMove1.moves);
+        console.log('Boulder state manager boulders:', Array.from(gameStateAfterMove1.boulderStateManager.boulders.entries()));
+
+        // Verify player moved and boulder is triggered but hasn't moved yet
+        expect(gameStateAfterMove1.player?.x).toBe(2);
+        expect(gameStateAfterMove1.player?.y).toBe(1);
+        expect(gameStateAfterMove1.maze[2]![2]).toBe(CELL.BOULDER); // Boulder still in original position
+        expect(gameStateAfterMove1.maze[3]![2]).toBe(CELL.EMPTY); // No boulder below yet
+
+        // Move 2: Player moves again (boulder should start falling)
+        const gameStateAfterMove2 = movePlayer(gameStateAfterMove1, 1, 0);
+
+        console.log('After move 2 (boulder falls):');
+        console.log('Player position:', gameStateAfterMove2.player);
+        console.log('Moves:', gameStateAfterMove2.moves);
+        console.log('Boulder state manager boulders:', Array.from(gameStateAfterMove2.boulderStateManager.boulders.entries()));
 
         // Verify boulder fell due to physics simulation
-        expect(newGameState.maze[2]![2]).toBe(CELL.EMPTY); // Original boulder position empty
-        expect(newGameState.maze[3]![2]).toBe(CELL.BOULDER); // Boulder fell down
+        expect(gameStateAfterMove2.maze[2]![2]).toBe(CELL.EMPTY); // Original boulder position empty
+        expect(gameStateAfterMove2.maze[3]![2]).toBe(CELL.BOULDER); // Boulder fell down
 
         console.log('Player moved successfully and boulder physics was applied');
-        console.log('Final player position:', newGameState.player);
+        console.log('Final player position:', gameStateAfterMove2.player);
         console.log('Boulder moved from (2,2) to (2,3)');
     });
 

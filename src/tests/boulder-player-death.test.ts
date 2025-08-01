@@ -35,7 +35,7 @@ describe('Boulder Player Death', () => {
             boulderStateManager = updateBoulderTriggers(
                 boulderStateManager,
                 [{ x: 0, y: 0 }], // Trigger boulder at (0,0)
-                1 // Move 1
+                2 // Trigger for move 2
             );
 
             // Simulate physics on move 2 (boulder should start moving and hit player)
@@ -61,7 +61,7 @@ describe('Boulder Player Death', () => {
             boulderStateManager = updateBoulderTriggers(
                 boulderStateManager,
                 [{ x: 0, y: 0 }],
-                1
+                2 // Trigger for move 2
             );
 
             const result = simulatePhysicsStepWithState(maze, boulderStateManager, 2);
@@ -111,7 +111,7 @@ describe('Boulder Player Death', () => {
             gameState.boulderStateManager = updateBoulderTriggers(
                 gameState.boulderStateManager,
                 [{ x: 1, y: 0 }],
-                8 // Trigger on move 8 so it starts moving on move 9
+                9 // Trigger for move 9 so it starts moving on move 9
             );
 
             // Move player right into the path where boulder will fall
@@ -139,7 +139,7 @@ describe('Boulder Player Death', () => {
             gameState.boulderStateManager = updateBoulderTriggers(
                 gameState.boulderStateManager,
                 [{ x: 1, y: 0 }],
-                8
+                9 // Trigger for move 9
             );
 
             // Move player into boulder's path
@@ -161,7 +161,7 @@ describe('Boulder Player Death', () => {
             gameState.boulderStateManager = updateBoulderTriggers(
                 gameState.boulderStateManager,
                 [{ x: 1, y: 0 }],
-                8
+                9 // Trigger for move 9
             );
 
             const afterMove = movePlayer(gameState, 1, 0);
