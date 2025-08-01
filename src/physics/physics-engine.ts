@@ -108,17 +108,9 @@ export function simulateGravityWithState(
 
 
 
-    // Track newly triggered boulders and generate movement sounds
+    // Track newly triggered boulders
     for (const boulder of triggeredBoulders) {
         movingBoulders.push(boulder);
-
-        // Generate BOULDER_MOVE sound when boulder starts moving
-        allSoundEvents.push({
-            type: 'movement',
-            source: 'boulder',
-            priority: 'medium',
-            volume: 0.8
-        });
     }
 
     // Process boulder movement from bottom to top to avoid conflicts

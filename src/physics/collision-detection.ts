@@ -405,8 +405,13 @@ export function simulateEnhancedBoulderFall(
     // Move boulder to new position
     newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
 
-    // Note: Movement sound is generated when boulder starts moving, not on each step
-    // This prevents duplicate movement sounds for continuing boulder movement
+    // Generate movement sound when boulder successfully moves
+    soundEvents.push({
+        type: 'movement',
+        source: 'boulder',
+        priority: 'medium',
+        volume: 0.8
+    });
 
     return {
         newMaze,
