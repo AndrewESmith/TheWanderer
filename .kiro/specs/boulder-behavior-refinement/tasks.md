@@ -48,6 +48,10 @@
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
 - [ ] 7. Implement player death from boulder collision
+
+
+
+
   - Add logic to detect when moving boulder hits player
   - Implement immediate player death and game state transition
   - Ensure DEATH_SOUND plays on boulder collision death

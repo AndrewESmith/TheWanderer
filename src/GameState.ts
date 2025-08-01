@@ -4,10 +4,17 @@ import type { MazeCell } from "./maze";
 import type { IPlayerPos } from "./Interfaces/IPlayerPos";
 import { generatePlayerMoveEvents } from "./audio/events/sound-event-mapper";
 import { emitSoundEvents } from "./audio/events/sound-event-emitter";
-import { simulatePhysicsStep } from "./physics/physics-engine";
+import { simulatePhysicsStep, simulatePhysicsStepWithState } from "./physics/physics-engine";
 import { handleGameEndSounds } from "./audio/events/game-end-sound-manager";
 import type { BoulderStateManager, MovementConstraint } from "./physics/boulder-state-manager";
-import { createBoulderStateManager, updatePlayerPosition } from "./physics/boulder-state-manager";
+import {
+  createBoulderStateManager,
+  updatePlayerPosition,
+  updateBoulderMovement,
+  updateBoulderPositions,
+  identifyTriggeredBoulders,
+  updateBoulderTriggers
+} from "./physics/boulder-state-manager";
 import { shouldBlockPlayerMovement, updateMovementConstraints } from "./physics/movement-constraint-system";
 
 // Game state type following TypeScript standards
@@ -139,8 +146,17 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   );
 
   // Simulate physics after player movement (boulder gravity, etc.)
-  const physicsResult = simulatePhysicsStep(newMaze);
+  const physicsResult = simulatePhysicsStepWithState(
+    newMaze,
+    gameState.boulderStateManager,
+    newMoves
+  );
   const finalMaze = physicsResult.newMaze;
+
+  // Check for boulder-player collisions and handle player death
+  if (physicsResult.playerCollisions.length > 0 && newGameState === 'playing') {
+    newGameState = 'dead';
+  }
 
   // Only include physics sound events if this is not the first move (when moves = 54)
   // This prevents initial boulder sounds from playing on the first move
@@ -168,11 +184,34 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     }
   }
 
-  // Update boulder state manager with new player position
-  const updatedBoulderStateManager = updatePlayerPosition(
+  // Update boulder state manager with physics results
+  let updatedBoulderStateManager = updatePlayerPosition(
     gameState.boulderStateManager,
     { x: newX, y: newY }
   );
+
+  // Update boulder movement states based on physics results
+  updatedBoulderStateManager = updateBoulderMovement(
+    updatedBoulderStateManager,
+    physicsResult.movingBoulders,
+    physicsResult.completedBoulders
+  );
+
+  // Identify and trigger newly adjacent boulders
+  const triggeredBoulders = identifyTriggeredBoulders(
+    gameState.boulderStateManager.lastPlayerPosition,
+    { x: newX, y: newY },
+    updatedBoulderStateManager
+  );
+
+  // Update boulder triggers for next move
+  if (triggeredBoulders.length > 0) {
+    updatedBoulderStateManager = updateBoulderTriggers(
+      updatedBoulderStateManager,
+      triggeredBoulders,
+      newMoves // Current move number for triggering
+    );
+  }
 
   // Update movement constraints based on current boulder states
   const updatedMovementConstraint = updateMovementConstraints(updatedBoulderStateManager);
