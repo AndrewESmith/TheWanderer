@@ -15,6 +15,14 @@ import {
     updateBoulderPositions,
     createPositionKey
 } from './boulder-state-manager';
+import {
+    validateMazeIntegrity,
+    validateBoulderStateManager,
+    handlePhysicsError,
+    createFallbackBoulderStateManager,
+    logBoulderError,
+    type ErrorResult
+} from './boulder-error-handling';
 
 // Enhanced physics simulation result
 export interface PhysicsSimulationResult {
@@ -77,88 +85,208 @@ export function simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult {
     };
 }
 
-// Enhanced function to simulate gravity with boulder state management
+// Enhanced function to simulate gravity with boulder state management and error handling
 export function simulateGravityWithState(
     maze: MazeCell[][],
     boulderStateManager: BoulderStateManager,
     currentMoveNumber: number
 ): PhysicsSimulationResult {
-    let currentMaze = maze.map(row => [...row]);
-    const allSoundEvents: SoundEvent[] = [];
-    const movingBoulders: Position[] = [];
-    const completedBoulders: Position[] = [];
-    const playerCollisions: Position[] = [];
-    const positionUpdates: Array<{ from: Position; to: Position }> = [];
+    try {
+        // Validate inputs
+        const mazeValidation = validateMazeIntegrity(maze);
+        if (!mazeValidation.success) {
+            logBoulderError(mazeValidation.error!, 'simulateGravityWithState');
 
-    // Get boulders that should start moving this turn
-    const triggeredBoulders = getTriggeredBouldersForMove(boulderStateManager, currentMoveNumber);
-
-    // Get all boulders that are currently moving or should start moving
-    const currentlyMovingBoulders = Array.from(boulderStateManager.boulders.values())
-        .filter(state => state.isMoving)
-        .map(state => state.position);
-
-    const allMovingBoulders = [
-        ...triggeredBoulders,
-        ...currentlyMovingBoulders
-    ];
-
-    // Remove duplicates based on position
-    const uniqueMovingBoulders = allMovingBoulders.filter((boulder, index, array) =>
-        array.findIndex(b => b.x === boulder.x && b.y === boulder.y) === index
-    );
-
-
-
-    // Track newly triggered boulders
-    for (const boulder of triggeredBoulders) {
-        movingBoulders.push(boulder);
-    }
-
-    // Process boulder movement from bottom to top to avoid conflicts
-    const sortedMovingBoulders = [...uniqueMovingBoulders].sort((a, b) => b.y - a.y);
-
-    for (const boulder of sortedMovingBoulders) {
-        const result = simulateEnhancedBoulderFall(currentMaze, boulder);
-
-        // Add sound events from boulder fall simulation
-        allSoundEvents.push(...result.soundEvents);
-
-        // Check for player collision
-        if (result.playerCollision) {
-            playerCollisions.push(result.newPosition);
+            // Return safe fallback result
+            const safeMaze = maze && Array.isArray(maze) ? maze.map(row => [...row]) : [];
+            return {
+                newMaze: safeMaze,
+                soundEvents: [],
+                boulderPositions: safeMaze.length > 0 ? findBoulders(safeMaze) : [],
+                arrowPositions: [],
+                movingBoulders: [],
+                completedBoulders: [],
+                playerCollisions: [],
+                positionUpdates: []
+            };
         }
 
-        // Check if boulder actually moved
-        const hasMoved = result.newPosition.x !== boulder.x || result.newPosition.y !== boulder.y;
+        const managerValidation = validateBoulderStateManager(boulderStateManager, maze);
+        if (!managerValidation.success) {
+            logBoulderError(managerValidation.error!, 'simulateGravityWithState');
 
-        if (hasMoved) {
-            // Boulder moved successfully
-            currentMaze = result.newMaze;
-            positionUpdates.push({ from: boulder, to: result.newPosition });
-
-            // If this wasn't a newly triggered boulder, it's still moving
-            if (!triggeredBoulders.some(tb => tb.x === boulder.x && tb.y === boulder.y)) {
-                movingBoulders.push(boulder);
+            if (!managerValidation.error?.recoverable) {
+                // Return safe fallback result for non-recoverable errors
+                const safeMaze = maze && Array.isArray(maze) ? maze.map(row => [...row]) : [];
+                return {
+                    newMaze: safeMaze,
+                    soundEvents: [],
+                    boulderPositions: safeMaze.length > 0 ? findBoulders(safeMaze) : [],
+                    arrowPositions: [],
+                    movingBoulders: [],
+                    completedBoulders: [],
+                    playerCollisions: [],
+                    positionUpdates: []
+                };
             }
-        } else {
-            // Boulder stopped moving (collision or reached bottom)
-            completedBoulders.push(boulder);
         }
+
+        let currentMaze = maze.map(row => [...row]);
+        const allSoundEvents: SoundEvent[] = [];
+        const movingBoulders: Position[] = [];
+        const completedBoulders: Position[] = [];
+        const playerCollisions: Position[] = [];
+        const positionUpdates: Array<{ from: Position; to: Position }> = [];
+
+        // Get boulders that should start moving this turn
+        let triggeredBoulders: Position[] = [];
+        try {
+            triggeredBoulders = getTriggeredBouldersForMove(boulderStateManager, currentMoveNumber);
+        } catch (error) {
+            logBoulderError({
+                type: 'physics_failure',
+                message: `Error getting triggered boulders: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                context: { error, currentMoveNumber },
+                recoverable: true
+            }, 'simulateGravityWithState');
+            triggeredBoulders = []; // Continue with empty array
+        }
+
+        // Get all boulders that are currently moving or should start moving
+        let currentlyMovingBoulders: Position[] = [];
+        try {
+            currentlyMovingBoulders = Array.from(boulderStateManager.boulders.values())
+                .filter(state => state.isMoving)
+                .map(state => state.position);
+        } catch (error) {
+            logBoulderError({
+                type: 'physics_failure',
+                message: `Error getting currently moving boulders: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                context: { error },
+                recoverable: true
+            }, 'simulateGravityWithState');
+            currentlyMovingBoulders = []; // Continue with empty array
+        }
+
+        const allMovingBoulders = [
+            ...triggeredBoulders,
+            ...currentlyMovingBoulders
+        ];
+
+        // Remove duplicates based on position
+        const uniqueMovingBoulders = allMovingBoulders.filter((boulder, index, array) =>
+            array.findIndex(b => b.x === boulder.x && b.y === boulder.y) === index
+        );
+
+        // Track newly triggered boulders
+        for (const boulder of triggeredBoulders) {
+            movingBoulders.push(boulder);
+        }
+
+        // Process boulder movement from bottom to top to avoid conflicts
+        const sortedMovingBoulders = [...uniqueMovingBoulders].sort((a, b) => b.y - a.y);
+
+        for (const boulder of sortedMovingBoulders) {
+            try {
+                const result = simulateEnhancedBoulderFall(currentMaze, boulder);
+
+                // Add sound events from boulder fall simulation
+                allSoundEvents.push(...result.soundEvents);
+
+                // Check for player collision
+                if (result.playerCollision) {
+                    playerCollisions.push(result.newPosition);
+                }
+
+                // Check if boulder actually moved
+                const hasMoved = result.newPosition.x !== boulder.x || result.newPosition.y !== boulder.y;
+
+                if (hasMoved) {
+                    // Boulder moved successfully
+                    currentMaze = result.newMaze;
+                    positionUpdates.push({ from: boulder, to: result.newPosition });
+
+                    // If this wasn't a newly triggered boulder, it's still moving
+                    if (!triggeredBoulders.some(tb => tb.x === boulder.x && tb.y === boulder.y)) {
+                        movingBoulders.push(boulder);
+                    }
+                } else {
+                    // Boulder stopped moving (collision or reached bottom)
+                    completedBoulders.push(boulder);
+                }
+            } catch (boulderError) {
+                logBoulderError({
+                    type: 'physics_failure',
+                    message: `Error simulating boulder fall at position (${boulder.x},${boulder.y}): ${boulderError instanceof Error ? boulderError.message : 'Unknown error'}`,
+                    context: { boulder, error: boulderError },
+                    recoverable: true
+                }, 'simulateGravityWithState');
+
+                // Mark boulder as completed to prevent infinite processing
+                completedBoulders.push(boulder);
+                continue;
+            }
+        }
+
+        let finalBoulderPositions: Position[] = [];
+        try {
+            finalBoulderPositions = findBoulders(currentMaze);
+        } catch (error) {
+            logBoulderError({
+                type: 'physics_failure',
+                message: `Error finding final boulder positions: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                context: { error },
+                recoverable: true
+            }, 'simulateGravityWithState');
+            finalBoulderPositions = []; // Continue with empty array
+        }
+
+        return {
+            newMaze: currentMaze,
+            soundEvents: allSoundEvents,
+            boulderPositions: finalBoulderPositions,
+            arrowPositions: [], // No arrows in current implementation
+            movingBoulders,
+            completedBoulders,
+            playerCollisions,
+            positionUpdates
+        };
+    } catch (error) {
+        logBoulderError({
+            type: 'physics_failure',
+            message: `Unexpected error in gravity simulation: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            context: { error, currentMoveNumber },
+            recoverable: false
+        }, 'simulateGravityWithState');
+
+        // Handle physics error with fallback
+        const fallbackResult = handlePhysicsError(error, maze, boulderStateManager);
+        if (fallbackResult.success && fallbackResult.data) {
+            return {
+                newMaze: fallbackResult.data.maze,
+                soundEvents: [],
+                boulderPositions: findBoulders(fallbackResult.data.maze),
+                arrowPositions: [],
+                movingBoulders: [],
+                completedBoulders: [],
+                playerCollisions: [],
+                positionUpdates: []
+            };
+        }
+
+        // Final fallback - return original maze unchanged
+        const safeMaze = maze && Array.isArray(maze) ? maze.map(row => [...row]) : [];
+        return {
+            newMaze: safeMaze,
+            soundEvents: [],
+            boulderPositions: safeMaze.length > 0 ? findBoulders(safeMaze) : [],
+            arrowPositions: [],
+            movingBoulders: [],
+            completedBoulders: [],
+            playerCollisions: [],
+            positionUpdates: []
+        };
     }
-
-    const finalBoulderPositions = findBoulders(currentMaze);
-
-    return {
-        newMaze: currentMaze,
-        soundEvents: allSoundEvents,
-        boulderPositions: finalBoulderPositions,
-        arrowPositions: [], // No arrows in current implementation
-        movingBoulders,
-        completedBoulders,
-        playerCollisions,
-        positionUpdates
-    };
 }
 
 // Helper function to find player position in maze
@@ -231,30 +359,74 @@ export function simulatePhysicsStep(
     };
 }
 
-// Enhanced function to run physics simulation with boulder state management
+// Enhanced function to run physics simulation with boulder state management and error handling
 export function simulatePhysicsStepWithState(
     maze: MazeCell[][],
     boulderStateManager: BoulderStateManager,
     currentMoveNumber: number,
     arrows: Array<{ position: Position; direction: { dx: number; dy: number } }> = []
 ): PhysicsSimulationResult {
-    // First simulate gravity for boulders with state management
-    const gravityResult = simulateGravityWithState(maze, boulderStateManager, currentMoveNumber);
+    try {
+        // First simulate gravity for boulders with state management
+        const gravityResult = simulateGravityWithState(maze, boulderStateManager, currentMoveNumber);
 
-    // Then simulate arrow movement
-    const arrowResult = simulateArrows(gravityResult.newMaze, arrows);
+        // Then simulate arrow movement
+        let arrowResult: PhysicsSimulationResult;
+        try {
+            arrowResult = simulateArrows(gravityResult.newMaze, arrows);
+        } catch (arrowError) {
+            logBoulderError({
+                type: 'physics_failure',
+                message: `Error simulating arrows: ${arrowError instanceof Error ? arrowError.message : 'Unknown error'}`,
+                context: { error: arrowError, arrows },
+                recoverable: true
+            }, 'simulatePhysicsStepWithState');
 
-    // Combine results
-    return {
-        newMaze: arrowResult.newMaze,
-        soundEvents: [...gravityResult.soundEvents, ...arrowResult.soundEvents],
-        boulderPositions: arrowResult.boulderPositions,
-        arrowPositions: arrowResult.arrowPositions,
-        movingBoulders: gravityResult.movingBoulders,
-        completedBoulders: gravityResult.completedBoulders,
-        playerCollisions: gravityResult.playerCollisions,
-        positionUpdates: gravityResult.positionUpdates
-    };
+            // Continue without arrow simulation
+            arrowResult = {
+                newMaze: gravityResult.newMaze,
+                soundEvents: [],
+                boulderPositions: gravityResult.boulderPositions,
+                arrowPositions: [],
+                movingBoulders: [],
+                completedBoulders: [],
+                playerCollisions: [],
+                positionUpdates: []
+            };
+        }
+
+        // Combine results
+        return {
+            newMaze: arrowResult.newMaze,
+            soundEvents: [...gravityResult.soundEvents, ...arrowResult.soundEvents],
+            boulderPositions: arrowResult.boulderPositions,
+            arrowPositions: arrowResult.arrowPositions,
+            movingBoulders: gravityResult.movingBoulders,
+            completedBoulders: gravityResult.completedBoulders,
+            playerCollisions: gravityResult.playerCollisions,
+            positionUpdates: gravityResult.positionUpdates
+        };
+    } catch (error) {
+        logBoulderError({
+            type: 'physics_failure',
+            message: `Unexpected error in physics step simulation: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            context: { error, currentMoveNumber, arrows },
+            recoverable: false
+        }, 'simulatePhysicsStepWithState');
+
+        // Return safe fallback result
+        const safeMaze = maze && Array.isArray(maze) ? maze.map(row => [...row]) : [];
+        return {
+            newMaze: safeMaze,
+            soundEvents: [],
+            boulderPositions: safeMaze.length > 0 ? findBoulders(safeMaze) : [],
+            arrowPositions: [],
+            movingBoulders: [],
+            completedBoulders: [],
+            playerCollisions: [],
+            positionUpdates: []
+        };
+    }
 }
 
 // Pure function to check if physics simulation should continue

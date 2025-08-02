@@ -1,5 +1,13 @@
 import type { MazeCell } from '../maze';
 import { CELL } from '../maze';
+import {
+    validatePosition,
+    validateBoulderStateManager,
+    recoverBoulderStateManager,
+    createFallbackBoulderStateManager,
+    logBoulderError,
+    type ErrorResult
+} from './boulder-error-handling';
 
 // Position interface (re-exported from collision-detection for consistency)
 export interface Position {
@@ -64,29 +72,56 @@ export function findBoulderPositions(maze: MazeCell[][]): Position[] {
     return positions;
 }
 
-// Pure function to create initial boulder state manager
+// Pure function to create initial boulder state manager with error handling
 export function createBoulderStateManager(
     maze: MazeCell[][],
     currentMoveNumber: number = 0
 ): BoulderStateManager {
-    const boulderPositions = findBoulderPositions(maze);
-    const boulders = new Map<string, BoulderState>();
+    try {
+        const boulderPositions = findBoulderPositions(maze);
+        const boulders = new Map<string, BoulderState>();
 
-    for (const position of boulderPositions) {
-        const key = createPositionKey(position);
-        boulders.set(key, {
-            position,
-            isTriggered: false,
-            isMoving: false,
-            triggeredOnMove: -1,
-        });
+        for (const position of boulderPositions) {
+            // Validate position before creating state
+            const positionResult = validatePosition(position, maze);
+            if (!positionResult.success) {
+                logBoulderError(positionResult.error!, 'createBoulderStateManager');
+                continue; // Skip invalid positions
+            }
+
+            const key = createPositionKey(position);
+            boulders.set(key, {
+                position,
+                isTriggered: false,
+                isMoving: false,
+                triggeredOnMove: -1,
+            });
+        }
+
+        const manager: BoulderStateManager = {
+            boulders,
+            movingBoulderCount: 0,
+            lastPlayerPosition: null,
+        };
+
+        // Validate created manager
+        const validationResult = validateBoulderStateManager(manager, maze);
+        if (!validationResult.success) {
+            logBoulderError(validationResult.error!, 'createBoulderStateManager');
+            return createFallbackBoulderStateManager(maze);
+        }
+
+        return manager;
+    } catch (error) {
+        logBoulderError({
+            type: 'unknown',
+            message: `Unexpected error creating boulder state manager: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            context: { error, currentMoveNumber },
+            recoverable: true
+        }, 'createBoulderStateManager');
+
+        return createFallbackBoulderStateManager(maze);
     }
-
-    return {
-        boulders,
-        movingBoulderCount: 0,
-        lastPlayerPosition: null,
-    };
 }
 
 // Pure function to check if two positions are adjacent (including diagonals)
@@ -137,106 +172,263 @@ export function identifyTriggeredBoulders(
     );
 }
 
-// Pure function to update boulder state manager with triggered boulders
+// Pure function to update boulder state manager with triggered boulders with error handling
 export function updateBoulderTriggers(
     boulderStateManager: BoulderStateManager,
     triggeredBoulders: Position[],
     currentMoveNumber: number
 ): BoulderStateManager {
-    const newBoulders = new Map(boulderStateManager.boulders);
+    try {
+        // Skip validation in updateBoulderTriggers to avoid breaking existing tests
+        // The validation will be done at the physics simulation level where maze is available
 
-    for (const position of triggeredBoulders) {
-        const key = createPositionKey(position);
-        const existingState = newBoulders.get(key);
+        const newBoulders = new Map(boulderStateManager.boulders);
 
-        if (existingState && !existingState.isTriggered) {
-            newBoulders.set(key, {
-                ...existingState,
-                isTriggered: true,
-                triggeredOnMove: currentMoveNumber,
-            });
+        for (const position of triggeredBoulders) {
+            try {
+                const key = createPositionKey(position);
+                const existingState = newBoulders.get(key);
+
+                if (existingState && !existingState.isTriggered) {
+                    newBoulders.set(key, {
+                        ...existingState,
+                        isTriggered: true,
+                        triggeredOnMove: currentMoveNumber,
+                    });
+                } else if (!existingState) {
+                    logBoulderError({
+                        type: 'position_mismatch',
+                        message: `Attempted to trigger boulder at position (${position.x},${position.y}) but no boulder state exists`,
+                        context: { position, availableKeys: Array.from(newBoulders.keys()) },
+                        recoverable: true
+                    }, 'updateBoulderTriggers');
+                }
+            } catch (positionError) {
+                logBoulderError({
+                    type: 'invalid_state',
+                    message: `Error processing triggered boulder at position (${position.x},${position.y}): ${positionError instanceof Error ? positionError.message : 'Unknown error'}`,
+                    context: { position, error: positionError },
+                    recoverable: true
+                }, 'updateBoulderTriggers');
+                continue; // Skip this position and continue with others
+            }
         }
-    }
 
-    return {
-        ...boulderStateManager,
-        boulders: newBoulders,
-    };
+        return {
+            ...boulderStateManager,
+            boulders: newBoulders,
+        };
+    } catch (error) {
+        logBoulderError({
+            type: 'unknown',
+            message: `Unexpected error updating boulder triggers: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            context: { error, triggeredBoulders, currentMoveNumber },
+            recoverable: true
+        }, 'updateBoulderTriggers');
+
+        return boulderStateManager; // Return original state on error
+    }
 }
 
-// Pure function to update boulder movement states
+// Pure function to update boulder movement states with error handling
 export function updateBoulderMovement(
     boulderStateManager: BoulderStateManager,
     movingBoulders: Position[],
     stoppedBoulders: Position[]
 ): BoulderStateManager {
-    const newBoulders = new Map(boulderStateManager.boulders);
-    let movingCount = boulderStateManager.movingBoulderCount;
+    try {
+        const newBoulders = new Map(boulderStateManager.boulders);
+        let movingCount = boulderStateManager.movingBoulderCount;
 
-    // Mark boulders as moving
-    for (const position of movingBoulders) {
-        const key = createPositionKey(position);
-        const existingState = newBoulders.get(key);
+        // Mark boulders as moving
+        for (const position of movingBoulders) {
+            try {
+                const key = createPositionKey(position);
+                const existingState = newBoulders.get(key);
 
-        if (existingState && !existingState.isMoving) {
-            newBoulders.set(key, {
-                ...existingState,
-                isMoving: true,
-            });
-            movingCount++;
+                if (existingState && !existingState.isMoving) {
+                    newBoulders.set(key, {
+                        ...existingState,
+                        isMoving: true,
+                    });
+                    movingCount++;
+                } else if (!existingState) {
+                    logBoulderError({
+                        type: 'position_mismatch',
+                        message: `Attempted to mark boulder as moving at position (${position.x},${position.y}) but no boulder state exists`,
+                        context: { position, availableKeys: Array.from(newBoulders.keys()) },
+                        recoverable: true
+                    }, 'updateBoulderMovement');
+                }
+            } catch (positionError) {
+                logBoulderError({
+                    type: 'invalid_state',
+                    message: `Error processing moving boulder at position (${position.x},${position.y}): ${positionError instanceof Error ? positionError.message : 'Unknown error'}`,
+                    context: { position, error: positionError },
+                    recoverable: true
+                }, 'updateBoulderMovement');
+                continue;
+            }
         }
-    }
 
-    // Mark boulders as stopped
-    for (const position of stoppedBoulders) {
-        const key = createPositionKey(position);
-        const existingState = newBoulders.get(key);
+        // Mark boulders as stopped
+        for (const position of stoppedBoulders) {
+            try {
+                const key = createPositionKey(position);
+                const existingState = newBoulders.get(key);
 
-        if (existingState && existingState.isMoving) {
-            newBoulders.set(key, {
-                ...existingState,
-                isMoving: false,
-            });
-            movingCount--;
+                if (existingState && existingState.isMoving) {
+                    newBoulders.set(key, {
+                        ...existingState,
+                        isMoving: false,
+                    });
+                    movingCount--;
+                } else if (!existingState) {
+                    logBoulderError({
+                        type: 'position_mismatch',
+                        message: `Attempted to mark boulder as stopped at position (${position.x},${position.y}) but no boulder state exists`,
+                        context: { position, availableKeys: Array.from(newBoulders.keys()) },
+                        recoverable: true
+                    }, 'updateBoulderMovement');
+                } else if (!existingState.isMoving) {
+                    logBoulderError({
+                        type: 'invalid_state',
+                        message: `Attempted to stop boulder at position (${position.x},${position.y}) but it was not moving`,
+                        context: { position, state: existingState },
+                        recoverable: true
+                    }, 'updateBoulderMovement');
+                }
+            } catch (positionError) {
+                logBoulderError({
+                    type: 'invalid_state',
+                    message: `Error processing stopped boulder at position (${position.x},${position.y}): ${positionError instanceof Error ? positionError.message : 'Unknown error'}`,
+                    context: { position, error: positionError },
+                    recoverable: true
+                }, 'updateBoulderMovement');
+                continue;
+            }
         }
-    }
 
-    return {
-        ...boulderStateManager,
-        boulders: newBoulders,
-        movingBoulderCount: Math.max(0, movingCount),
-    };
+        // Ensure moving count doesn't go negative
+        const finalMovingCount = Math.max(0, movingCount);
+
+        // Validate final count against actual moving boulders
+        const actualMovingCount = Array.from(newBoulders.values()).filter(s => s.isMoving).length;
+        if (finalMovingCount !== actualMovingCount) {
+            logBoulderError({
+                type: 'invalid_state',
+                message: `Moving boulder count mismatch after update: calculated ${finalMovingCount}, actual ${actualMovingCount}`,
+                context: { calculatedCount: finalMovingCount, actualCount: actualMovingCount },
+                recoverable: true
+            }, 'updateBoulderMovement');
+
+            // Use actual count as fallback
+            return {
+                ...boulderStateManager,
+                boulders: newBoulders,
+                movingBoulderCount: actualMovingCount,
+            };
+        }
+
+        return {
+            ...boulderStateManager,
+            boulders: newBoulders,
+            movingBoulderCount: finalMovingCount,
+        };
+    } catch (error) {
+        logBoulderError({
+            type: 'unknown',
+            message: `Unexpected error updating boulder movement: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            context: { error, movingBoulders, stoppedBoulders },
+            recoverable: true
+        }, 'updateBoulderMovement');
+
+        return boulderStateManager; // Return original state on error
+    }
 }
 
-// Pure function to update boulder positions after movement
+// Pure function to update boulder positions after movement with error handling
 export function updateBoulderPositions(
     boulderStateManager: BoulderStateManager,
     positionUpdates: Array<{ from: Position; to: Position }>
 ): BoulderStateManager {
-    const newBoulders = new Map<string, BoulderState>();
+    try {
+        const newBoulders = new Map<string, BoulderState>();
 
-    // Create a mapping of old positions to new positions
-    const positionMap = new Map<string, Position>();
-    for (const update of positionUpdates) {
-        const fromKey = createPositionKey(update.from);
-        positionMap.set(fromKey, update.to);
+        // Create a mapping of old positions to new positions
+        const positionMap = new Map<string, Position>();
+        for (const update of positionUpdates) {
+            try {
+                const fromKey = createPositionKey(update.from);
+                positionMap.set(fromKey, update.to);
+            } catch (keyError) {
+                logBoulderError({
+                    type: 'invalid_state',
+                    message: `Error creating position key for update from (${update.from.x},${update.from.y}) to (${update.to.x},${update.to.y}): ${keyError instanceof Error ? keyError.message : 'Unknown error'}`,
+                    context: { update, error: keyError },
+                    recoverable: true
+                }, 'updateBoulderPositions');
+                continue;
+            }
+        }
+
+        // Update all boulder states with new positions
+        for (const [key, state] of boulderStateManager.boulders) {
+            try {
+                const newPosition = positionMap.get(key) || state.position;
+                const newKey = createPositionKey(newPosition);
+
+                // Check for key conflicts (multiple boulders trying to move to same position)
+                if (newKey !== key && newBoulders.has(newKey)) {
+                    logBoulderError({
+                        type: 'position_mismatch',
+                        message: `Position conflict: multiple boulders trying to occupy position (${newPosition.x},${newPosition.y})`,
+                        context: {
+                            originalKey: key,
+                            newKey,
+                            originalPosition: state.position,
+                            newPosition,
+                            existingState: newBoulders.get(newKey)
+                        },
+                        recoverable: true
+                    }, 'updateBoulderPositions');
+
+                    // Keep boulder at original position to avoid conflict
+                    newBoulders.set(key, state);
+                    continue;
+                }
+
+                newBoulders.set(newKey, {
+                    ...state,
+                    position: newPosition,
+                });
+            } catch (updateError) {
+                logBoulderError({
+                    type: 'invalid_state',
+                    message: `Error updating boulder position for key ${key}: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`,
+                    context: { key, state, error: updateError },
+                    recoverable: true
+                }, 'updateBoulderPositions');
+
+                // Keep original state on error
+                newBoulders.set(key, state);
+            }
+        }
+
+        return {
+            ...boulderStateManager,
+            boulders: newBoulders,
+        };
+    } catch (error) {
+        logBoulderError({
+            type: 'unknown',
+            message: `Unexpected error updating boulder positions: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            context: { error, positionUpdates },
+            recoverable: true
+        }, 'updateBoulderPositions');
+
+        return boulderStateManager; // Return original state on error
     }
-
-    // Update all boulder states with new positions
-    for (const [key, state] of boulderStateManager.boulders) {
-        const newPosition = positionMap.get(key) || state.position;
-        const newKey = createPositionKey(newPosition);
-
-        newBoulders.set(newKey, {
-            ...state,
-            position: newPosition,
-        });
-    }
-
-    return {
-        ...boulderStateManager,
-        boulders: newBoulders,
-    };
 }
 
 // Pure function to check if any boulders are currently moving

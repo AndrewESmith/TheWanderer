@@ -58,9 +58,7 @@
   - Write unit tests for boulder collision death scenarios
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 8. Integrate boulder system with game state management
-
-
+- [x] 8. Integrate boulder system with game state management
 
 
   - Modify `movePlayer` function to incorporate boulder proximity detection
@@ -69,7 +67,12 @@
   - Write integration tests for game state and boulder system interaction
   - _Requirements: 6.1, 6.4_
 
-- [ ] 9. Add comprehensive error handling and fallbacks
+- [x] 9. Add comprehensive error handling and fallbacks
+
+
+
+
+
   - Implement error handling for invalid boulder states
   - Add fallback mechanisms for physics simulation failures
   - Create graceful degradation when boulder system encounters errors

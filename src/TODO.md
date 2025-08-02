@@ -48,6 +48,7 @@
 ## Version 6
 
 - [ ] Improve Graphics
+- [ ] View port for mobiles
 
 ## Version 7
 
