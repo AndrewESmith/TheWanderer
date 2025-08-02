@@ -37,7 +37,7 @@
 ## Version 4 - Add another dynamic
 
 - [x] Create rules for boulders.
-- [ ] Implement Boulder Spec
+- [x] Implement Boulder Spec
 
 ## Version 5 - Maze levels
 
@@ -53,6 +53,7 @@
 ## Version 7
 
 - [ ] Boulders should not be able to fall through soil - update requirements.
+- [ ] Bombs should explode when you get too close
 - [ ] Assign passwords to maze levels to allow player jump to another maze level.
 - [ ] Missing Arrows. Original spec asked for arrows but where are they? They are mentioned in the code.
 
