@@ -254,7 +254,7 @@ export function getTriggeredBouldersForMove(
     for (const state of boulderStateManager.boulders.values()) {
         // Boulder should start moving if it was triggered on the previous move number
         // and is not already moving (boulders start moving on the move after being triggered)
-        // A boulder triggered on move N should start moving on move N+1
+        // Boulder triggered on move N should start moving on move N+1
         if (state.isTriggered &&
             !state.isMoving &&
             state.triggeredOnMove === currentMoveNumber - 1) {
