@@ -316,96 +316,17 @@ export function simulateBoulderFall(
 }
 
 // Enhanced function to simulate boulder falling with detailed collision information
+// This function now continues falling until collision, as per Requirement 1.4
 export function simulateEnhancedBoulderFall(
     maze: MazeCell[][],
     boulderPosition: Position
 ): BoulderFallResult {
     const soundEvents: SoundEvent[] = [];
-    const belowPosition = { x: boulderPosition.x, y: boulderPosition.y + 1 };
+    let currentPosition = boulderPosition;
+    let currentMaze = maze.map(row => [...row]);
+    let hasMoved = false;
 
-    // Check collision at the position below
-    const belowCollision = detectBoulderCollision(maze, belowPosition);
-
-    // If boulder can't fall due to collision, generate collision sound
-    if (!canBoulderFall(maze, boulderPosition)) {
-        // Boulder hits something and stops - generate collision sound
-        if (belowCollision.hasCollision && belowCollision.soundEvent) {
-            soundEvents.push(belowCollision.soundEvent);
-        }
-
-        return {
-            newMaze: maze,
-            newPosition: boulderPosition,
-            soundEvents,
-            playerCollision: false,
-            bombExplosion: false,
-            targetCell: belowCollision.targetCell
-        };
-    }
-
-    // Create new maze with boulder moved down
-    const newMaze = maze.map(row => [...row]);
-    const newPosition = { x: boulderPosition.x, y: boulderPosition.y + 1 };
-
-    // Clear old position
-    newMaze[boulderPosition.y]![boulderPosition.x] = CELL.EMPTY;
-
-    // Check collision at new position using enhanced detection
-    const collision = detectBoulderCollision(maze, newPosition);
-
-
-
-    if (collision.hasCollision) {
-        // Boulder hits something
-        if (collision.soundEvent) {
-            soundEvents.push(collision.soundEvent);
-        }
-
-        // Handle special collision cases where boulder moves to target position
-        if (collision.isPlayerCollision) {
-            // Boulder hits player - player dies, boulder moves to player position
-            newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
-            return {
-                newMaze,
-                newPosition,
-                soundEvents,
-                playerCollision: true,
-                bombExplosion: false,
-                targetCell: collision.targetCell
-            };
-        }
-
-        if (collision.shouldTriggerBombExplosion) {
-            // Boulder hits bomb - boulder moves to bomb position, bomb explodes
-            newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
-
-
-
-            return {
-                newMaze,
-                newPosition,
-                soundEvents,
-                playerCollision: false,
-                bombExplosion: true,
-                targetCell: collision.targetCell
-            };
-        }
-
-        // Regular collision - boulder stays at original position
-        return {
-            newMaze: maze,
-            newPosition: boulderPosition,
-            soundEvents,
-            playerCollision: false,
-            bombExplosion: false,
-            targetCell: collision.targetCell
-        };
-    }
-
-    // Move boulder to new position
-    newMaze[newPosition.y]![newPosition.x] = CELL.BOULDER;
-
-    // Generate movement sound when boulder successfully moves
+    // Generate movement sound when boulder starts falling
     soundEvents.push({
         type: 'movement',
         source: 'boulder',
@@ -413,9 +334,101 @@ export function simulateEnhancedBoulderFall(
         volume: 0.8
     });
 
+    // Clear original position
+    currentMaze[boulderPosition.y]![boulderPosition.x] = CELL.EMPTY;
+
+    // Continue falling until collision
+    while (true) {
+        const nextPosition = { x: currentPosition.x, y: currentPosition.y + 1 };
+
+        // Check if boulder can continue falling
+        if (!canBoulderFall(currentMaze, currentPosition)) {
+            // Boulder hits something and stops
+            const belowCollision = detectBoulderCollision(currentMaze, nextPosition);
+
+            if (belowCollision.hasCollision && belowCollision.soundEvent) {
+                soundEvents.push(belowCollision.soundEvent);
+            }
+
+            // Place boulder at current position (where it stopped)
+            currentMaze[currentPosition.y]![currentPosition.x] = CELL.BOULDER;
+
+            return {
+                newMaze: currentMaze,
+                newPosition: currentPosition,
+                soundEvents,
+                playerCollision: false,
+                bombExplosion: false,
+                targetCell: belowCollision.targetCell
+            };
+        }
+
+        // Check collision at next position using enhanced detection
+        const collision = detectBoulderCollision(currentMaze, nextPosition);
+
+        if (collision.hasCollision) {
+            // Boulder hits something
+            if (collision.soundEvent) {
+                soundEvents.push(collision.soundEvent);
+            }
+
+            // Handle special collision cases where boulder moves to target position
+            if (collision.isPlayerCollision) {
+                // Boulder hits player - player dies, boulder moves to player position
+                currentMaze[nextPosition.y]![nextPosition.x] = CELL.BOULDER;
+                return {
+                    newMaze: currentMaze,
+                    newPosition: nextPosition,
+                    soundEvents,
+                    playerCollision: true,
+                    bombExplosion: false,
+                    targetCell: collision.targetCell
+                };
+            }
+
+            if (collision.shouldTriggerBombExplosion) {
+                // Boulder hits bomb - boulder moves to bomb position, bomb explodes
+                currentMaze[nextPosition.y]![nextPosition.x] = CELL.BOULDER;
+                return {
+                    newMaze: currentMaze,
+                    newPosition: nextPosition,
+                    soundEvents,
+                    playerCollision: false,
+                    bombExplosion: true,
+                    targetCell: collision.targetCell
+                };
+            }
+
+            // Regular collision - boulder stops at current position
+            currentMaze[currentPosition.y]![currentPosition.x] = CELL.BOULDER;
+            return {
+                newMaze: currentMaze,
+                newPosition: currentPosition,
+                soundEvents,
+                playerCollision: false,
+                bombExplosion: false,
+                targetCell: collision.targetCell
+            };
+        }
+
+        // Move boulder to next position and continue falling
+        currentPosition = nextPosition;
+        hasMoved = true;
+
+        // Safety check to prevent infinite loops
+        if (currentPosition.y >= currentMaze.length - 1) {
+            // Boulder reached bottom of maze
+            currentMaze[currentPosition.y]![currentPosition.x] = CELL.BOULDER;
+            break;
+        }
+    }
+
+    // Place boulder at final position
+    currentMaze[currentPosition.y]![currentPosition.x] = CELL.BOULDER;
+
     return {
-        newMaze,
-        newPosition,
+        newMaze: currentMaze,
+        newPosition: currentPosition,
         soundEvents,
         playerCollision: false,
         bombExplosion: false
