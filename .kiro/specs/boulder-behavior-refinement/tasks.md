@@ -85,17 +85,18 @@
 
 - [x] 11. Optimize performance for multiple boulder scenarios
 
-
-
-
-
   - Implement efficient algorithms for proximity detection with many boulders
   - Optimize boulder state management for large mazes
   - Add performance monitoring for boulder system operations
   - Write performance tests for boulder system scalability
   - _Requirements: 6.2, 6.3_
 
-- [ ] 12. Create end-to-end tests for player experience
+- [x] 12. Create end-to-end tests for player experience
+
+
+
+
+
   - Test complete gameplay scenarios with boulder interactions
   - Verify player movement blocking works correctly during boulder motion
   - Test audio feedback provides appropriate player guidance
