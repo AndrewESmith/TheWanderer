@@ -42,8 +42,6 @@
 ## Version 5 - Maze levels
 
 - [ ] Add support for multiple maze levels
-- [ ] Create 5 maze levels
-- [ ] Only play victory sound when last level is exited.
 
 ## Version 6
 
