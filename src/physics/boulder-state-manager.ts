@@ -50,7 +50,14 @@ export function createPositionKey(position: Position): string {
 
 // Pure function to parse position key back to Position
 export function parsePositionKey(key: string): Position {
-    const [x, y] = key.split(',').map(Number);
+    const parts = key.split(',');
+    const x = Number(parts[0]);
+    const y = Number(parts[1]);
+
+    if (isNaN(x) || isNaN(y)) {
+        throw new Error(`Invalid position key format: ${key}`);
+    }
+
     return { x, y };
 }
 

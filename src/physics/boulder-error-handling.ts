@@ -227,7 +227,7 @@ export function recoverBoulderState(
         }
 
         // Use the first available boulder position as recovery position
-        const recoveryPosition = boulderPositions[0];
+        const recoveryPosition = boulderPositions[0]!; // Safe because we checked length > 0
 
         // Create recovered state with safe defaults
         const recoveredState: BoulderState = {
