@@ -50,20 +50,7 @@
   - Write unit tests for enhanced collision detection
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-- [ ] 7. Implement player death from boulder collision
-
-
-
-
-
-
-
-
-
-
-
-
-
+- [x] 7. Implement player death from boulder collision
 
   - Add logic to detect when moving boulder hits player
   - Implement immediate player death and game state transition
@@ -72,6 +59,10 @@
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 8. Integrate boulder system with game state management
+
+
+
+
   - Modify `movePlayer` function to incorporate boulder proximity detection
   - Update game state to track boulder movement constraints
   - Ensure boulder state persists correctly across game moves
