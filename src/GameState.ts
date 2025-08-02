@@ -215,7 +215,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     updatedBoulderStateManager = updateBoulderTriggers(
       updatedBoulderStateManager,
       triggeredBoulders,
-      newMoves // Trigger on current move, will start moving on next move
+      newMoves - 2 // Trigger with move number that will be found on next physics simulation
     );
   }
 
