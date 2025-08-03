@@ -50,25 +50,29 @@
 
 ## Version 7
 
+- [ ] FizzBash - lets fix typescript errors
+
+## Version 8
+
 - [ ] Boulders should not be able to fall through soil - update requirements.
 - [ ] Bombs should explode when you get too close
 - [ ] Assign passwords to maze levels to allow player jump to another maze level.
 - [ ] Missing Arrows. Original spec asked for arrows but where are they? They are mentioned in the code.
 
-## Version 8
+## Version 9
 
 - [ ] Boulders should be able to be pushed by player
 
-## Version 9
+## Version 10
 
 - [ ] Introduce slopes for boulders to roll down and cause arrows to slip along
 
-## Version 10 AI at run time?
+## Version 11 AI at run time?
 
 - [ ] can the game call AI to create a new level as requested by a player...?
 - [ ] or Ask AI for hint?
 
-## Version 10
+## Version 12
 
 - [ ] Zombies!
 

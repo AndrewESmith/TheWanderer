@@ -9,7 +9,7 @@ describe('MazeLevelManager', () => {
         const currentLevel = manager.getCurrentLevel();
         expect(currentLevel.levelNumber).toBe(1);
         expect(currentLevel.moveLimit).toBe(55);
-        expect(currentLevel.diamondCount).toBe(5);
+        expect(currentLevel.diamondCount).toBe(6);
         expect(currentLevel.bombCount).toBe(2);
         expect(currentLevel.playerStartPosition).toEqual({ x: 1, y: 3 });
         expect(currentLevel.exitPosition).toEqual({ x: 14, y: 8 });

@@ -111,7 +111,7 @@ const MAZE_LEVELS: MazeLevelData[] = [
             [CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK, CELL.ROCK],
         ],
         moveLimit: 50,
-        diamondCount: 8,
+        diamondCount: 6,
         bombCount: 2,
         rockCount: 6,
         playerStartPosition: { x: 1, y: 1 },
@@ -145,7 +145,7 @@ const MAZE_LEVELS: MazeLevelData[] = [
         ],
         moveLimit: 35,
         diamondCount: 6,
-        bombCount: 3,
+        bombCount: 2,
         rockCount: 5,
         playerStartPosition: { x: 1, y: 1 },
         exitPosition: { x: 14, y: 8 }
