@@ -56,7 +56,7 @@ export function createLevelProgressionHandler(): LevelProgressionHandler {
                 return {
                     success: false,
                     isGameComplete: true,
-                    soundToPlay: 'victory_sound'
+                    soundToPlay: 'victory'
                 };
             }
         } else {
@@ -64,7 +64,7 @@ export function createLevelProgressionHandler(): LevelProgressionHandler {
             return {
                 success: true,
                 isGameComplete: true,
-                soundToPlay: 'victory_sound'
+                soundToPlay: 'victory'
             };
         }
     };

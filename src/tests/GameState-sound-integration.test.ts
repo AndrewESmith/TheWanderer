@@ -139,11 +139,18 @@ describe('GameState Sound Integration', () => {
 
         const gameState = createInitialGameState(customMaze);
 
+        // Mock the level manager to have no next level to prevent level progression
+        const mockLevelManager = {
+            ...gameState.levelManager,
+            hasNextLevel: () => false
+        };
+        gameState.levelManager = mockLevelManager;
+
         // Move player right to exit
         movePlayer(gameState, 1, 0);
 
-        // Should emit walk and door slam sounds immediately (victory sound handled by game end manager)
-        expect(mockCallback).toHaveBeenCalledTimes(2);
+        // Should emit walk, door slam, and victory sounds immediately (game complete scenario)
+        expect(mockCallback).toHaveBeenCalledTimes(3);
         expect(mockCallback).toHaveBeenNthCalledWith(1,
             SOUND_IDS.PLAYER_WALK,
             expect.objectContaining({
@@ -158,17 +165,25 @@ describe('GameState Sound Integration', () => {
                 source: 'system'
             })
         );
-
-        // Wait for the delayed victory sound from game end manager
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Should now have the victory sound as well
-        expect(mockCallback).toHaveBeenCalledTimes(3);
         expect(mockCallback).toHaveBeenNthCalledWith(3,
             SOUND_IDS.VICTORY_SOUND,
             expect.objectContaining({
                 type: 'victory',
                 source: 'system'
+            })
+        );
+
+        // Wait for the delayed victory sound from game end manager
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Should now have 4 calls total (including delayed victory sound from game end manager)
+        expect(mockCallback).toHaveBeenCalledTimes(4);
+        expect(mockCallback).toHaveBeenNthCalledWith(4,
+            SOUND_IDS.VICTORY_SOUND,
+            expect.objectContaining({
+                type: 'victory',
+                source: 'system',
+                volume: 0.8
             })
         );
     });

@@ -15,5 +15,5 @@ export interface LevelProgressionResult {
     isGameComplete: boolean;
 
     /** The sound that should be played for this transition */
-    soundToPlay: 'door_slam' | 'victory_sound';
+    soundToPlay: 'door_slam' | 'victory';
 }

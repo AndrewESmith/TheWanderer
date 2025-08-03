@@ -42,10 +42,6 @@
 
 - [x] 6. Integrate level progression with player movement
 
-
-
-
-
   - Modify movePlayer function to detect level completion
   - Add level transition logic when player exits current level
   - Ensure proper sound triggering (door slam for next level, victory for completion)
