@@ -43,7 +43,8 @@
 
 - [ ] Add support for multiple maze levels
 - [ ] Boulders no longer fall until they hit something.
-- [ ] Sound stops
+- [ ] Sound stops if boulder can't move
+- [ ] no sound on mobiles
 - [ ] Victory_sound should only play when exiting the last level.
 
 ## Version 6
