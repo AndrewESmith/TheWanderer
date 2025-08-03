@@ -18,6 +18,8 @@ import {
 import { shouldBlockPlayerMovement, updateMovementConstraints } from "./physics/movement-constraint-system";
 import type { MazeLevelManager } from "./Interfaces/IMazeLevelManager";
 import { createMazeLevelManager } from "./levels/maze-level-manager";
+import type { LevelProgressionHandler } from "./levels/level-progression-handler";
+import { createLevelProgressionHandler } from "./levels/level-progression-handler";
 
 // Game state type following TypeScript standards
 export interface GameStateData {
@@ -31,6 +33,7 @@ export interface GameStateData {
   movementConstraint: MovementConstraint;
   currentLevel: number;
   levelManager: MazeLevelManager;
+  levelProgressionHandler: LevelProgressionHandler;
   isGameComplete: boolean;
 }
 
@@ -52,6 +55,7 @@ export function createInitialGameState(maze?: MazeCell[][]): GameStateData {
   const moveLimit = maze ? 55 : currentLevelData.moveLimit; // Use default if custom maze provided
   const boulderStateManager = createBoulderStateManager(mazeCopy, moveLimit);
   const movementConstraint = updateMovementConstraints(boulderStateManager);
+  const levelProgressionHandler = createLevelProgressionHandler();
 
   return {
     maze: mazeCopy,
@@ -64,6 +68,7 @@ export function createInitialGameState(maze?: MazeCell[][]): GameStateData {
     movementConstraint,
     currentLevel: levelManager.getCurrentLevelNumber(),
     levelManager,
+    levelProgressionHandler,
     isGameComplete: false,
   };
 }
@@ -236,15 +241,60 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   // Update movement constraints based on current boulder states
   const updatedMovementConstraint = updateMovementConstraints(updatedBoulderStateManager);
 
+  // Handle level progression if player completed the level
+  let updatedLevelManager = gameState.levelManager;
+  let updatedCurrentLevel = gameState.currentLevel;
+  let updatedIsGameComplete = gameState.isGameComplete;
+  let updatedMaze = finalMaze;
+  let updatedPlayer = { x: newX, y: newY };
+  let updatedScore = newScore;
+  let updatedMoves = newMoves;
+  let updatedDiamonds = newDiamonds;
+  let updatedGameState = newGameState;
+  let updatedBoulderStateManager = updatedBoulderStateManager;
+
+  // Check if level is complete and handle progression
+  if (gameState.levelProgressionHandler.isLevelComplete(newGameState, newDiamonds)) {
+    const progressionResult = gameState.levelProgressionHandler.processLevelCompletion(updatedLevelManager);
+
+    if (progressionResult.success) {
+      if (progressionResult.isGameComplete) {
+        // Game is complete - no more levels
+        updatedIsGameComplete = true;
+        // Emit victory sound
+        gameState.levelProgressionHandler.emitLevelProgressionSound(progressionResult);
+      } else if (progressionResult.nextLevel) {
+        // Advance to next level
+        updatedCurrentLevel = progressionResult.nextLevel.levelNumber;
+        updatedMaze = progressionResult.nextLevel.maze.map(row => [...row]);
+        updatedPlayer = { ...progressionResult.nextLevel.playerStartPosition };
+        updatedScore = newScore; // Keep cumulative score
+        updatedMoves = progressionResult.nextLevel.moveLimit;
+        updatedDiamonds = progressionResult.nextLevel.diamondCount;
+        updatedGameState = 'playing'; // Reset to playing for new level
+
+        // Create new boulder state manager for the new level
+        updatedBoulderStateManager = createBoulderStateManager(updatedMaze, updatedMoves);
+
+        // Emit door slam sound
+        gameState.levelProgressionHandler.emitLevelProgressionSound(progressionResult);
+      }
+    }
+  }
+
   return {
-    maze: finalMaze,
-    player: { x: newX, y: newY },
-    score: newScore,
-    moves: newMoves,
-    diamonds: newDiamonds,
-    gameState: newGameState,
+    maze: updatedMaze,
+    player: updatedPlayer,
+    score: updatedScore,
+    moves: updatedMoves,
+    diamonds: updatedDiamonds,
+    gameState: updatedGameState,
     boulderStateManager: updatedBoulderStateManager,
     movementConstraint: updatedMovementConstraint,
+    currentLevel: updatedCurrentLevel,
+    levelManager: updatedLevelManager,
+    levelProgressionHandler: gameState.levelProgressionHandler,
+    isGameComplete: updatedIsGameComplete,
   };
 }
 
@@ -277,6 +327,7 @@ export function createGameState(initialData?: Partial<GameStateData>): IGameStat
     get movementConstraint() { return currentState.movementConstraint; },
     get currentLevel() { return currentState.currentLevel; },
     get levelManager() { return currentState.levelManager; },
+    get levelProgressionHandler() { return currentState.levelProgressionHandler; },
     get isGameComplete() { return currentState.isGameComplete; },
 
     movePlayer: (dx: number, dy: number) => {
