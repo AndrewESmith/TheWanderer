@@ -4,6 +4,8 @@ import { CELL, type MazeCell } from "../maze";
 import type { IPlayerPos } from "../Interfaces/IPlayerPos";
 import { createBoulderStateManager } from "../physics/boulder-state-manager";
 import { updateMovementConstraints } from "../physics/movement-constraint-system";
+import { createMazeLevelManager } from "../levels/maze-level-manager";
+import { createLevelProgressionHandler } from "../levels/level-progression-handler";
 
 // Helper function to create test maze data following functional patterns
 function createTestGameState(
@@ -12,11 +14,22 @@ function createTestGameState(
     score: number = 0,
     moves: number = 10,
     diamonds: number = 0,
-    gameState: 'playing' | 'dead' | 'won' = 'playing'
+    gameState: 'playing' | 'dead' | 'won' = 'playing',
+    isLastLevel: boolean = false
 ): GameStateData {
     const mazeCopy = maze.map(row => [...row]); // Deep copy
     const boulderStateManager = createBoulderStateManager(mazeCopy, moves);
     const movementConstraint = updateMovementConstraints(boulderStateManager);
+    const levelManager = createMazeLevelManager();
+    const levelProgressionHandler = createLevelProgressionHandler();
+
+    // If this is meant to be the last level for testing, advance to the last level
+    if (isLastLevel) {
+        // Advance to the last level (level 5)
+        while (levelManager.hasNextLevel()) {
+            levelManager.advanceToNextLevel();
+        }
+    }
 
     return {
         maze: mazeCopy,
@@ -27,6 +40,10 @@ function createTestGameState(
         gameState,
         boulderStateManager,
         movementConstraint,
+        currentLevel: isLastLevel ? levelManager.getCurrentLevelNumber() : 1,
+        levelManager,
+        levelProgressionHandler,
+        isGameComplete: false,
     };
 }
 
@@ -103,7 +120,7 @@ describe("GameState - Functional Implementation", () => {
                 [CELL.PLAYER, CELL.EXIT],
                 [CELL.ROCK, CELL.ROCK],
             ];
-            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 10, 10, 0, 'playing');
+            const initialState = createTestGameState(testMaze, { x: 0, y: 0 }, 10, 10, 0, 'playing', true);
 
             const newState = movePlayer(initialState, 1, 0);
 
