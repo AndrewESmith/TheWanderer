@@ -64,7 +64,7 @@ describe('LevelProgressionHandler', () => {
 
             expect(result.success).toBe(true);
             expect(result.isGameComplete).toBe(true);
-            expect(result.soundToPlay).toBe('victory_sound');
+            expect(result.soundToPlay).toBe('victory');
             expect(result.nextLevel).toBeUndefined();
         });
 
@@ -96,7 +96,7 @@ describe('LevelProgressionHandler', () => {
             // Test completion from level 5
             result = handler.processLevelCompletion(levelManager);
             expect(result.nextLevel).toBeUndefined();
-            expect(result.soundToPlay).toBe('victory_sound');
+            expect(result.soundToPlay).toBe('victory');
             expect(result.isGameComplete).toBe(true);
         });
     });
@@ -126,13 +126,13 @@ describe('LevelProgressionHandler', () => {
             const progressionResult = {
                 success: true,
                 isGameComplete: true,
-                soundToPlay: 'victory_sound' as const
+                soundToPlay: 'victory' as const
             };
 
             handler.emitLevelProgressionSound(progressionResult);
 
             expect(emitSoundEvent).toHaveBeenCalledWith({
-                type: 'victory_sound',
+                type: 'victory',
                 source: 'system',
                 priority: 'high'
             });
@@ -165,7 +165,7 @@ describe('LevelProgressionHandler', () => {
             // Final completion should indicate game is complete
             const finalResult = handler.processLevelCompletion(levelManager);
             expect(finalResult.isGameComplete).toBe(true);
-            expect(finalResult.soundToPlay).toBe('victory_sound');
+            expect(finalResult.soundToPlay).toBe('victory');
         });
     });
 });

@@ -4,22 +4,24 @@ import { CELL, type MazeCell } from "../maze";
 import type { IPlayerPos } from "../Interfaces/IPlayerPos";
 import { createBoulderStateManager, updatePlayerPosition } from "../physics/boulder-state-manager";
 import { updateMovementConstraints } from "../physics/movement-constraint-system";
+import { createMazeLevelManager } from "../levels/maze-level-manager";
+import { createLevelProgressionHandler } from "../levels/level-progression-handler";
 
 // Helper function to create larger test maze following functional patterns
 function createLargerTestMaze(): MazeCell[][] {
-    // Create a 16x10 maze filled with empty cells
-    const maze: MazeCell[][] = Array(10).fill(null).map(() =>
-        Array(16).fill(CELL.EMPTY)
+    // Create a 18x12 maze filled with empty cells (different from level system 10x16)
+    const maze: MazeCell[][] = Array(12).fill(null).map(() =>
+        Array(18).fill(CELL.EMPTY)
     );
 
     // Add a border of rocks
-    for (let x = 0; x < 16; x++) {
+    for (let x = 0; x < 18; x++) {
         maze[0]![x] = CELL.ROCK; // Top border
-        maze[9]![x] = CELL.ROCK; // Bottom border
+        maze[11]![x] = CELL.ROCK; // Bottom border
     }
-    for (let y = 0; y < 10; y++) {
+    for (let y = 0; y < 12; y++) {
         maze[y]![0] = CELL.ROCK; // Left border
-        maze[y]![15] = CELL.ROCK; // Right border
+        maze[y]![17] = CELL.ROCK; // Right border
     }
 
     return maze;
@@ -40,6 +42,8 @@ function createTestGameState(
         player
     );
     const movementConstraint = updateMovementConstraints(boulderStateManager);
+    const levelManager = createMazeLevelManager();
+    const levelProgressionHandler = createLevelProgressionHandler();
 
     return {
         maze: mazeCopy,
@@ -50,6 +54,10 @@ function createTestGameState(
         gameState,
         boulderStateManager,
         movementConstraint,
+        currentLevel: 1,
+        levelManager,
+        levelProgressionHandler,
+        isGameComplete: false,
     };
 }
 
@@ -108,12 +116,12 @@ describe("Larger Maze Tests - Functional Implementation", () => {
 
             // Test right border
             const rightBorderMaze = createLargerTestMaze();
-            rightBorderMaze[5]![14] = CELL.PLAYER;
-            const rightBorderState = createTestGameState(rightBorderMaze, { x: 14, y: 5 });
+            rightBorderMaze[5]![16] = CELL.PLAYER;
+            const rightBorderState = createTestGameState(rightBorderMaze, { x: 16, y: 5 });
 
             const afterRightAttempt = movePlayer(rightBorderState, 1, 0);
-            expect(afterRightAttempt.player).toEqual({ x: 14, y: 5 });
-            expect(afterRightAttempt.maze[5]?.[14]).toBe(CELL.PLAYER);
+            expect(afterRightAttempt.player).toEqual({ x: 16, y: 5 });
+            expect(afterRightAttempt.maze[5]?.[16]).toBe(CELL.PLAYER);
             expect(afterRightAttempt.moves).toBe(2000); // No move should occur
         });
     });

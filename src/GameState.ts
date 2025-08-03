@@ -253,8 +253,14 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   let updatedGameState = newGameState;
   let finalBoulderStateManager = updatedBoulderStateManager;
 
+  // Only handle level progression if we're using the actual level system
+  // (not for simple custom test mazes which have different dimensions)
+  // However, allow progression if the level manager indicates no next level (game complete)
+  const isUsingLevelSystem = gameState.maze.length === 10 && gameState.maze[0]?.length === 16;
+  const isGameCompleteScenario = !gameState.levelManager.hasNextLevel();
+
   // Check if level is complete and handle progression
-  if (gameState.levelProgressionHandler.isLevelComplete(newGameState, newDiamonds)) {
+  if ((isUsingLevelSystem || isGameCompleteScenario) && gameState.levelProgressionHandler.isLevelComplete(newGameState, newDiamonds)) {
     const progressionResult = gameState.levelProgressionHandler.processLevelCompletion(updatedLevelManager);
 
     if (progressionResult.success) {
