@@ -16,6 +16,8 @@ import {
   updateBoulderTriggers
 } from "./physics/boulder-state-manager";
 import { shouldBlockPlayerMovement, updateMovementConstraints } from "./physics/movement-constraint-system";
+import type { MazeLevelManager } from "./Interfaces/IMazeLevelManager";
+import { createMazeLevelManager } from "./levels/maze-level-manager";
 
 // Game state type following TypeScript standards
 export interface GameStateData {
@@ -27,6 +29,9 @@ export interface GameStateData {
   gameState: 'playing' | 'dead' | 'won';
   boulderStateManager: BoulderStateManager;
   movementConstraint: MovementConstraint;
+  currentLevel: number;
+  levelManager: MazeLevelManager;
+  isGameComplete: boolean;
 }
 
 // Pure function to count diamonds in maze
@@ -35,22 +40,31 @@ export function countDiamonds(maze: MazeCell[][]): number {
 }
 
 // Pure function to create initial game state
-export function createInitialGameState(maze: MazeCell[][] = initialMaze): GameStateData {
-  const mazeCopy = maze.map(row => [...row]);
+export function createInitialGameState(maze?: MazeCell[][]): GameStateData {
+  // Create level manager and get level 1 data
+  const levelManager = createMazeLevelManager();
+  const currentLevelData = levelManager.getCurrentLevel();
+
+  // Use provided maze or level 1 maze
+  const mazeCopy = maze ? maze.map(row => [...row]) : currentLevelData.maze.map(row => [...row]);
   const playerPosition = getPlayerPosition(mazeCopy);
   const diamondCount = countDiamonds(mazeCopy);
-  const boulderStateManager = createBoulderStateManager(mazeCopy, 55);
+  const moveLimit = maze ? 55 : currentLevelData.moveLimit; // Use default if custom maze provided
+  const boulderStateManager = createBoulderStateManager(mazeCopy, moveLimit);
   const movementConstraint = updateMovementConstraints(boulderStateManager);
 
   return {
     maze: mazeCopy,
     player: playerPosition,
     score: 0,
-    moves: 55,
+    moves: moveLimit,
     diamonds: diamondCount,
     gameState: 'playing',
     boulderStateManager,
     movementConstraint,
+    currentLevel: levelManager.getCurrentLevelNumber(),
+    levelManager,
+    isGameComplete: false,
   };
 }
 
@@ -261,6 +275,9 @@ export function createGameState(initialData?: Partial<GameStateData>): IGameStat
     get gameState() { return currentState.gameState; },
     get boulderStateManager() { return currentState.boulderStateManager; },
     get movementConstraint() { return currentState.movementConstraint; },
+    get currentLevel() { return currentState.currentLevel; },
+    get levelManager() { return currentState.levelManager; },
+    get isGameComplete() { return currentState.isGameComplete; },
 
     movePlayer: (dx: number, dy: number) => {
       currentState = movePlayer(currentState, dx, dy);
