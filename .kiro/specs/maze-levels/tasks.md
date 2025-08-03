@@ -40,7 +40,12 @@
   - Add sound event generation for door slam vs victory sounds
   - _Requirements: 1.2, 1.3, 1.4_
 
-- [ ] 6. Integrate level progression with player movement
+- [x] 6. Integrate level progression with player movement
+
+
+
+
+
   - Modify movePlayer function to detect level completion
   - Add level transition logic when player exits current level
   - Ensure proper sound triggering (door slam for next level, victory for completion)

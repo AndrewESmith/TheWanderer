@@ -6,6 +6,8 @@ import { createBoulderStateManager, updateBoulderTriggers } from '../physics/bou
 import { movePlayer, type GameStateData } from '../GameState';
 import { emitSoundEvents } from '../audio/events/sound-event-emitter';
 import { handleGameEndSounds } from '../audio/events/game-end-sound-manager';
+import { createMazeLevelManager } from '../levels/maze-level-manager';
+import { createLevelProgressionHandler } from '../levels/level-progression-handler';
 
 // Mock the sound system
 vi.mock('../audio/events/sound-event-emitter', () => ({
@@ -94,7 +96,11 @@ describe('Boulder Player Death', () => {
                 movementConstraint: {
                     isPlayerMovementBlocked: false,
                     blockingReason: 'none'
-                }
+                },
+                currentLevel: 1,
+                levelManager: createMazeLevelManager(),
+                levelProgressionHandler: createLevelProgressionHandler(),
+                isGameComplete: false
             };
         }
 
