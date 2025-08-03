@@ -153,6 +153,9 @@ describe('Audio Error Handling and Fallbacks', () => {
             // Spy on document.addEventListener to verify event listeners are added
             const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
+            // Create WebAudioManager instance to trigger event listener setup
+            const manager = new WebAudioManager();
+
             // Verify that event listeners were added
             expect(addEventListenerSpy).toHaveBeenCalledWith(
                 'click',
