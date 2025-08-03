@@ -251,7 +251,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   let updatedMoves = newMoves;
   let updatedDiamonds = newDiamonds;
   let updatedGameState = newGameState;
-  let updatedBoulderStateManager = updatedBoulderStateManager;
+  let finalBoulderStateManager = updatedBoulderStateManager;
 
   // Check if level is complete and handle progression
   if (gameState.levelProgressionHandler.isLevelComplete(newGameState, newDiamonds)) {
@@ -274,7 +274,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
         updatedGameState = 'playing'; // Reset to playing for new level
 
         // Create new boulder state manager for the new level
-        updatedBoulderStateManager = createBoulderStateManager(updatedMaze, updatedMoves);
+        finalBoulderStateManager = createBoulderStateManager(updatedMaze, updatedMoves);
 
         // Emit door slam sound
         gameState.levelProgressionHandler.emitLevelProgressionSound(progressionResult);
@@ -289,7 +289,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     moves: updatedMoves,
     diamonds: updatedDiamonds,
     gameState: updatedGameState,
-    boulderStateManager: updatedBoulderStateManager,
+    boulderStateManager: finalBoulderStateManager,
     movementConstraint: updatedMovementConstraint,
     currentLevel: updatedCurrentLevel,
     levelManager: updatedLevelManager,
