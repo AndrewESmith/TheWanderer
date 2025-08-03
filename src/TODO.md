@@ -42,6 +42,9 @@
 ## Version 5 - Maze levels
 
 - [ ] Add support for multiple maze levels
+- [ ] Boulders no longer fall until they hit something.
+- [ ] Sound stops
+- [ ] Victory_sound should only play when exiting the last level.
 
 ## Version 6
 
