@@ -1,19 +1,18 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AudioControl } from '../AudioControl';
 
 // Mock the audio settings hook
 const mockUseAudioSettings = {
     isMuted: false,
-    toggleMute: jest.fn()
+    toggleMute: vi.fn()
 };
 
-jest.mock('../../hooks/use-audio-settings', () => ({
+vi.mock('../../hooks/use-audio-settings', () => ({
     useAudioSettings: () => mockUseAudioSettings
 }));
 
 // Mock the AudioSettings component
-jest.mock('../AudioSettings', () => ({
+vi.mock('../AudioSettings', () => ({
     AudioSettings: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => (
         isOpen ? (
             <div data-testid="audio-settings-modal">
@@ -25,7 +24,7 @@ jest.mock('../AudioSettings', () => ({
 
 describe('AudioControl', () => {
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('rendering', () => {
@@ -72,7 +71,7 @@ describe('AudioControl', () => {
         });
 
         it('should prevent event propagation when mute button is clicked', () => {
-            const parentClickHandler = jest.fn();
+            const parentClickHandler = vi.fn();
             render(
                 <div onClick={parentClickHandler}>
                     <AudioControl />
@@ -119,7 +118,7 @@ describe('AudioControl', () => {
         });
 
         it('should prevent event propagation when settings button is clicked', () => {
-            const parentClickHandler = jest.fn();
+            const parentClickHandler = vi.fn();
             render(
                 <div onClick={parentClickHandler}>
                     <AudioControl />

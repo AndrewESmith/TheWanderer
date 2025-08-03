@@ -301,7 +301,6 @@ export class HTML5AudioManager implements AudioManager {
                         this.state.loadedSounds.add(asset.id);
                         loadedCount++;
 
-                        const progress = loadedCount / soundsToLoad.length;
                         this.loadingState = {
                             isLoading: true,
                             loadedCount: loadedCount,

@@ -243,7 +243,7 @@ describe('Audio Settings Integration', () => {
 
             // Should show default settings
             expect(screen.getByText(`Master Volume: ${Math.round(SOUND_CONFIG.globalVolume * 100)}%`)).toBeInTheDocument();
-            expect(screen.getByText(`Movement: ${Math.round(SOUND_CONFIG.categories.movement.volume * 100)}%`)).toBeInTheDocument();
+            expect(screen.getByText(`Movement: ${Math.round(SOUND_CONFIG.categories.movement?.volume ?? 0 * 100)}%`)).toBeInTheDocument();
 
             // Mute toggle should be unchecked
             const muteToggle = screen.getByRole('checkbox');

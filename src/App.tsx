@@ -131,7 +131,7 @@ const GameComponent: React.FC = () => {
     return false;
   }, []);
 
-  const [gameState, setGameState] = React.useState(() =>
+  const [gameState, _] = React.useState(() =>
     createGameState(useTestMaze ? { maze: testBombMaze } : undefined)
   );
 

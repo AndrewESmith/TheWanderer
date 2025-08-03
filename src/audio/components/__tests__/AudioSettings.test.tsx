@@ -1,5 +1,4 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { AudioSettings } from "../AudioSettings";
 import { SOUND_CONFIG } from "../../config/sound-config";
 
@@ -13,30 +12,30 @@ const mockUseAudioSettings = {
     gameState: 1.0,
   },
   showDebugPanel: false,
-  setMuted: jest.fn(),
-  setGlobalVolume: jest.fn(),
-  setCategoryVolume: jest.fn(),
-  setShowDebugPanel: jest.fn(),
-  resetToDefaults: jest.fn(),
+  setMuted: vi.fn(),
+  setGlobalVolume: vi.fn(),
+  setCategoryVolume: vi.fn(),
+  setShowDebugPanel: vi.fn(),
+  resetToDefaults: vi.fn(),
 };
 
-jest.mock("../../hooks/use-audio-settings", () => ({
+vi.mock("../../hooks/use-audio-settings", () => ({
   useAudioSettings: () => mockUseAudioSettings,
 }));
 
 describe("AudioSettings", () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("rendering", () => {
     it("should not render when isOpen is false", () => {
-      render(<AudioSettings isOpen={false} onClose={jest.fn()} />);
+      render(<AudioSettings isOpen={false} onClose={vi.fn()} />);
 
       expect(screen.queryByText("Audio Settings")).not.toBeInTheDocument();
     });
@@ -143,7 +142,7 @@ describe("AudioSettings", () => {
 
   describe("close functionality", () => {
     it("should call onClose when close button is clicked", () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       render(<AudioSettings isOpen={true} onClose={onClose} />);
 
       const closeButton = screen.getByLabelText("Close");
@@ -153,7 +152,7 @@ describe("AudioSettings", () => {
     });
 
     it("should call onClose when overlay is clicked", () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       render(<AudioSettings isOpen={true} onClose={onClose} />);
 
       const overlay = screen
@@ -165,7 +164,7 @@ describe("AudioSettings", () => {
     });
 
     it("should not call onClose when panel content is clicked", () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       render(<AudioSettings isOpen={true} onClose={onClose} />);
 
       const panel = screen

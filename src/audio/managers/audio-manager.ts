@@ -30,7 +30,6 @@ export class WebAudioManager implements AudioManager {
     private suspensionTimeouts: number[] = [];
     private resumeHandlers: Record<string, EventListener> = {};
     private resumeFailureCount: number = 0;
-    private useHTML5Backup: string | null = null;
 
     // Audio pooling for performance optimization
     private gainNodePool: GainNode[] = [];
@@ -419,7 +418,7 @@ export class WebAudioManager implements AudioManager {
     /**
      * Try alternative resume strategies when standard resume fails
      */
-    private tryAlternativeResumeStrategies(error: Error, source: string): void {
+    private tryAlternativeResumeStrategies(_error: Error, source: string): void {
         if (!this.state.audioContext) return;
 
         const strategies = [
@@ -1194,7 +1193,7 @@ export class SilentAudioManager implements AudioManager {
         console.warn('No audio support detected, using silent mode');
     }
 
-    playSound(soundId: string, options?: PlaySoundOptions): void {
+    playSound(_soundId: string, _options?: PlaySoundOptions): void {
         // Silent implementation - do nothing
     }
 
@@ -1232,7 +1231,7 @@ export class SilentAudioManager implements AudioManager {
         };
     }
 
-    onLoadingProgress(callback: (progress: LoadingProgress) => void): () => void {
+    onLoadingProgress(_callback: (progress: LoadingProgress) => void): () => void {
         return () => { };
     }
 

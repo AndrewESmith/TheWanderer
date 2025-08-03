@@ -9,9 +9,6 @@
 
 - [ ] 2. Implement MazeLevelManager class
 
-
-
-
   - Create MazeLevelManager class that manages array of level configurations
   - Implement getCurrentLevel(), hasNextLevel(), advanceToNextLevel() methods
   - Add level validation logic to ensure data integrity

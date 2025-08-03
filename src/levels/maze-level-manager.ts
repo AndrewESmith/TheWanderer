@@ -1,7 +1,6 @@
 import type { MazeLevelData } from "../Interfaces/IMazeLevelData";
 import type { MazeLevelManager } from "../Interfaces/IMazeLevelManager";
 import { CELL, initialMaze } from "../maze";
-import type { MazeCell } from "../maze";
 
 /**
  * Level configurations for the maze game

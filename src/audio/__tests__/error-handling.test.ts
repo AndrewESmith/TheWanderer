@@ -1,6 +1,5 @@
 import { WebAudioManager, SilentAudioManager, createAudioManager } from '../managers/audio-manager';
 import { HTML5AudioManager } from '../managers/html5-audio-manager';
-import { SOUND_ASSETS } from '../config/sound-config';
 
 // Mock Web Audio API
 const mockAudioContext = {
@@ -153,8 +152,6 @@ describe('Audio Error Handling and Fallbacks', () => {
 
             // Spy on document.addEventListener to verify event listeners are added
             const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
-
-            const manager = new WebAudioManager();
 
             // Verify that event listeners were added
             expect(addEventListenerSpy).toHaveBeenCalledWith(

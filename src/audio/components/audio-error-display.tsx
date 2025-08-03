@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import { useAudioContext } from '../context/audio-context';
 import { useSound } from '../hooks/use-sound';
 
