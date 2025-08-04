@@ -2,6 +2,11 @@ import type { LevelProgressionResult } from "../Interfaces/ILevelProgressionResu
 import type { MazeLevelManager } from "../Interfaces/IMazeLevelManager";
 import type { SoundEvent } from "../Interfaces/ISoundEvent";
 import { emitSoundEvent } from "../audio/events/sound-event-emitter";
+import {
+    createLevelError,
+    logLevelError,
+    withLevelErrorHandling
+} from "./level-error-handler";
 
 /**
  * Interface for level progression handler
@@ -37,36 +42,50 @@ export interface LevelProgressionHandler {
 export function createLevelProgressionHandler(): LevelProgressionHandler {
 
     const processLevelCompletion = (levelManager: MazeLevelManager): LevelProgressionResult => {
-        // Check if there's a next level available
-        const hasNext = levelManager.hasNextLevel();
+        return withLevelErrorHandling(() => {
+            // Check if there's a next level available
+            const hasNext = levelManager.hasNextLevel();
 
-        if (hasNext) {
-            // Advance to next level
-            const nextLevel = levelManager.advanceToNextLevel();
+            if (hasNext) {
+                // Attempt to advance to next level
+                const nextLevel = levelManager.advanceToNextLevel();
 
-            if (nextLevel) {
+                if (nextLevel) {
+                    return {
+                        success: true,
+                        nextLevel,
+                        isGameComplete: false,
+                        soundToPlay: 'door_slam'
+                    };
+                } else {
+                    // This indicates a level transition failure
+                    const error = createLevelError(
+                        'level_transition_failed',
+                        'Failed to advance to next level despite hasNextLevel() returning true',
+                        { context: { hasNext, currentLevel: levelManager.getCurrentLevelNumber() } }
+                    );
+
+                    logLevelError(error);
+
+                    // Fallback to game completion
+                    return {
+                        success: false,
+                        isGameComplete: true,
+                        soundToPlay: 'victory'
+                    };
+                }
+            } else {
+                // No more levels - game is complete
                 return {
                     success: true,
-                    nextLevel,
-                    isGameComplete: false,
-                    soundToPlay: 'door_slam'
-                };
-            } else {
-                // This shouldn't happen if hasNextLevel() returned true
-                return {
-                    success: false,
                     isGameComplete: true,
                     soundToPlay: 'victory'
                 };
             }
-        } else {
-            // No more levels - game is complete
-            return {
-                success: true,
-                isGameComplete: true,
-                soundToPlay: 'victory'
-            };
-        }
+        }, 'level_progression_failed', {
+            levelNumber: levelManager.getCurrentLevelNumber(),
+            operationName: 'Process level completion'
+        });
     };
 
     const isLevelComplete = (gameState: 'playing' | 'dead' | 'won', diamonds: number): boolean => {
@@ -75,13 +94,18 @@ export function createLevelProgressionHandler(): LevelProgressionHandler {
     };
 
     const emitLevelProgressionSound = (result: LevelProgressionResult): void => {
-        const soundEvent: SoundEvent = {
-            type: result.soundToPlay,
-            source: 'system',
-            priority: 'high'
-        };
+        return withLevelErrorHandling(() => {
+            const soundEvent: SoundEvent = {
+                type: result.soundToPlay,
+                source: 'system',
+                priority: 'high'
+            };
 
-        emitSoundEvent(soundEvent);
+            emitSoundEvent(soundEvent);
+        }, 'level_progression_failed', {
+            operationName: 'Emit level progression sound',
+            context: { soundType: result.soundToPlay, isGameComplete: result.isGameComplete }
+        });
     };
 
     return {
