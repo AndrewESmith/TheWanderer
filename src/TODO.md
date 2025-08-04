@@ -44,11 +44,12 @@
 - [ ] Add support for multiple maze levels
 - [x] Boulders no longer fall until they hit something.
 - [x] Sound stops if boulder can't move
+- [ ] Update readme
 
 ## Version 6
 
 - [ ] Improve Graphics
-- [ ] View port for mobiles
+- [ ] ViewPort for mobiles
 
 ## Version 7
 
