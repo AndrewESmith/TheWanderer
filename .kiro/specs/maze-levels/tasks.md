@@ -48,10 +48,7 @@
   - Update game state to reflect new level data and reset move counter
   - _Requirements: 1.2, 1.3, 1.5, 3.3, 3.4_
 
-- [ ] 7. Update UI to display level information
-
-
-
+- [x] 7. Update UI to display level information
 
   - Add current level number to HUD display
   - Show level-specific move limits in the moves counter
@@ -59,7 +56,12 @@
   - Add visual indication of level progression
   - _Requirements: 3.1, 3.2, 5.3_
 
-- [ ] 8. Create comprehensive unit tests for level management
+- [x] 8. Create comprehensive unit tests for level management
+
+
+
+
+
   - Test MazeLevelManager level navigation and validation
   - Test level progression logic and sound event generation
   - Test GameState integration with level management
