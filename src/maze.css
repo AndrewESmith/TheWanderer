@@ -53,6 +53,60 @@
   white-space: nowrap;
 }
 
+/* Level progression styling */
+.level-info {
+  background: #4a5568;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+/* Moves counter styling with progress indication */
+.moves-info {
+  background: #2d3748;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.moves-info.low-moves {
+  background: #c53030;
+  color: #fed7d7;
+}
+
+.moves-info.medium-moves {
+  background: #d69e2e;
+  color: #faf089;
+}
+
+/* Game status styling */
+.game-status {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.game-status.game-over {
+  background: #c53030;
+  color: #fed7d7;
+}
+
+.game-status.level-complete {
+  background: #38a169;
+  color: #c6f6d5;
+}
+
+.game-status.victory {
+  background: #d69e2e;
+  color: #faf089;
+  animation: victory-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes victory-pulse {
+  from { opacity: 0.8; }
+  to { opacity: 1; }
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 600px) {
   .hud {

@@ -139,7 +139,7 @@ const GameComponent: React.FC = () => {
 
   const [showMobileControls, setShowMobileControls] = React.useState(false);
   React.useEffect(() => {
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const isSmallScreen = window.innerWidth <= 800;
     setShowMobileControls(isTouch || isSmallScreen);
   }, []);
@@ -215,23 +215,73 @@ const GameComponent: React.FC = () => {
       </div>
       {showMobileControls && (
         <div className="mobile-controls">
-          <button className="mobile-btn up" onClick={() => movePlayer(0, -1)} aria-label="Up">▲</button>
+          <button
+            className="mobile-btn up"
+            onClick={() => movePlayer(0, -1)}
+            aria-label="Up"
+          >
+            ▲
+          </button>
           <div>
-            <button className="mobile-btn left" onClick={() => movePlayer(-1, 0)} aria-label="Left">◀</button>
-            <button className="mobile-btn down" onClick={() => movePlayer(0, 1)} aria-label="Down">▼</button>
-            <button className="mobile-btn right" onClick={() => movePlayer(1, 0)} aria-label="Right">▶</button>
+            <button
+              className="mobile-btn left"
+              onClick={() => movePlayer(-1, 0)}
+              aria-label="Left"
+            >
+              ◀
+            </button>
+            <button
+              className="mobile-btn down"
+              onClick={() => movePlayer(0, 1)}
+              aria-label="Down"
+            >
+              ▼
+            </button>
+            <button
+              className="mobile-btn right"
+              onClick={() => movePlayer(1, 0)}
+              aria-label="Right"
+            >
+              ▶
+            </button>
           </div>
         </div>
       )}
       <div className="hud">
         <div className="hud-left">
+          <span className="level-info">
+            Level: {gameState.currentLevel} /{" "}
+            {gameState.levelManager.getTotalLevels()}
+          </span>
           <span>Score: {gameState.score}</span>
           <span>Diamonds left: {gameState.diamonds}</span>
-          <span>Moves: {gameState.moves}</span>
-          <span>
-            {gameState.gameState === "dead" && "Game Over"}
-            {gameState.gameState === "won" && "You Win!"}
+          <span
+            className={`moves-info ${
+              gameState.moves <= 5
+                ? "low-moves"
+                : gameState.moves <= 15
+                ? "medium-moves"
+                : ""
+            }`}
+          >
+            Moves: {gameState.moves} /{" "}
+            {gameState.levelManager.getCurrentLevel().moveLimit}
           </span>
+          {gameState.gameState !== "playing" && (
+            <span
+              className={`game-status ${
+                gameState.gameState === "dead"
+                  ? "game-over"
+                  : gameState.isGameComplete
+                  ? "victory"
+                  : "level-complete"
+              }`}
+            >
+              {gameState.gameState === "dead" && "Game Over"}
+              {gameState.gameState === "won" &&
+                (gameState.isGameComplete ? "Victory!" : "Level Complete!")}
+            </span>
+          )}
           {fallbackMode && (
             <span style={{ color: "#ffa500", fontSize: "0.8em" }}>
               Audio: Fallback Mode

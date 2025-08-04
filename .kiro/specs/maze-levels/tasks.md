@@ -49,6 +49,10 @@
   - _Requirements: 1.2, 1.3, 1.5, 3.3, 3.4_
 
 - [ ] 7. Update UI to display level information
+
+
+
+
   - Add current level number to HUD display
   - Show level-specific move limits in the moves counter
   - Ensure score display shows cumulative total across all levels
