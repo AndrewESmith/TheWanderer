@@ -188,6 +188,8 @@ export function simulateGravityWithState(
 
         for (const boulder of sortedMovingBoulders) {
             try {
+                // CRITICAL: simulateEnhancedBoulderFall implements continuous falling per Requirement 1.4
+                // Each call to this function will make the boulder fall all the way down until collision
                 const result = simulateEnhancedBoulderFall(currentMaze, boulder);
 
                 // Add sound events from boulder fall simulation

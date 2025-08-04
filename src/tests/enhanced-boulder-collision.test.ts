@@ -544,23 +544,25 @@ describe('Enhanced Boulder Collision Integration Tests', () => {
             ];
             const boulderPosition: Position = { x: 0, y: 0 };
 
-            // First fall
-            const result1 = simulateEnhancedBoulderFall(maze, boulderPosition);
-            expect(result1.newPosition).toEqual({ x: 0, y: 1 });
-            expect(result1.playerCollision).toBe(false);
-            expect(result1.bombExplosion).toBe(false);
+            // Boulder should now fall continuously until it hits the rock at y: 2
+            // This is the correct behavior per Requirement 1.4: boulder continues moving until collision
+            const result = simulateEnhancedBoulderFall(maze, boulderPosition);
+            expect(result.newPosition).toEqual({ x: 0, y: 2 }); // Falls all the way down to rock
+            expect(result.playerCollision).toBe(false);
+            expect(result.bombExplosion).toBe(false);
 
-            // Second fall
-            const result2 = simulateEnhancedBoulderFall(result1.newMaze, result1.newPosition);
-            expect(result2.newPosition).toEqual({ x: 0, y: 2 });
-            expect(result2.playerCollision).toBe(false);
-            expect(result2.bombExplosion).toBe(false);
+            // Verify boulder is placed correctly in the maze
+            expect(result.newMaze[0]![0]).toBe(CELL.EMPTY); // Original position cleared
+            expect(result.newMaze[1]![0]).toBe(CELL.EMPTY); // Intermediate position empty
+            expect(result.newMaze[2]![0]).toBe(CELL.BOULDER); // Final position has boulder
+            expect(result.newMaze[3]![0]).toBe(CELL.ROCK); // Rock remains unchanged
 
-            // Third fall - should stop at rock
-            const result3 = simulateEnhancedBoulderFall(result2.newMaze, result2.newPosition);
-            expect(result3.newPosition).toEqual({ x: 0, y: 2 }); // Stays in place
-            expect(result3.playerCollision).toBe(false);
-            expect(result3.bombExplosion).toBe(false);
+            // Should generate movement sound and collision sound
+            expect(result.soundEvents.length).toBe(2);
+            expect(result.soundEvents[0]?.type).toBe('movement');
+            expect(result.soundEvents[0]?.source).toBe('boulder');
+            expect(result.soundEvents[1]?.type).toBe('collision');
+            expect(result.soundEvents[1]?.source).toBe('boulder');
         });
 
         it('should handle boulder collision with diamond after falling', () => {
@@ -571,16 +573,24 @@ describe('Enhanced Boulder Collision Integration Tests', () => {
             ];
             const boulderPosition: Position = { x: 0, y: 0 };
 
-            // First fall - moves to empty space
-            const result1 = simulateEnhancedBoulderFall(maze, boulderPosition);
-            expect(result1.newPosition).toEqual({ x: 0, y: 1 });
+            // Boulder should fall continuously until it hits the diamond at y: 1
+            // This is the correct behavior per Requirement 1.4: boulder continues moving until collision
+            const result = simulateEnhancedBoulderFall(maze, boulderPosition);
+            expect(result.newPosition).toEqual({ x: 0, y: 1 }); // Falls to position above diamond
+            expect(result.playerCollision).toBe(false);
+            expect(result.bombExplosion).toBe(false);
 
-            // Second fall - should stop at diamond (can't fall)
-            const result2 = simulateEnhancedBoulderFall(result1.newMaze, result1.newPosition);
-            expect(result2.newPosition).toEqual({ x: 0, y: 1 }); // Stays in place
-            expect(result2.playerCollision).toBe(false);
-            expect(result2.bombExplosion).toBe(false);
-            // targetCell is undefined when boulder can't fall
+            // Verify boulder is placed correctly in the maze
+            expect(result.newMaze[0]![0]).toBe(CELL.EMPTY); // Original position cleared
+            expect(result.newMaze[1]![0]).toBe(CELL.BOULDER); // Boulder stops above diamond
+            expect(result.newMaze[2]![0]).toBe(CELL.DIAMOND); // Diamond remains unchanged
+
+            // Should generate movement sound and collision sound
+            expect(result.soundEvents.length).toBe(2);
+            expect(result.soundEvents[0]?.type).toBe('movement');
+            expect(result.soundEvents[0]?.source).toBe('boulder');
+            expect(result.soundEvents[1]?.type).toBe('collision');
+            expect(result.soundEvents[1]?.source).toBe('boulder');
         });
 
         it('should handle complex maze with multiple collision types', () => {

@@ -45,13 +45,15 @@ describe('Enhanced Physics Engine', () => {
             expect(movementSounds).toHaveLength(1);
             expect(movementSounds[0]?.volume).toBe(0.8);
 
-            // Boulder should be in moving list
+            // Boulder should be in moving list (original position when it started moving)
             expect(result.movingBoulders).toHaveLength(1);
             expect(result.movingBoulders[0]).toEqual({ x: 2, y: 1 });
 
-            // Boulder should have moved down
+            // Boulder should have moved down continuously until it hits the bottom rock
+            // Per Requirement 1.4: boulder continues moving until collision
             expect(result.newMaze[1]![2]).toBe(CELL.EMPTY); // Original position empty
-            expect(result.newMaze[2]![2]).toBe(CELL.BOULDER); // Boulder moved down
+            expect(result.newMaze[2]![2]).toBe(CELL.EMPTY); // Intermediate position empty
+            expect(result.newMaze[3]![2]).toBe(CELL.BOULDER); // Boulder fell all the way down
         });
 
         it('should handle boulder collision with COLLISION_THUD sound', () => {
@@ -136,9 +138,14 @@ describe('Enhanced Physics Engine', () => {
             // Both boulders should be in moving list
             expect(result.movingBoulders).toHaveLength(2);
 
-            // Both boulders should have moved
-            expect(result.newMaze[2]![1]).toBe(CELL.BOULDER); // First boulder moved down
-            expect(result.newMaze[2]![3]).toBe(CELL.BOULDER); // Second boulder moved down
+            // Both boulders should have moved down continuously until they hit the bottom rocks
+            // Per Requirement 1.4: boulder continues moving until collision
+            expect(result.newMaze[1]![1]).toBe(CELL.EMPTY); // First boulder original position empty
+            expect(result.newMaze[1]![3]).toBe(CELL.EMPTY); // Second boulder original position empty
+            expect(result.newMaze[2]![1]).toBe(CELL.EMPTY); // Intermediate positions empty
+            expect(result.newMaze[2]![3]).toBe(CELL.EMPTY); // Intermediate positions empty
+            expect(result.newMaze[3]![1]).toBe(CELL.BOULDER); // First boulder fell all the way down
+            expect(result.newMaze[3]![3]).toBe(CELL.BOULDER); // Second boulder fell all the way down
         });
     });
 
