@@ -1,7 +1,7 @@
 .maze-grid {
     display: grid;
-    grid-template-columns: repeat(16, 32px);
-    grid-template-rows: repeat(10, 32px);
+    grid-template-columns: var(--maze-columns, repeat(16, 32px));
+    grid-template-rows: var(--maze-rows, repeat(10, 32px));
     gap: 2px;
     background: #222;
     padding: 10px;
@@ -33,7 +33,7 @@
   background: #333;
   color: white;
   margin-top: 10px;
-  width: calc(16 * 32px + 12px); /* Match the width of the maze grid */
+  width: var(--maze-width, calc(16 * 32px + 12px)); /* Match the width of the maze grid */
   box-sizing: border-box;
 }
 
@@ -41,11 +41,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
 .hud-right {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .hud span {
@@ -112,15 +115,17 @@
   .hud {
     flex-direction: column;
     gap: 10px;
-    align-items: stretch;
+    align-items: center;
   }
   
   .hud-left {
     justify-content: center;
+    align-items: center;
   }
   
   .hud-right {
     justify-content: center;
+    align-items: center;
   }
 }
 

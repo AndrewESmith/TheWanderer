@@ -202,6 +202,29 @@ const GameComponent: React.FC = () => {
     }
   }, [resetAudioSystem]);
 
+  // Calculate maze dimensions and set CSS custom properties
+  React.useEffect(() => {
+    const mazeWidth = gameState.maze[0]?.length || 16;
+    const mazeHeight = gameState.maze.length || 10;
+    // Calculate exact maze width: cells + gaps + padding
+    // cells: mazeWidth * 32px
+    // gaps: (mazeWidth - 1) * 2px
+    // padding: 20px (10px on each side)
+    const calculatedWidth = `calc(${mazeWidth} * 32px + ${
+      (mazeWidth - 1) * 2
+    }px + 20px)`;
+
+    document.documentElement.style.setProperty("--maze-width", calculatedWidth);
+    document.documentElement.style.setProperty(
+      "--maze-columns",
+      `repeat(${mazeWidth}, 32px)`
+    );
+    document.documentElement.style.setProperty(
+      "--maze-rows",
+      `repeat(${mazeHeight}, 32px)`
+    );
+  }, [gameState.maze]);
+
   return (
     <div>
       <AudioErrorDisplay />
