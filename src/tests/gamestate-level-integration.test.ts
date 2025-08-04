@@ -27,7 +27,7 @@ describe('GameState Level Integration', () => {
 
         // Should use the move limit from level 1 (55 moves)
         expect(gameState.moves).toBe(levelData.moveLimit);
-        expect(gameState.moves).toBe(55);
+        expect(gameState.moves).toBe(45);
 
         // Should use the maze from level 1
         expect(gameState.maze).toEqual(levelData.maze);

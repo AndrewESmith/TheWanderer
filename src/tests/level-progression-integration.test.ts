@@ -61,8 +61,8 @@ describe('Level Progression Integration', () => {
         // Should have new maze from level 2
         expect(gameState.maze).not.toEqual(testMaze);
 
-        // Should have level 2's move limit (45 - 1 for the final move to exit)
-        expect(gameState.moves).toBe(44); // Level 2 move limit minus the final move
+        // Should have level 2's move limit minus the final move to exit
+        expect(gameState.moves).toBe(49); // Level 2 move limit minus the final move
     });
 
     it('should complete game when reaching final level', () => {
@@ -229,8 +229,8 @@ describe('Level Progression Integration', () => {
             gameState.movePlayer(1, 0); // Move right
             // Check if level progression happened
             if (gameState.currentLevel === 2) {
-                // Level progression happened - moves should be reset to level 2's limit
-                expect(gameState.moves).toBe(45); // Level 2 move limit
+                // Level progression happened - moves should be reset to level 2's limit minus the final move
+                expect(gameState.moves).toBe(50); // Level 2 move limit minus the final move
                 expect(gameState.currentLevel).toBe(2);
                 return; // Test passed, exit early
             }

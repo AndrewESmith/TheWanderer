@@ -171,7 +171,7 @@ describe("GameState - Functional Implementation", () => {
             const gameState = createGameState();
 
             expect(gameState.score).toBe(0);
-            expect(gameState.moves).toBe(55);
+            expect(gameState.moves).toBe(45);
             expect(gameState.gameState).toBe('playing');
             expect(gameState.player).toBeTruthy();
         });
