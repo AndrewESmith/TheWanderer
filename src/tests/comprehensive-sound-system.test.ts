@@ -309,7 +309,7 @@ describe('Comprehensive Sound System Test Suite', () => {
             it('should correctly map all game state changes', () => {
                 const testCases = [
                     { newState: 'dead', oldState: 'playing', expected: { type: 'death', priority: 'high', volume: 0.9 } },
-                    { newState: 'won', oldState: 'playing', expected: { type: 'victory', priority: 'high', volume: 0.8 } },
+                    { newState: 'won', oldState: 'playing', expected: null }, // Victory now handled by level progression
                     { newState: 'playing', oldState: 'playing', expected: null },
                     { newState: 'playing', oldState: 'dead', expected: null }
                 ];
@@ -342,13 +342,13 @@ describe('Comprehensive Sound System Test Suite', () => {
                 expect(deathEvents[0]?.type).toBe('bomb_explode');
                 expect(deathEvents[1]?.type).toBe('death');
 
-                // Test victory sequence
+                // Test victory sequence (victory sound now handled by level progression)
                 const victoryEvents = generatePlayerMoveEvents(
                     CELL.EMPTY, CELL.EXIT, 'won', 'playing', 0
                 );
-                expect(victoryEvents.length).toBeGreaterThan(2);
+                expect(victoryEvents.length).toBeGreaterThan(1);
                 expect(victoryEvents.some(e => e.type === 'door_slam')).toBe(true);
-                expect(victoryEvents.some(e => e.type === 'victory')).toBe(true);
+                // Victory sound is now handled by level progression system
             });
         });
 

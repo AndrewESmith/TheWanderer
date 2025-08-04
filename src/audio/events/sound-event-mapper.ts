@@ -57,15 +57,8 @@ export function mapGameStateChangeToSound(
         };
     }
 
-    // Victory sound when player wins
-    if (newGameState === 'won' && previousGameState === 'playing') {
-        return {
-            type: 'victory',
-            source: 'system',
-            priority: 'high',
-            volume: 0.8
-        };
-    }
+    // Note: Victory sound is now handled by the level progression system
+    // to ensure it only plays when completing the final level, not on every level completion
 
     return null;
 }

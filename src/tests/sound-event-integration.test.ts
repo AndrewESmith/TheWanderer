@@ -92,15 +92,12 @@ describe('Sound Event Mapper', () => {
             });
         });
 
-        it('should return victory sound event when player wins', () => {
+        it('should return null when player wins (victory handled by level progression)', () => {
             const result = mapGameStateChangeToSound('won', 'playing');
 
-            expect(result).toEqual({
-                type: 'victory',
-                source: 'system',
-                priority: 'high',
-                volume: 0.8
-            });
+            // Victory sounds are now handled by the level progression system
+            // to ensure they only play when completing the final level
+            expect(result).toBeNull();
         });
 
         it('should return null when game state does not change', () => {
@@ -329,7 +326,7 @@ describe('Sound Event Mapper', () => {
             });
         });
 
-        it('should generate movement, door slam, and victory events when player wins', () => {
+        it('should generate movement and door slam events when player wins', () => {
             const events = generatePlayerMoveEvents(
                 CELL.EMPTY,
                 CELL.EXIT,
@@ -338,7 +335,8 @@ describe('Sound Event Mapper', () => {
                 0
             );
 
-            expect(events).toHaveLength(3);
+            // Victory sound is now handled by level progression system
+            expect(events).toHaveLength(2);
             expect(events[0]).toEqual({
                 type: 'movement',
                 source: 'player',
@@ -347,12 +345,6 @@ describe('Sound Event Mapper', () => {
             });
             expect(events[1]).toEqual({
                 type: 'door_slam',
-                source: 'system',
-                priority: 'high',
-                volume: 0.8
-            });
-            expect(events[2]).toEqual({
-                type: 'victory',
                 source: 'system',
                 priority: 'high',
                 volume: 0.8

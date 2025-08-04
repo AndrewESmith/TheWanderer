@@ -371,7 +371,7 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
 
             expect(gameEvents).toContain(SOUND_IDS.DIAMOND_COLLECT);
             expect(gameEvents).toContain(SOUND_IDS.DOOR_SLAM);
-            expect(gameEvents).toContain(SOUND_IDS.VICTORY_SOUND);
+            // Victory sound is now handled by level progression system
 
             audioManager.cleanup();
         });
@@ -801,13 +801,12 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
             }
 
             // Verify complete game event integration
-            expect(gameEventLog.length).toBeGreaterThan(5);
+            expect(gameEventLog.length).toBeGreaterThan(4);
             expect(gameEventLog.some(e => e.event === 'movement')).toBe(true);
             expect(gameEventLog.some(e => e.event === 'collection')).toBe(true);
-            expect(gameEventLog.some(e => e.event === 'victory')).toBe(true);
+            // Victory sound is now handled by level progression system, not by generatePlayerMoveEvents
             expect(gameEventLog.some(e => e.soundId === SOUND_IDS.PLAYER_WALK)).toBe(true);
             expect(gameEventLog.some(e => e.soundId === SOUND_IDS.DIAMOND_COLLECT)).toBe(true);
-            expect(gameEventLog.some(e => e.soundId === SOUND_IDS.VICTORY_SOUND)).toBe(true);
 
             // Events should be properly timed
             const timestamps = gameEventLog.map(e => e.timestamp);
