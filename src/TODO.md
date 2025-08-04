@@ -43,12 +43,7 @@
 
 - [ ] Add support for multiple maze levels
 - [x] Boulders no longer fall until they hit something.
-Boulder movement has been implemented however when play testing the Acceptance Criteria for requirement 1.4 4. WHEN a boulder is moving THEN it SHALL continue moving downward until it collides with another object is failing. Investigate the boulder movement implementation to understand why it's only moving one space instead of continuing until collision as per requirement. Please retify and add comments to codes and tests to ensure that this behaviour is not removed again in future updates
-- [x] Victory_sound should only play when exiting the last level.
 - [x] Sound stops if boulder can't move
-This test and sound behavior is wrong
-Boulder Movement and Sound Events > should generate collision sound when boulder cannot fall. There should be no sound because the boulder can't move.
-
 
 ## Version 6
 
