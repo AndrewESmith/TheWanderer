@@ -182,7 +182,12 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   const physicsSoundEvents = gameState.moves === 55 ? [] : physicsResult.soundEvents;
 
   // Handle game end sounds separately to ensure movement sounds are stopped
-  if (newGameState !== 'playing' && previousGameState === 'playing') {
+  // Only handle game end sounds for actual game endings (death or final level completion)
+  // Level progression sounds are handled separately by the level progression handler
+  const isActualGameEnd = newGameState === 'dead' ||
+    (newGameState === 'won' && (gameState.maze.length !== 10 || gameState.maze[0]?.length !== 16 || !gameState.levelManager.hasNextLevel()));
+
+  if (isActualGameEnd && previousGameState === 'playing') {
     // Game just ended - handle end sounds with proper stopping of movement sounds
     handleGameEndSounds(newGameState);
 
