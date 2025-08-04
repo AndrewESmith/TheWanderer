@@ -228,10 +228,12 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
   );
 
   // Identify and trigger newly adjacent boulders
+  // Only trigger boulders that can actually move to prevent unnecessary sounds
   const triggeredBoulders = identifyTriggeredBoulders(
     gameState.boulderStateManager.lastPlayerPosition,
     { x: newX, y: newY },
-    updatedBoulderStateManager
+    updatedBoulderStateManager,
+    finalMaze // Pass maze to check if boulders can actually move
   );
 
   // Update boulder triggers for next move

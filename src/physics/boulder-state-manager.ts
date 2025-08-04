@@ -140,6 +140,27 @@ export function arePositionsAdjacent(pos1: Position, pos2: Position): boolean {
     return dx <= 1 && dy <= 1 && !(dx === 0 && dy === 0);
 }
 
+// Simple function to check if boulder can fall (to avoid circular dependency with collision-detection)
+function canBoulderFallSimple(maze: MazeCell[][], position: Position): boolean {
+    const belowPosition = { x: position.x, y: position.y + 1 };
+
+    // Check bounds
+    if (belowPosition.y >= maze.length || belowPosition.x < 0 || belowPosition.x >= (maze[belowPosition.y]?.length ?? 0)) {
+        return false; // Can't fall outside maze bounds
+    }
+
+    const cellBelow = maze[belowPosition.y]?.[belowPosition.x];
+    if (cellBelow === undefined) {
+        return false;
+    }
+
+    // Boulder can fall if there's empty space, or if it can collide with special objects
+    return cellBelow === CELL.EMPTY ||
+        cellBelow === CELL.SOIL ||
+        cellBelow === CELL.PLAYER ||
+        cellBelow === CELL.BOMB;
+}
+
 // Pure function to detect boulders adjacent to player position
 export function detectAdjacentBoulders(
     playerPosition: Position,
@@ -151,10 +172,12 @@ export function detectAdjacentBoulders(
 }
 
 // Pure function to identify newly triggered boulders based on player movement
+// Only triggers boulders that can actually move to prevent unnecessary sounds
 export function identifyTriggeredBoulders(
     previousPlayerPosition: Position | null,
     currentPlayerPosition: Position,
-    boulderStateManager: BoulderStateManager
+    boulderStateManager: BoulderStateManager,
+    maze?: MazeCell[][]
 ): Position[] {
     const currentAdjacentBoulders = detectAdjacentBoulders(
         currentPlayerPosition,
@@ -162,21 +185,45 @@ export function identifyTriggeredBoulders(
     );
 
     // If no previous position, all adjacent boulders are newly triggered
+    let newlyTriggeredBoulders: Position[];
     if (!previousPlayerPosition) {
-        return currentAdjacentBoulders;
+        newlyTriggeredBoulders = currentAdjacentBoulders;
+    } else {
+        const previousAdjacentBoulders = detectAdjacentBoulders(
+            previousPlayerPosition,
+            Array.from(boulderStateManager.boulders.values()).map(state => state.position)
+        );
+
+        // Find boulders that are adjacent now but weren't before
+        newlyTriggeredBoulders = currentAdjacentBoulders.filter(currentBoulder =>
+            !previousAdjacentBoulders.some(prevBoulder =>
+                prevBoulder.x === currentBoulder.x && prevBoulder.y === currentBoulder.y
+            )
+        );
     }
 
-    const previousAdjacentBoulders = detectAdjacentBoulders(
-        previousPlayerPosition,
-        Array.from(boulderStateManager.boulders.values()).map(state => state.position)
-    );
+    // If maze is provided, filter out boulders that cannot actually move
+    // This prevents COLLISION_THUD sounds from playing when player passes immovable boulders
+    if (maze) {
+        return newlyTriggeredBoulders.filter(boulder => {
+            try {
+                return canBoulderFallSimple(maze, boulder);
+            } catch (error) {
+                // If we can't determine if boulder can fall, err on the side of not triggering
+                // to prevent unwanted sounds
+                logBoulderError({
+                    type: 'physics_failure',
+                    message: `Error checking if boulder can fall at position (${boulder.x},${boulder.y}): ${error instanceof Error ? error.message : 'Unknown error'}`,
+                    context: { boulder, error },
+                    recoverable: true
+                }, 'identifyTriggeredBoulders');
+                return false;
+            }
+        });
+    }
 
-    // Find boulders that are adjacent now but weren't before
-    return currentAdjacentBoulders.filter(currentBoulder =>
-        !previousAdjacentBoulders.some(prevBoulder =>
-            prevBoulder.x === currentBoulder.x && prevBoulder.y === currentBoulder.y
-        )
-    );
+    // If no maze provided, return all newly triggered boulders (backward compatibility)
+    return newlyTriggeredBoulders;
 }
 
 // Pure function to update boulder state manager with triggered boulders with error handling
@@ -478,7 +525,8 @@ export function updatePlayerPosition(
 export function createProximityResult(
     playerPosition: Position,
     previousPlayerPosition: Position | null,
-    boulderStateManager: BoulderStateManager
+    boulderStateManager: BoulderStateManager,
+    maze?: MazeCell[][]
 ): ProximityResult {
     const adjacentBoulders = detectAdjacentBoulders(
         playerPosition,
@@ -488,7 +536,8 @@ export function createProximityResult(
     const newlyTriggeredBoulders = identifyTriggeredBoulders(
         previousPlayerPosition,
         playerPosition,
-        boulderStateManager
+        boulderStateManager,
+        maze
     );
 
     return {
