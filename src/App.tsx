@@ -190,7 +190,17 @@ const GameComponent: React.FC = () => {
 
   // Render cell (reuse previous Cell component)
   const Cell: React.FC<{ type: MazeCell }> = ({ type }) => {
-    return <div className={`cell ${type}`}>{ICONS[type]}</div>;
+    return (
+      <div
+        className={`cell ${type}`}
+        style={{
+          backgroundImage: `url(${ICONS[type]})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+    );
   };
 
   // Handle audio system reset

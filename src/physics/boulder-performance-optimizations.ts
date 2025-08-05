@@ -234,11 +234,12 @@ export function processBouldersBatch(
         }
 
         // Yield control to prevent blocking UI (in browser environment)
+        // Only break if we're in a browser and have processed a significant amount
         if (typeof window !== 'undefined' && i + batchSize < boulders.length) {
-            // Small delay to prevent blocking
             const now = performance.now();
-            if (now - startTime > 16) { // ~60fps threshold
-                break; // Exit early if taking too long
+            // Only break for very large batches to prevent blocking
+            if (now - startTime > 100 && boulders.length > 1000) {
+                break; // Exit early only for very large datasets
             }
         }
     }

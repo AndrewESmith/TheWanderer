@@ -1,15 +1,13 @@
 # Implementation Plan
 
-- [ ] 1. Update ICONS constant to use PNG image paths
-
-
-
+- [x] 1. Update ICONS constant to use PNG image paths
 
   - Modify the ICONS constant in src/maze.ts to reference PNG files instead of emoji characters
   - Ensure all image paths correctly map to files in the public folder (note: Empty.png vs empty)
   - _Requirements: 1.1, 1.2, 3.1_
 
-- [ ] 2. Implement image-based Cell component rendering
+- [x] 2. Implement image-based Cell component rendering
+
   - Modify the Cell component in src/App.tsx to use CSS background-image instead of text content
   - Add inline styles for backgroundImage, backgroundSize, backgroundPosition, and backgroundRepeat
   - Remove emoji text content from the cell div
