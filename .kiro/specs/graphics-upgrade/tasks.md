@@ -27,17 +27,19 @@
   - Ensure preloading doesn't block initial game rendering
   - _Requirements: 2.1, 2.2_
 
-- [ ] 5. Add error handling for image loading failures
-
-
-
+- [x] 5. Add error handling for image loading failures
 
   - Implement onError handling for background images using CSS fallback mechanism
   - Add console warnings for failed image loads
   - Ensure game remains playable when images fail to load
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 6. Create unit tests for image system
+- [x] 6. Create unit tests for image system
+
+
+
+
+
   - Write tests for the updated ICONS constant to verify correct image paths
   - Test Cell component rendering with image backgrounds
   - Mock image loading scenarios to test error handling
