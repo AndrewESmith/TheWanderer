@@ -41,7 +41,7 @@
 
 ## Version 5 - Maze levels
 
-- [ ] Add support for multiple maze levels
+- [x] Add support for multiple maze levels
 - [x] Boulders no longer fall until they hit something.
 - [x] Sound stops if boulder can't move
 - [ ] Update readme

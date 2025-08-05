@@ -8,6 +8,35 @@ The game came into existence in 1991 and appears to have its origins in a MS-DOS
 
 This Game has been created using AI, React and TypeScript. The instructions and images provided to the AI can be found under the folder _Instructions_.
 
+## Major Features
+
+### 🎵 Comprehensive Audio System
+- **Full Audio Integration**: Complete sound system with HTML5 Audio and Web Audio API support
+- **Audio Settings Panel**: User-configurable audio settings with mute controls and debug options
+- **Sound Events**: Rich audio feedback for all game interactions including:
+  - Boulder movement and collision sounds
+  - Player movement feedback
+  - Game state transitions (victory, game over)
+  - Environmental audio cues
+- **Browser Compatibility**: Graceful fallback for different browser audio capabilities
+- **Audio Debug Tools**: Development tools for testing and debugging audio functionality
+
+### 🪨 Advanced Boulder Physics
+- **Continuous Boulder Falling**: Boulders fall continuously until collision (per game requirements)
+- **Enhanced Collision Detection**: Sophisticated physics engine with multiple collision types
+- **Boulder State Management**: Intelligent tracking of boulder movement states
+- **Player Death Mechanics**: Boulder-player collision detection with game over functionality
+- **Performance Optimizations**: Efficient physics calculations for multiple concurrent boulders
+- **Error Handling**: Comprehensive error recovery for physics edge cases
+
+### 🎯 Multi-Level Maze System
+- **5 Unique Levels**: Each with distinct layouts and increasing difficulty
+- **Level Progression**: Automatic advancement through completed levels
+- **Level Validation**: Built-in validation system ensuring level integrity
+- **Dynamic Difficulty**: Varying move limits and element distributions per level
+- **Error Recovery**: Fallback mechanisms for level loading failures
+- **Level Management**: Comprehensive level state tracking and progression logic
+
 ## Changes
 
 This project has been migrated from Create React App (react-scripts) to Vite for improved performance and developer experience. For details about the migration and its benefits, see [MigrateToVite.md](./MigrateToVite.md).
@@ -22,17 +51,16 @@ This project has been migrated from Create React App (react-scripts) to Vite for
 - **Enhanced Game Elements**: Additional diamonds, boulders, and bombs have been strategically placed throughout the larger maze
 - **Balanced Gameplay**: Game parameters have been adjusted to maintain proper difficulty with the expanded maze size
 - **Improved UI Testing**: Added automated tests to verify UI adaptation for the larger maze dimensions
+- **Interactive Boulders**: Implementation of pushable boulders by the player
 - **Bug Fixes**: Fixed player position tracking in larger maze movement tests
+- **Sound Effects**: Adding sound for game events (boulder/arrow collisions, player actions)
+- **Multiple Maze Levels**: Creating additional maze layouts with increasing difficulty
 
 ### Upcoming Features
 
-- **Interactive Boulders**: Implementation of pushable boulders by the player
-- **Sound Effects**: Adding sound for game events (boulder/arrow collisions, player actions)
 - **Arrow Mechanics**: Adding directional arrows with complex movement patterns
 - **Enhanced Maze Generation**: Ensuring all diamonds are reachable in AI-generated mazes
-- **Multiple Maze Levels**: Creating additional maze layouts with increasing difficulty
 - **Level Password System**: Assigning unique passwords to each maze level for direct access
-- **Cell Item Architecture**: Implementation of a cell-based component system where various items populate cells
 
 ### Completed Features
 
@@ -75,34 +103,31 @@ npm run preview
 
 ### Testing
 
+The project includes extensive test coverage across multiple testing frameworks:
+
 ```bash
-# Run unit tests with Vitest
-npm test
+# Unit Tests (Vitest)
+npm test                    # Run all unit tests
+npm run test:watch         # Run tests in watch mode
+npm run test:no-warnings   # Run tests without Node.js warnings
 
-# Run tests in watch mode
-npm run test:watch
+# End-to-End Tests (Playwright)
+npm run test:e2e           # Run Playwright E2E tests
+npm run test:e2e:ui        # Run with Playwright UI
+npm run test:e2e:debug     # Debug Playwright tests
 
-# Run tests without warnings
-npm run test:no-warnings
-
-# Run end-to-end tests with Playwright
-npm run test:e2e
-
-# Run Playwright tests with UI
-npm run test:e2e:ui
-
-# Debug Playwright tests
-npm run test:e2e:debug
+# Specialized Test Suites
+npm run test:isolated      # Run tests in isolated environment
 ```
 
-The project includes comprehensive test coverage for:
-
-- **Functional Game Logic**: Pure function testing for game state transitions
-- **Player Movement Mechanics**: Immutable state updates and collision detection
-- **Game State Management**: Functional patterns with proper TypeScript interfaces
-- **UI Adaptation**: Responsive design testing for the larger maze dimensions
-- **End-to-End Testing**: Playwright integration with MCP server automation
-- **Player Position Tracking**: Coordinate system validation in the expanded maze
+#### Test Coverage Areas
+- **Audio System Tests**: 50+ tests covering audio manager, sound events, and browser compatibility
+- **Boulder Physics Tests**: 67+ tests for collision detection, movement constraints, and player interactions  
+- **Level Management Tests**: 12+ tests for level progression, validation, and error handling
+- **Game State Tests**: Comprehensive testing of game logic and state transitions
+- **Integration Tests**: End-to-end testing of complete game workflows
+- **Performance Tests**: Boulder physics performance and optimization validation
+- **Error Handling Tests**: Comprehensive error recovery and fallback testing
 
 ## Environment Variables
 
@@ -128,26 +153,38 @@ This project includes VS Code configurations for:
 - **TypeScript 5.8.3** - Following modern TypeScript standards with interfaces over types
 - **Vite 6.3.5** - Fast build tool with optimized chunking strategy and ES modules
 - **Vitest 3.2.4** - Modern testing framework with native TypeScript support
-- **Playwright** - End-to-end testing with MCP server integration
+- **Playwright 1.54.1** - End-to-end testing with MCP server integration
+- **Web Audio API** - Advanced audio processing and sound management
+- **HTML5 Audio** - Fallback audio system for broader browser compatibility
+- **Cross-env 7.0.3** - Cross-platform environment variable management
 - **Kiro with Agent Hooks** - AI-powered development automation
 - **Functional Architecture** - Pure functions and immutable state management
 - **CSS Modules** - Component-scoped styling with mobile-first responsive design
 
 ## Game Features
 
-- ✅ **16x10 maze grid** with 32px cell size (enlarged from previous 8x5)
+- ✅ **Multi-Level Gameplay**: 5 unique levels with progressive difficulty
+- ✅ **16x10 maze grid** with 32px cell size optimized for various screen sizes
+- ✅ **Advanced Boulder Physics**: Continuous falling boulders with collision detection
+- ✅ **Comprehensive Audio System**: Rich sound effects for all game interactions
+- ✅ **Player Death Mechanics**: Boulder collision detection with game over functionality
+- ✅ **Level Progression**: Automatic advancement through completed levels
+- ✅ **Audio Settings**: User-configurable sound settings with mute controls
+- ✅ **Performance Optimizations**: Efficient rendering and physics calculations
+- ✅ **Error Recovery**: Robust error handling throughout all game systems
+- ✅ **Debug Tools**: Development tools for testing audio and physics systems
+- ✅ **Browser Compatibility**: Graceful fallback for different browser capabilities
 - **Functional State Management** with immutable updates and pure functions
 - **Responsive HUD** that adapts to the maze dimensions using mobile-first CSS
 - **Multiple game elements** with type-safe interfaces:
   - Player character with position tracking
   - Diamonds to collect (affects exit availability)
-  - Boulders to navigate around
+  - Boulders with advanced physics simulation
   - Bombs to avoid (fatal on contact)
   - Exit to complete levels (requires all diamonds)
   - Soil that disappears when traversed
 - **Cell-based architecture** where game elements populate individual cells
 - **Move counter** with game-over mechanics when moves are exhausted
-- **Test mazes** for specific gameplay scenarios and edge cases
 - **Comprehensive test suite** with functional testing patterns and TypeScript interfaces
 
 ## Architecture
@@ -172,6 +209,26 @@ This project follows modern TypeScript and React best practices:
 - **End-to-End Coverage**: Playwright tests verify complete user workflows
 - **Type-Safe Tests**: All tests use proper TypeScript interfaces
 
+### Audio Architecture
+- **Multi-Manager System**: HTML5 Audio and Web Audio API managers with automatic fallback
+- **Event-Driven Audio**: Sound events generated by game logic and processed by audio system
+- **Context Management**: Proper AudioContext lifecycle management with user interaction handling
+- **Asset Loading**: Intelligent sound asset preloading with error recovery
+- **Settings Integration**: User-configurable audio settings with persistent preferences
+
+### Physics Architecture  
+- **Boulder State Management**: Comprehensive tracking of boulder movement states and triggers
+- **Collision Detection System**: Multi-layered collision detection with different interaction types
+- **Performance Optimization**: Efficient algorithms for handling multiple concurrent physics objects
+- **Error Recovery**: Robust error handling with fallback mechanisms for physics edge cases
+- **Continuous Simulation**: Real-time physics updates with proper state synchronization
+
+### Level Management Architecture
+- **Validation System**: Built-in level validation with automatic error detection and repair
+- **Progressive Difficulty**: Intelligent difficulty scaling across multiple levels
+- **Error Recovery**: Comprehensive fallback mechanisms for level loading failures
+- **State Persistence**: Proper level progression tracking and state management
+
 ## Game Mechanics
 
 The game follows specific behavior rules for all elements:
@@ -188,3 +245,24 @@ The game follows specific behavior rules for all elements:
 - **Bombs**: Fatal to player if touched
 
 For complete game behavior specifications, see [gamebehaviour.md](./Instructions/gamebehaviour.md).
+
+## Development Tools
+
+### Audio Debug Panel
+Access audio debugging tools in development mode:
+- Real-time audio system status monitoring
+- Individual sound testing capabilities  
+- AudioContext state visualization
+- Sound asset loading status display
+
+### Physics Debug Tools
+- Boulder state visualization
+- Collision detection debugging
+- Performance monitoring for physics calculations
+- Error logging and recovery tracking
+
+### Level Debug Utilities
+- Level validation testing
+- Maze layout visualization
+- Element count verification
+- Level progression testing
