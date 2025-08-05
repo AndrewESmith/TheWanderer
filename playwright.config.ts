@@ -35,6 +35,20 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
 
+  /* Configure visual comparisons */
+  expect: {
+    /* Threshold for visual comparisons */
+    toHaveScreenshot: {
+      threshold: 0.2,
+      mode: 'strict',
+      animations: 'disabled',
+    },
+    toMatchSnapshot: {
+      threshold: 0.2,
+      mode: 'strict',
+    },
+  },
+
   /* Configure projects for major browsers */
   projects: [
     {
@@ -53,14 +67,14 @@ export default defineConfig({
     },
 
     /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'Mobile Safari',
+      use: { ...devices['iPhone 12'] },
+    },
 
     /* Test against branded browsers. */
     // {
