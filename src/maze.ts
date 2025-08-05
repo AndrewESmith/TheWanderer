@@ -3,14 +3,14 @@ import type { IMaze } from "./Interfaces/IMaze";
 import type { IPlayerPos } from "./Interfaces/IPlayerPos";
 
 export const ICONS = {
-  empty: "",
-  player: "🧑",
-  rock: "🧱",
-  soil: "🟫",
-  diamond: "💎",
-  boulder: "🪨",
-  bomb: "💣",
-  exit: "🚪",
+  empty: "/Empty.png",
+  player: "/player.png",
+  rock: "/rock.png",
+  soil: "/soil.png",
+  diamond: "/diamond.png",
+  boulder: "/boulder.png",
+  bomb: "/bomb.png",
+  exit: "/exit.png",
 } as const;
 
 export const CELL = {

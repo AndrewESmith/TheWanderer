@@ -1,6 +1,10 @@
 # Implementation Plan
 
 - [ ] 1. Update ICONS constant to use PNG image paths
+
+
+
+
   - Modify the ICONS constant in src/maze.ts to reference PNG files instead of emoji characters
   - Ensure all image paths correctly map to files in the public folder (note: Empty.png vs empty)
   - _Requirements: 1.1, 1.2, 3.1_
