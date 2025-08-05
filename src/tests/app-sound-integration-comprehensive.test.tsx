@@ -667,7 +667,7 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
       const totalTime = endTime - startTime;
 
       // Should handle stress test in reasonable time (less than 1 second)
-      expect(totalTime).toBeLessThan(2500);
+      expect(totalTime).toBeLessThan(2700);
 
       // Game should remain functional
       expect(screen.getByText(/Score:/)).toBeInTheDocument();

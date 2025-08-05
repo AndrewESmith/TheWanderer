@@ -21,6 +21,50 @@ interface ImageLoadingState {
   errors: string[];
 }
 
+// Individual cell image state tracking
+interface CellImageState {
+  loaded: boolean;
+  error: boolean;
+  retryCount: number;
+}
+
+// Utility function to handle image loading with retry logic
+function loadImageWithRetry(
+  imagePath: string,
+  maxRetries: number = 2
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    let retryCount = 0;
+
+    const attemptLoad = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        resolve(true);
+      };
+
+      img.onerror = () => {
+        retryCount++;
+        if (retryCount <= maxRetries) {
+          console.warn(
+            `Image load failed, retrying (${retryCount}/${maxRetries}): ${imagePath}`
+          );
+          setTimeout(attemptLoad, 1000 * retryCount); // Exponential backoff
+        } else {
+          console.error(
+            `Image load failed after ${maxRetries} retries: ${imagePath}`
+          );
+          resolve(false);
+        }
+      };
+
+      img.src = imagePath;
+    };
+
+    attemptLoad();
+  });
+}
+
 function preloadImages(): Promise<ImageLoadingState> {
   const imagePaths = Object.values(ICONS);
   const totalCount = imagePaths.length;
@@ -47,14 +91,30 @@ function preloadImages(): Promise<ImageLoadingState> {
     imagePaths.forEach((imagePath) => {
       const img = new Image();
 
+      // Set a timeout to catch images that never trigger load or error events
+      const timeoutId = setTimeout(() => {
+        if (!img.complete) {
+          errors.push(`${imagePath} (timeout)`);
+          console.warn(`Image preload timeout: ${imagePath}`);
+          checkComplete();
+        }
+      }, 10000); // 10 second timeout
+
       img.onload = () => {
+        clearTimeout(timeoutId);
         loadedCount++;
+        console.log(`Successfully preloaded image: ${imagePath}`);
         checkComplete();
       };
 
-      img.onerror = () => {
+      img.onerror = (event) => {
+        clearTimeout(timeoutId);
         errors.push(imagePath);
-        console.warn(`Failed to preload image: ${imagePath}`);
+        console.warn(`Failed to preload image: ${imagePath}`, {
+          error: event,
+          path: imagePath,
+          timestamp: new Date().toISOString(),
+        });
         checkComplete();
       };
 
@@ -238,17 +298,95 @@ const GameComponent: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, [movePlayer, gameState.gameState]);
 
-  // Render cell (reuse previous Cell component)
+  // Render cell with error handling for image loading failures
   const Cell: React.FC<{ type: MazeCell }> = ({ type }) => {
+    const [cellImageState, setCellImageState] = React.useState<CellImageState>({
+      loaded: false,
+      error: false,
+      retryCount: 0,
+    });
+
+    // Load image with retry logic
+    React.useEffect(() => {
+      let isMounted = true;
+
+      const loadImage = async () => {
+        try {
+          const success = await loadImageWithRetry(ICONS[type]);
+
+          if (isMounted) {
+            if (success) {
+              setCellImageState({
+                loaded: true,
+                error: false,
+                retryCount: 0,
+              });
+            } else {
+              setCellImageState((prev) => ({
+                loaded: false,
+                error: true,
+                retryCount: prev.retryCount + 1,
+              }));
+              console.warn(
+                `Failed to load image for cell type "${type}" after retries: ${ICONS[type]}`
+              );
+            }
+          }
+        } catch (error) {
+          if (isMounted) {
+            setCellImageState((prev) => ({
+              loaded: false,
+              error: true,
+              retryCount: prev.retryCount + 1,
+            }));
+            console.error(
+              `Unexpected error loading image for cell type "${type}":`,
+              error
+            );
+          }
+        }
+      };
+
+      loadImage();
+
+      // Cleanup function
+      return () => {
+        isMounted = false;
+      };
+    }, [type]);
+
+    // Determine styling based on image loading state
+    const cellStyle: React.CSSProperties = {
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    };
+
+    // Only add background image if it loaded successfully
+    if (cellImageState.loaded && !cellImageState.error) {
+      cellStyle.backgroundImage = `url(${ICONS[type]})`;
+    }
+
+    // Generate CSS classes for styling
+    const cssClasses = [
+      "cell",
+      type,
+      cellImageState.error ? "image-error" : "",
+      cellImageState.loaded ? "image-loaded" : "",
+      !cellImageState.loaded && !cellImageState.error ? "image-loading" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     return (
       <div
-        className={`cell ${type}`}
-        style={{
-          backgroundImage: `url(${ICONS[type]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
+        className={cssClasses}
+        style={cellStyle}
+        title={
+          cellImageState.error
+            ? `Image failed to load: ${ICONS[type]}`
+            : undefined
+        }
       />
     );
   };
@@ -416,6 +554,17 @@ const App: React.FC = () => {
           `Image preloading completed with ${loadingState.errors.length} errors:`,
           loadingState.errors
         );
+
+        // Show user-friendly notification for image loading issues
+        if (loadingState.errors.length === loadingState.totalCount) {
+          console.error(
+            "All images failed to load. Game will use fallback colors."
+          );
+        } else {
+          console.warn(
+            `${loadingState.errors.length} of ${loadingState.totalCount} images failed to load. Game will use fallback colors for failed images.`
+          );
+        }
       } else {
         console.log(
           `Successfully preloaded ${loadingState.loadedCount} images`
