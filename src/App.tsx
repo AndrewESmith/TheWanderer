@@ -13,6 +13,56 @@ import { AudioErrorDisplay } from "./audio/components/audio-error-display";
 import { AudioInitialization } from "./audio/components/audio-initialization";
 import { AudioDebug } from "./audio/components/audio-debug";
 
+// Image preloading system
+interface ImageLoadingState {
+  isLoading: boolean;
+  loadedCount: number;
+  totalCount: number;
+  errors: string[];
+}
+
+function preloadImages(): Promise<ImageLoadingState> {
+  const imagePaths = Object.values(ICONS);
+  const totalCount = imagePaths.length;
+  let loadedCount = 0;
+  const errors: string[] = [];
+
+  return new Promise((resolve) => {
+    if (totalCount === 0) {
+      resolve({ isLoading: false, loadedCount: 0, totalCount: 0, errors: [] });
+      return;
+    }
+
+    const checkComplete = () => {
+      if (loadedCount + errors.length === totalCount) {
+        resolve({
+          isLoading: false,
+          loadedCount,
+          totalCount,
+          errors,
+        });
+      }
+    };
+
+    imagePaths.forEach((imagePath) => {
+      const img = new Image();
+
+      img.onload = () => {
+        loadedCount++;
+        checkComplete();
+      };
+
+      img.onerror = () => {
+        errors.push(imagePath);
+        console.warn(`Failed to preload image: ${imagePath}`);
+        checkComplete();
+      };
+
+      img.src = imagePath;
+    });
+  });
+}
+
 // Test-specific maze with a bomb right next to the player for testing
 const testBombMaze: MazeCell[][] = [
   [
@@ -348,6 +398,32 @@ const GameComponent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  const [imageLoadingState, setImageLoadingState] =
+    React.useState<ImageLoadingState>({
+      isLoading: true,
+      loadedCount: 0,
+      totalCount: Object.values(ICONS).length,
+      errors: [],
+    });
+
+  // Preload images on app initialization
+  React.useEffect(() => {
+    preloadImages().then((loadingState) => {
+      setImageLoadingState(loadingState);
+
+      if (loadingState.errors.length > 0) {
+        console.warn(
+          `Image preloading completed with ${loadingState.errors.length} errors:`,
+          loadingState.errors
+        );
+      } else {
+        console.log(
+          `Successfully preloaded ${loadingState.loadedCount} images`
+        );
+      }
+    });
+  }, []);
+
   return (
     <AudioProvider>
       <AudioInitialization>

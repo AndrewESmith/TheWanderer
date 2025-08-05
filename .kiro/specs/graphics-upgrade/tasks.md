@@ -21,6 +21,10 @@
   - _Requirements: 1.1, 1.3, 4.1_
 
 - [ ] 4. Implement image preloading system
+
+
+
+
   - Create a preloadImages function that loads all PNG assets before game initialization
   - Add the preloading call to the App component's useEffect hook
   - Ensure preloading doesn't block initial game rendering
