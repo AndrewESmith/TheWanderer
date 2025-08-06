@@ -192,7 +192,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
 
   if (isActualGameEnd && previousGameState === 'playing') {
     // Game just ended - handle end sounds with proper stopping of movement sounds
-    handleGameEndSounds(newGameState);
+    handleGameEndSounds(newGameState as 'dead' | 'won');
 
     // Only emit non-game-state-change sounds for game end moves
     const nonGameEndEvents = [...playerSoundEvents, ...physicsSoundEvents].filter(

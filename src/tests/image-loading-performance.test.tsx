@@ -165,13 +165,13 @@ class PerformanceMockImage {
   naturalWidth: number = 32;
   naturalHeight: number = 32;
 
-  private static instances: PerformanceMockImage[] = [];
-  private static operationTimes: Array<{
+  protected static instances: PerformanceMockImage[] = [];
+  protected static operationTimes: Array<{
     operation: string;
     time: number;
     src: string;
   }> = [];
-  private static loadDelay: number = 1; // Default 1ms load delay
+  protected static loadDelay: number = 1; // Default 1ms load delay
 
   constructor() {
     const start = performance.now();

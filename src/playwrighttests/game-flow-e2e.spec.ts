@@ -16,13 +16,13 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
         // Get initial game state
         const initialScoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
-        const initialScore = extractNumber(initialScoreText || '0');
+        const initialScore = extractNumber(initialScoreText);
 
         const initialMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const initialMoves = extractNumber(initialMovesText || '0');
+        const initialMoves = extractNumber(initialMovesText);
 
         const initialDiamondsText = await page.locator('.hud span').filter({ hasText: /Diamonds left:/ }).textContent();
-        const initialDiamonds = extractNumber(initialDiamondsText || '0');
+        const initialDiamonds = extractNumber(initialDiamondsText);
 
         console.log(`Level 1 - Initial: Score=${initialScore}, Moves=${initialMoves}, Diamonds=${initialDiamonds}`);
 
@@ -36,16 +36,17 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
         const testMoves = Math.min(5, Math.floor(initialMoves / 4)); // Use up to 5 moves or quarter available moves
 
         for (let i = 0; i < testMoves; i++) {
-            const direction = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'][i % 4];
+            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'] as const;
+            const direction = directions[i % 4] as string;
 
             const beforeMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-            const beforeMoves = extractNumber(beforeMovesText || '0');
+            const beforeMoves = extractNumber(beforeMovesText);
 
             await page.keyboard.press(direction);
             await page.waitForTimeout(50);
 
             const afterMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-            const afterMoves = extractNumber(afterMovesText || '0');
+            const afterMoves = extractNumber(afterMovesText);
 
             // If move was successful, moves should decrease
             if (afterMoves < beforeMoves) {
@@ -61,7 +62,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
             // Check for level progression (unlikely but possible)
             const currentLevelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-            const currentLevel = extractNumber(currentLevelText || '1');
+            const currentLevel = extractNumber(currentLevelText);
 
             if (currentLevel > 1) {
                 console.log(`Advanced to level ${currentLevel} - level progression working`);
@@ -83,7 +84,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
         while (moveCount < maxSafeMoves) {
             // Get current moves
             const movesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-            const currentMoves = extractNumber(movesText || '0');
+            const currentMoves = extractNumber(movesText);
 
             if (currentMoves <= 1) {
                 // Make the final move
@@ -102,7 +103,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
                 // If not game over, check if level advanced
                 const levelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-                const currentLevel = extractNumber(levelText || '1');
+                const currentLevel = extractNumber(levelText);
 
                 if (currentLevel > 1) {
                     console.log(`Player advanced to level ${currentLevel} before running out of moves`);
@@ -114,8 +115,8 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
             }
 
             // Make a move (try different directions to avoid getting stuck)
-            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
-            const direction = directions[moveCount % directions.length];
+            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'] as const;
+            const direction = directions[moveCount % directions.length] as string;
 
             await page.keyboard.press(direction);
             await page.waitForTimeout(50);
@@ -124,7 +125,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
             // Check if level changed (player found exit)
             const levelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-            const currentLevel = extractNumber(levelText || '1');
+            const currentLevel = extractNumber(levelText);
 
             if (currentLevel > 1) {
                 console.log(`Player advanced to level ${currentLevel} before running out of moves`);
@@ -136,9 +137,9 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
         // If we reach here, verify the final state
         const finalGameOverElement = page.locator('.hud span').filter({ hasText: 'Game Over' });
         const finalLevelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-        const finalLevel = extractNumber(finalLevelText || '1');
+        const finalLevel = extractNumber(finalLevelText);
         const finalMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const finalMoves = extractNumber(finalMovesText || '0');
+        const finalMoves = extractNumber(finalMovesText);
 
         // Either game over, level progression, or low moves should have occurred
         const isGameOver = await finalGameOverElement.isVisible();
@@ -160,10 +161,10 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
         // Get initial state
         const initialLevelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-        const initialLevel = extractNumber(initialLevelText || '1');
+        const initialLevel = extractNumber(initialLevelText);
 
         const initialMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const initialMoves = extractNumber(initialMovesText || '0');
+        const initialMoves = extractNumber(initialMovesText);
 
         expect(initialLevel).toBe(1);
         expect(initialMoves).toBeGreaterThan(0);
@@ -175,15 +176,15 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
         while (attempts < maxAttempts && !levelChanged) {
             // Try different movement patterns
-            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
-            const direction = directions[attempts % directions.length];
+            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'] as const;
+            const direction = directions[attempts % directions.length] as string;
 
             await page.keyboard.press(direction);
             await page.waitForTimeout(50);
 
             // Check if level changed
             const newLevelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-            const newLevel = extractNumber(newLevelText || '1');
+            const newLevel = extractNumber(newLevelText);
 
             if (newLevel > initialLevel) {
                 levelChanged = true;
@@ -194,7 +195,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
                 // Check that moves were reset for new level
                 const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-                const newMoves = extractNumber(newMovesText || '0');
+                const newMoves = extractNumber(newMovesText);
                 expect(newMoves).toBeGreaterThan(0);
 
                 break;
@@ -221,10 +222,10 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
         // Get initial score
         const initialScoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
-        const initialScore = extractNumber(initialScoreText || '0');
+        const initialScore = extractNumber(initialScoreText);
 
         const initialDiamondsText = await page.locator('.hud span').filter({ hasText: /Diamonds left:/ }).textContent();
-        const initialDiamonds = extractNumber(initialDiamondsText || '0');
+        const initialDiamonds = extractNumber(initialDiamondsText);
 
         expect(initialScore).toBe(0);
         expect(initialDiamonds).toBeGreaterThan(0);
@@ -240,24 +241,24 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
         while (movesAttempted < maxMoves) {
             // Get state before move
             const beforeScoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
-            const beforeScore = extractNumber(beforeScoreText || '0');
+            const beforeScore = extractNumber(beforeScoreText);
 
             const beforeDiamondsText = await page.locator('.hud span').filter({ hasText: /Diamonds left:/ }).textContent();
-            const beforeDiamonds = extractNumber(beforeDiamondsText || '0');
+            const beforeDiamonds = extractNumber(beforeDiamondsText);
 
             // Make a move
-            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
-            const direction = directions[movesAttempted % directions.length];
+            const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'] as const;
+            const direction = directions[movesAttempted % directions.length] as string;
 
             await page.keyboard.press(direction);
             await page.waitForTimeout(50);
 
             // Get state after move
             const afterScoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
-            const afterScore = extractNumber(afterScoreText || '0');
+            const afterScore = extractNumber(afterScoreText);
 
             const afterDiamondsText = await page.locator('.hud span').filter({ hasText: /Diamonds left:/ }).textContent();
-            const afterDiamonds = extractNumber(afterDiamondsText || '0');
+            const afterDiamonds = extractNumber(afterDiamondsText);
 
             // Check if diamond was collected
             if (afterDiamonds < beforeDiamonds) {
@@ -277,7 +278,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
             }
 
             const levelText = await page.locator('.hud span').filter({ hasText: /Level:/ }).textContent();
-            const currentLevel = extractNumber(levelText || '1');
+            const currentLevel = extractNumber(levelText);
 
             if (currentLevel > 1) {
                 console.log(`Advanced to level ${currentLevel} during score test`);
@@ -287,7 +288,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
         // Verify score mechanics
         const finalScoreText = await page.locator('.hud span').filter({ hasText: /Score:/ }).textContent();
-        const finalScore = extractNumber(finalScoreText || '0');
+        const finalScore = extractNumber(finalScoreText);
 
         console.log(`Score test results: Diamonds collected=${diamondsCollected}, Score gained=${scoreGained}, Final score=${finalScore}`);
 
@@ -318,19 +319,19 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 
         // Verify game is still responsive
         const movesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const moves = extractNumber(movesText || '0');
+        const moves = extractNumber(movesText);
         expect(moves).toBeGreaterThanOrEqual(0);
 
         // Test invalid moves (trying to move into walls)
         const initialMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const initialMoves = extractNumber(initialMovesText || '0');
+        const initialMoves = extractNumber(initialMovesText);
 
         // Try to move up (likely into a wall at the start)
         await page.keyboard.press('ArrowUp');
         await page.waitForTimeout(50);
 
         const afterMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const afterMoves = extractNumber(afterMovesText || '0');
+        const afterMoves = extractNumber(afterMovesText);
 
         // Moves should either stay the same (blocked) or decrease (valid move)
         expect(afterMoves).toBeLessThanOrEqual(initialMoves);
@@ -340,7 +341,8 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
 });
 
 // Helper function to extract numbers from strings like "Score: 10"
-function extractNumber(text: string): number {
+function extractNumber(text: string | null | undefined): number {
+    if (!text) return 0;
     const match = text.match(/\d+/);
     return match ? parseInt(match[0], 10) : 0;
 }
