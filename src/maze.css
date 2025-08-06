@@ -6,6 +6,12 @@
     background: #222;
     padding: 10px;
     width: max-content;
+    /* Prevent layout shifts and improve performance */
+    will-change: auto;
+    contain: layout style;
+    /* Optimize for frequent updates */
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
   
   .cell {
@@ -17,6 +23,17 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    /* Optimize rendering performance and prevent flickering */
+    transform: translateZ(0); /* Force hardware acceleration */
+    backface-visibility: hidden; /* Prevent flickering during transforms */
+    will-change: auto; /* Let browser decide what to optimize */
+    contain: layout style paint; /* Contain rendering to this element */
+    /* Remove transitions to prevent flickering during rapid updates */
+    transition: none;
+    /* Ensure consistent rendering */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
   }
   
   /* Fallback background colors - always present as base layer */

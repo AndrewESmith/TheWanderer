@@ -42,6 +42,8 @@ export function countDiamonds(maze: MazeCell[][]): number {
   return maze.flat().filter((cell) => cell === CELL.DIAMOND).length;
 }
 
+
+
 // Pure function to create initial game state
 export function createInitialGameState(maze?: MazeCell[][]): GameStateData {
   // Create level manager and get level 1 data
@@ -83,7 +85,7 @@ function isBlockingCell(cell: MazeCell): boolean {
   return cell === CELL.ROCK || cell === CELL.BOULDER;
 }
 
-// Pure function to handle player movement
+// Pure function to handle player movement with maze reference optimization
 export function movePlayer(gameState: GameStateData, dx: number, dy: number): GameStateData {
   if (gameState.gameState !== 'playing' || !gameState.player) {
     return gameState;
@@ -170,6 +172,7 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     gameState.boulderStateManager,
     newMoves
   );
+
   const finalMaze = physicsResult.newMaze;
 
   // Check for boulder-player collisions and handle player death

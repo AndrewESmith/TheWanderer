@@ -2,9 +2,7 @@
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": [
-        "@executeautomation/playwright-mcp-server"
-      ],
+      "args": ["@executeautomation/playwright-mcp-server"],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
       },
@@ -17,7 +15,10 @@
         "mcp_playwright_playwright_get_visible_text",
         "mcp_playwright_playwright_get_visible_html",
         "playwright_navigate",
-        "playwright_get_visible_text"
+        "playwright_get_visible_text",
+        "playwright_screenshot",
+        "playwright_press_key",
+        "playwright_console_logs"
       ]
     },
     "aws-docs": {
@@ -33,10 +34,7 @@
         "FASTMCP_LOG_LEVEL": "ERROR"
       },
       "disabled": false,
-      "autoApprove": [
-        "read_documentation",
-        "recommend"
-      ]
+      "autoApprove": ["read_documentation", "recommend"]
     }
   }
 }

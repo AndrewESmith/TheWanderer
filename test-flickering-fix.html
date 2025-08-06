@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flickering Fix Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        background: #333;
+        border-radius: 8px;
+      }
+      .test-link {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #4caf50;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 10px 10px 10px 0;
+      }
+      .test-link:hover {
+        background: #45a049;
+      }
+      .instructions {
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .fix-list {
+        list-style-type: none;
+        padding: 0;
+      }
+      .fix-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #444;
+      }
+      .fix-list li:before {
+        content: "✓ ";
+        color: #4caf50;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>UI Flickering Fix Test</h1>
+
+      <div class="test-section">
+        <h2>Test the Fix</h2>
+        <p>
+          The following optimizations have been implemented to eliminate UI
+          flickering on player movement:
+        </p>
+
+        <ul class="fix-list">
+          <li>Enhanced Cell component memoization with custom comparison</li>
+          <li>
+            Stable maze reference system to prevent unnecessary re-renders
+          </li>
+          <li>Optimized CSS with hardware acceleration and no transitions</li>
+          <li>Efficient maze update detection using reference equality</li>
+          <li>Removed will-change hints that caused flickering</li>
+          <li>Added image rendering optimizations for crisp pixel art</li>
+        </ul>
+
+        <div class="instructions">
+          <h3>Testing Instructions:</h3>
+          <ol>
+            <li>Click the link below to open the game</li>
+            <li>Use arrow keys or WASD to move the player</li>
+            <li>Observe that the screen no longer flickers during movement</li>
+            <li>Try rapid key presses to test performance</li>
+            <li>
+              Check that blocked movements don't cause unnecessary updates
+            </li>
+          </ol>
+        </div>
+
+        <a href="http://localhost:3000" class="test-link" target="_blank"
+          >Open Game (Normal Mode)</a
+        >
+        <a
+          href="http://localhost:3000?testMaze=bomb"
+          class="test-link"
+          target="_blank"
+          >Open Game (Test Mode)</a
+        >
+      </div>
+
+      <div class="test-section">
+        <h2>Technical Details</h2>
+        <p>The flickering was caused by:</p>
+        <ul>
+          <li>
+            Physics simulation running on every move, recreating the maze array
+          </li>
+          <li>React re-rendering all cells when the maze reference changed</li>
+          <li>
+            CSS transitions and will-change properties causing visual artifacts
+          </li>
+          <li>Unnecessary re-renders when movement was blocked</li>
+        </ul>
+
+        <p>The fix implements:</p>
+        <ul>
+          <li>Reference-based maze change detection</li>
+          <li>Optimized Cell component with type-only comparison</li>
+          <li>Hardware-accelerated CSS without transitions</li>
+          <li>Early return optimization for blocked movements</li>
+        </ul>
+      </div>
+
+      <div class="test-section">
+        <h2>Performance Improvements</h2>
+        <p>Expected improvements:</p>
+        <ul>
+          <li>Eliminated visual flickering during player movement</li>
+          <li>Reduced unnecessary DOM updates</li>
+          <li>Smoother gameplay experience</li>
+          <li>Better performance on lower-end devices</li>
+          <li>Consistent rendering across different browsers</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

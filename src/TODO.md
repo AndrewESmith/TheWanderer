@@ -44,15 +44,20 @@
 - [x] Add support for multiple maze levels
 - [x] Boulders no longer fall until they hit something.
 - [x] Sound stops if boulder can't move
-- [ ] Update readme
+- [x] Update readme
 
 ## Version 6
 
-- [ ] Improve Graphics
+- [x] Improve Graphics
+- [ ] Fix flickering
+- [ ] Move touch screen controls below info bar
+- [ ] Center touch screen controls to maze
+- [ ] Remove cell borders and space between cells.
 - [ ] ViewPort for mobiles
 
 ## Version 7
 
+- [ ] Create a how to play page
 - [ ] FizzBash - lets fix typescript errors
 
 ## Version 8
