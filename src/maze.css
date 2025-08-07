@@ -1,8 +1,21 @@
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px 0;
+  box-sizing: border-box;
+}
+
 .maze-container {
     /* Container optimizations to prevent flickering */
     contain: layout style paint;
     transform: translateZ(0);
     backface-visibility: hidden;
+    /* Center the maze */
+    display: flex;
+    justify-content: center;
   }
 
   .maze-grid {
@@ -225,7 +238,9 @@
   justify-content: center;
   /* Ensure perfect alignment with maze */
   max-width: 100%;
-  /* Remove positioning and use margin auto for proper centering */
+  /* Center the controls relative to the maze */
+  position: relative;
+  gap: 8px; /* Space between up button and horizontal controls */
 }
 .mobile-btn {
   font-size: 2rem;
@@ -249,6 +264,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  width: 100%;
 }
 @media (max-width: 800px), (pointer: coarse) {
   .mobile-controls {
@@ -259,10 +275,14 @@
 /* Additional responsive adjustments for mobile controls */
 @media (max-width: 600px) {
   .mobile-controls {
-    width: 100%;
-    max-width: 320px;
+    /* On small screens, use the maze width if available, otherwise fallback to a reasonable width */
+    width: var(--maze-width, 320px);
+    max-width: 100%;
     padding: 0 16px;
     box-sizing: border-box;
+    /* Ensure centering on small screens */
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .mobile-btn {
@@ -274,5 +294,75 @@
   
   .mobile-controls-horizontal {
     gap: 6px;
+  }
+}
+/* 
+HUD Styles */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: var(--maze-width, calc(16 * 32px + 20px));
+  margin: 16px auto;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.hud-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.level-info, .moves-info {
+  font-weight: bold;
+}
+
+.low-moves {
+  color: #ff6b6b;
+}
+
+.medium-moves {
+  color: #ffa500;
+}
+
+.game-status {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.game-over {
+  color: #ff6b6b;
+}
+
+.victory {
+  color: #4ecdc4;
+}
+
+.level-complete {
+  color: #45b7d1;
+}
+
+/* Responsive HUD adjustments */
+@media (max-width: 600px) {
+  .hud {
+    width: var(--maze-width, 320px);
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .hud-left {
+    gap: 2px;
   }
 }

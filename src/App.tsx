@@ -462,7 +462,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
   }, [mazeDimensions]);
 
   return (
-    <div>
+    <div className="game-wrapper">
       <AudioErrorDisplay />
       <AudioDebug />
       <div className="maze-container" style={{ position: "relative" }}>
