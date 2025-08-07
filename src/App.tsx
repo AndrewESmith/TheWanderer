@@ -559,7 +559,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           >
             ▲
           </button>
-          <div>
+          <div className="mobile-controls-horizontal">
             <button
               className="mobile-btn left"
               onClick={() => movePlayer(-1, 0)}

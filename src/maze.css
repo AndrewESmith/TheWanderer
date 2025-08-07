@@ -223,6 +223,11 @@
   margin: 16px auto;
   width: var(--maze-width, calc(16 * 32px + 12px)); /* Match the width of the maze grid */
   justify-content: center;
+  /* Ensure perfect alignment with maze */
+  max-width: 100%;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .mobile-btn {
   font-size: 2rem;
@@ -235,9 +240,41 @@
   min-width: 56px;
   min-height: 56px;
   touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container for horizontal buttons (left, down, right) */
+.mobile-controls-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 @media (max-width: 800px), (pointer: coarse) {
   .mobile-controls {
     display: flex;
+  }
+}
+
+/* Additional responsive adjustments for mobile controls */
+@media (max-width: 600px) {
+  .mobile-controls {
+    width: 100%;
+    max-width: 320px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  
+  .mobile-btn {
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 1.8rem;
+    padding: 12px;
+  }
+  
+  .mobile-controls-horizontal {
+    gap: 6px;
   }
 }
