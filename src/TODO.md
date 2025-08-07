@@ -52,7 +52,7 @@
 - [x] Fix flickering
 - [ ] Move touch screen controls below info bar
 - [ ] Center touch screen controls to maze
-- [ ] Remove cell borders and space between cells.
+- [x] Remove cell borders and space between cells.
 - [ ] ViewPort for mobiles
 
 ## Version 7

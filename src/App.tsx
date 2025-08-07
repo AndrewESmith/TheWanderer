@@ -487,40 +487,6 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           )}
         </div>
       </div>
-      {showMobileControls && (
-        <div className="mobile-controls">
-          <button
-            className="mobile-btn up"
-            onClick={() => movePlayer(0, -1)}
-            aria-label="Up"
-          >
-            ▲
-          </button>
-          <div>
-            <button
-              className="mobile-btn left"
-              onClick={() => movePlayer(-1, 0)}
-              aria-label="Left"
-            >
-              ◀
-            </button>
-            <button
-              className="mobile-btn down"
-              onClick={() => movePlayer(0, 1)}
-              aria-label="Down"
-            >
-              ▼
-            </button>
-            <button
-              className="mobile-btn right"
-              onClick={() => movePlayer(1, 0)}
-              aria-label="Right"
-            >
-              ▶
-            </button>
-          </div>
-        </div>
-      )}
       <div className="hud">
         <div className="hud-left">
           <span className="level-info">
@@ -584,6 +550,40 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           )}
         </div>
       </div>
+      {showMobileControls && (
+        <div className="mobile-controls">
+          <button
+            className="mobile-btn up"
+            onClick={() => movePlayer(0, -1)}
+            aria-label="Up"
+          >
+            ▲
+          </button>
+          <div>
+            <button
+              className="mobile-btn left"
+              onClick={() => movePlayer(-1, 0)}
+              aria-label="Left"
+            >
+              ◀
+            </button>
+            <button
+              className="mobile-btn down"
+              onClick={() => movePlayer(0, 1)}
+              aria-label="Down"
+            >
+              ▼
+            </button>
+            <button
+              className="mobile-btn right"
+              onClick={() => movePlayer(1, 0)}
+              aria-label="Right"
+            >
+              ▶
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
