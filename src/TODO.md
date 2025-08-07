@@ -49,7 +49,7 @@
 ## Version 6
 
 - [x] Improve Graphics
-- [ ] Fix flickering
+- [x] Fix flickering
 - [ ] Move touch screen controls below info bar
 - [ ] Center touch screen controls to maze
 - [ ] Remove cell borders and space between cells.

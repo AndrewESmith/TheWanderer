@@ -58,8 +58,14 @@
     z-index: 1;
     position: relative;
   }
-  .cell.rock { background-color: #795548; }
-  .cell.soil { background-color: #a1887f; }
+  .cell.rock { 
+    background-color: #795548; 
+    /* Dominant color will be applied via inline styles for rock cells */
+  }
+  .cell.soil { 
+    background-color: #a1887f; 
+    /* Dominant color will be applied via inline styles for soil cells */
+  }
   .cell.diamond { background-color: #fff; }
   .cell.boulder { background-color: #757575; }
   .cell.bomb { background-color: #000; }

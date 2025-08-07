@@ -12,6 +12,7 @@ import { AudioControl } from "./audio/components/AudioControl";
 import { AudioErrorDisplay } from "./audio/components/audio-error-display";
 import { AudioInitialization } from "./audio/components/audio-initialization";
 import { AudioDebug } from "./audio/components/audio-debug";
+import { useDominantColors } from "./hooks/useDominantColors";
 
 // Image preloading system
 interface ImageLoadingState {
@@ -250,7 +251,9 @@ const testBombMaze: MazeCell[][] = [
   ],
 ];
 
-const GameComponent: React.FC = () => {
+const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
+  dominantColors,
+}) => {
   const {
     playSound,
     stopAllSounds,
@@ -374,11 +377,12 @@ const GameComponent: React.FC = () => {
   const loadImageWithRetryMemo = React.useCallback(loadImageWithRetry, []);
 
   // Optimized cell component with essential flickering prevention
-  const Cell: React.FC<{ type: MazeCell; x: number; y: number }> = ({
-    type,
-    x,
-    y,
-  }) => {
+  const Cell: React.FC<{
+    type: MazeCell;
+    x: number;
+    y: number;
+    dominantColors: Record<string, string>;
+  }> = ({ type, x, y, dominantColors }) => {
     // Determine actual cell type based on current player position
     const isPlayerCell = playerPosition.x === x && playerPosition.y === y;
     const actualCellType = isPlayerCell
@@ -402,13 +406,21 @@ const GameComponent: React.FC = () => {
       }
     }, [imagePath, isImageCached]);
 
-    // Simple styling with cached images
+    // Simple styling with cached images and dominant colors for soil/rock
     const cellStyle: React.CSSProperties = {
       backgroundImage: `url(${imagePath})`,
       backgroundSize: "cover",
       backgroundPosition: "center",
       backgroundRepeat: "no-repeat",
     };
+
+    // Add dominant color as background for soil and rock cells
+    if (
+      (actualCellType === CELL.SOIL || actualCellType === CELL.ROCK) &&
+      dominantColors[actualCellType]
+    ) {
+      cellStyle.backgroundColor = dominantColors[actualCellType];
+    }
 
     return <div className={`cell ${actualCellType}`} style={cellStyle} />;
   };
@@ -461,7 +473,13 @@ const GameComponent: React.FC = () => {
             () =>
               stableMazeRef.map((row: MazeCell[], y: number) =>
                 row.map((cell: MazeCell, x: number) => (
-                  <Cell key={`${y}-${x}`} type={cell} x={x} y={y} />
+                  <Cell
+                    key={`${y}-${x}`}
+                    type={cell}
+                    x={x}
+                    y={y}
+                    dominantColors={dominantColors}
+                  />
                 ))
               ),
             // Re-render maze when structure changes OR when player position changes
@@ -579,6 +597,9 @@ const App: React.FC = () => {
       errors: [],
     });
 
+  // Load dominant colors for soil and rock
+  const { dominantColors, isLoading: colorsLoading } = useDominantColors();
+
   // Preload images on app initialization
   React.useEffect(() => {
     preloadImages().then((loadingState) => {
@@ -611,7 +632,7 @@ const App: React.FC = () => {
   return (
     <AudioProvider>
       <AudioInitialization>
-        <GameComponent />
+        <GameComponent dominantColors={dominantColors} />
       </AudioInitialization>
     </AudioProvider>
   );
