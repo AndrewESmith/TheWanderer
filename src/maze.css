@@ -120,7 +120,7 @@
   background: #333;
   color: white;
   margin-top: 10px;
-  width: var(--maze-width, calc(16 * 32px + 12px)); /* Match the width of the maze grid */
+  width: var(--maze-width, calc(16 * 32px + 20px)); /* Match the width of the maze grid: cells + padding */
   box-sizing: border-box;
 }
 
@@ -221,7 +221,7 @@
   flex-direction: column;
   align-items: center;
   margin: 16px auto;
-  width: var(--maze-width, calc(16 * 32px + 12px)); /* Match the width of the maze grid */
+  width: var(--maze-width, calc(16 * 32px + 20px)); /* Match the width of the maze grid: cells + padding */
   justify-content: center;
   /* Ensure perfect alignment with maze */
   max-width: 100%;

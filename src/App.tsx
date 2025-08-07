@@ -444,13 +444,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
 
   React.useEffect(() => {
     const { mazeWidth, mazeHeight } = mazeDimensions;
-    // Calculate exact maze width: cells + gaps + padding
+    // Calculate exact maze width: cells + padding
     // cells: mazeWidth * 32px
-    // gaps: (mazeWidth - 1) * 2px
     // padding: 20px (10px on each side)
-    const calculatedWidth = `calc(${mazeWidth} * 32px + ${
-      (mazeWidth - 1) * 2
-    }px + 20px)`;
+    // Note: gap is 0 in CSS, so no gap calculation needed
+    const calculatedWidth = `calc(${mazeWidth} * 32px + 20px)`;
 
     document.documentElement.style.setProperty("--maze-width", calculatedWidth);
     document.documentElement.style.setProperty(
