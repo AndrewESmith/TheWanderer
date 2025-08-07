@@ -9,7 +9,7 @@
     display: grid;
     grid-template-columns: var(--maze-columns, repeat(16, 32px));
     grid-template-rows: var(--maze-rows, repeat(10, 32px));
-    gap: 2px;
+    gap: 0;
     background: #222;
     padding: 10px;
     width: max-content;
@@ -24,9 +24,9 @@
   .cell {
     width: 32px;
     height: 32px;
-    border-radius: 4px;
+    border-radius: 0;
     box-sizing: border-box;
-    border: 1px solid #333;
+    border: none;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -67,12 +67,13 @@
 
   /* Enhanced fallback styling for image loading errors */
   .cell.image-error {
-    /* Add a subtle border to indicate image loading failure */
-    border: 2px solid #ff6b6b;
     /* Ensure fallback background color is visible */
     background-image: none !important;
     /* Add a subtle pattern to indicate error state */
     position: relative;
+    /* Use outline instead of border to avoid affecting layout */
+    outline: 1px solid #ff6b6b;
+    outline-offset: -1px;
   }
 
   .cell.image-error::after {
@@ -88,13 +89,15 @@
   /* Styling for successfully loaded images */
   .cell.image-loaded {
     /* Subtle indication that image loaded successfully */
-    border-color: #4caf50;
+    outline: 1px solid #4caf50;
+    outline-offset: -1px;
   }
 
   /* Loading state styling */
   .cell.image-loading {
     /* Subtle animation to indicate loading */
-    border-color: #ffa500;
+    outline: 1px solid #ffa500;
+    outline-offset: -1px;
     animation: loading-pulse 1.5s ease-in-out infinite;
   }
 
