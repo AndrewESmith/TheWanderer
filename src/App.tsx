@@ -272,6 +272,9 @@ const GameComponent: React.FC = () => {
     createGameState(useTestMaze ? { maze: testBombMaze } : undefined)
   );
 
+  // Force re-render when game state changes
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
+
   // Use a more stable update mechanism with maze reference tracking
   const [stableMazeRef, setStableMazeRef] = React.useState(
     () => gameState.maze
@@ -310,19 +313,22 @@ const GameComponent: React.FC = () => {
 
   const movePlayer = React.useCallback(
     (dx: number, dy: number) => {
-      // Stop all currently playing sounds before the player moves
-      stopAllSounds();
-
       // Store the previous state for comparison
       const previousMazeRef = stableMazeRef;
       const previousGameState = gameState.gameState;
       const previousLevel = gameState.currentLevel;
       const previousPlayerPos = gameState.player;
 
+      // Stop all currently playing sounds before the player moves
+      stopAllSounds();
+
       // Call the GameState method
       gameState.movePlayer(dx, dy);
 
-      // Update player position immediately for smooth movement
+      // Force re-render to reflect game state changes
+      forceUpdate();
+
+      // Update player position immediately for responsive movement
       if (
         gameState.player &&
         (gameState.player.x !== previousPlayerPos?.x ||
@@ -345,7 +351,7 @@ const GameComponent: React.FC = () => {
         setStableMazeRef(gameState.maze);
       }
     },
-    [gameState, stopAllSounds, stableMazeRef]
+    [gameState, stopAllSounds, stableMazeRef, forceUpdate]
   );
 
   // Handle keyboard input
@@ -361,120 +367,51 @@ const GameComponent: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, [movePlayer, gameState.gameState]);
 
-  // Optimized cell component with memoization to prevent flickering
-  const Cell: React.FC<{ type: MazeCell; x: number; y: number }> = React.memo(
-    ({ type, x, y }) => {
-      // Determine actual cell type based on player position
-      const isPlayerCell = playerPosition.x === x && playerPosition.y === y;
-      const actualCellType = isPlayerCell
-        ? CELL.PLAYER
-        : type === CELL.PLAYER
-        ? CELL.EMPTY
-        : type;
-      const [cellImageState, setCellImageState] =
-        React.useState<CellImageState>({
-          loaded: false,
-          error: false,
-          retryCount: 0,
-        });
+  // Global image cache to prevent reloading
+  const imageCache = React.useRef<Map<string, boolean>>(new Map());
 
-      // Load image with retry logic - only when actual cell type changes
-      React.useEffect(() => {
-        let isMounted = true;
+  // Memoized image loading function to prevent recreation
+  const loadImageWithRetryMemo = React.useCallback(loadImageWithRetry, []);
 
-        const loadImage = async () => {
-          try {
-            const success = await loadImageWithRetry(ICONS[actualCellType]);
+  // Optimized cell component with essential flickering prevention
+  const Cell: React.FC<{ type: MazeCell; x: number; y: number }> = ({
+    type,
+    x,
+    y,
+  }) => {
+    // Determine actual cell type based on current player position
+    const isPlayerCell = playerPosition.x === x && playerPosition.y === y;
+    const actualCellType = isPlayerCell
+      ? CELL.PLAYER
+      : type === CELL.PLAYER
+      ? CELL.EMPTY
+      : type;
 
-            if (isMounted) {
-              if (success) {
-                setCellImageState({
-                  loaded: true,
-                  error: false,
-                  retryCount: 0,
-                });
-              } else {
-                setCellImageState((prev) => ({
-                  loaded: false,
-                  error: true,
-                  retryCount: prev.retryCount + 1,
-                }));
-                console.warn(
-                  `Failed to load image for cell type "${actualCellType}" after retries: ${ICONS[actualCellType]}`
-                );
-              }
-            }
-          } catch (error) {
-            if (isMounted) {
-              setCellImageState((prev) => ({
-                loaded: false,
-                error: true,
-                retryCount: prev.retryCount + 1,
-              }));
-              console.error(
-                `Unexpected error loading image for cell type "${actualCellType}":`,
-                error
-              );
-            }
-          }
+    // Simplified image loading with cache
+    const imagePath = ICONS[actualCellType];
+    const isImageCached = imageCache.current.has(imagePath);
+
+    // Cache image on first load
+    React.useEffect(() => {
+      if (!isImageCached) {
+        const img = new Image();
+        img.onload = () => {
+          imageCache.current.set(imagePath, true);
         };
+        img.src = imagePath;
+      }
+    }, [imagePath, isImageCached]);
 
-        loadImage();
+    // Simple styling with cached images
+    const cellStyle: React.CSSProperties = {
+      backgroundImage: `url(${imagePath})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    };
 
-        return () => {
-          isMounted = false;
-        };
-      }, [actualCellType]);
-
-      // Stable styling to prevent flickering
-      const cellStyle: React.CSSProperties = React.useMemo(() => {
-        const style: React.CSSProperties = {
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        };
-
-        if (cellImageState.loaded && !cellImageState.error) {
-          style.backgroundImage = `url(${ICONS[actualCellType]})`;
-        }
-
-        return style;
-      }, [cellImageState.loaded, cellImageState.error, actualCellType]);
-
-      // Generate CSS classes for styling
-      const cssClasses = React.useMemo(
-        () =>
-          [
-            "cell",
-            actualCellType,
-            cellImageState.error ? "image-error" : "",
-            cellImageState.loaded ? "image-loaded" : "",
-            !cellImageState.loaded && !cellImageState.error
-              ? "image-loading"
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" "),
-        [actualCellType, cellImageState.error, cellImageState.loaded]
-      );
-
-      return (
-        <div
-          className={cssClasses}
-          style={cellStyle}
-          title={
-            cellImageState.error
-              ? `Image failed to load: ${ICONS[actualCellType]}`
-              : undefined
-          }
-        />
-      );
-    },
-    // Custom comparison function to prevent re-renders when only position changes
-    (prevProps, nextProps) => {
-      return prevProps.type === nextProps.type;
-    }
-  );
+    return <div className={`cell ${actualCellType}`} style={cellStyle} />;
+  };
 
   // Handle audio system reset
   const handleAudioReset = React.useCallback(async () => {
@@ -518,16 +455,19 @@ const GameComponent: React.FC = () => {
     <div>
       <AudioErrorDisplay />
       <AudioDebug />
-      <div className="maze-grid">
-        {React.useMemo(
-          () =>
-            stableMazeRef.map((row: MazeCell[], y: number) =>
-              row.map((cell: MazeCell, x: number) => (
-                <Cell key={`${y}-${x}`} type={cell} x={x} y={y} />
-              ))
-            ),
-          [stableMazeRef, playerPosition.x, playerPosition.y]
-        )}
+      <div className="maze-container" style={{ position: "relative" }}>
+        <div className="maze-grid">
+          {React.useMemo(
+            () =>
+              stableMazeRef.map((row: MazeCell[], y: number) =>
+                row.map((cell: MazeCell, x: number) => (
+                  <Cell key={`${y}-${x}`} type={cell} x={x} y={y} />
+                ))
+              ),
+            // Re-render maze when structure changes OR when player position changes
+            [stableMazeRef, playerPosition]
+          )}
+        </div>
       </div>
       {showMobileControls && (
         <div className="mobile-controls">

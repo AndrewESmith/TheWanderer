@@ -1,4 +1,11 @@
-.maze-grid {
+.maze-container {
+    /* Container optimizations to prevent flickering */
+    contain: layout style paint;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .maze-grid {
     display: grid;
     grid-template-columns: var(--maze-columns, repeat(16, 32px));
     grid-template-rows: var(--maze-rows, repeat(10, 32px));
@@ -34,11 +41,23 @@
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    /* Additional anti-flicker optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent repaints during background changes */
+    background-attachment: local;
+    /* Optimize compositing */
+    isolation: isolate;
   }
   
   /* Fallback background colors - always present as base layer */
   .cell.empty { background-color: #2e7d32; }
-  .cell.player { background-color: #f44336; }
+  .cell.player { 
+    background-color: #f44336;
+    /* Additional optimization for player cell to prevent flickering */
+    z-index: 1;
+    position: relative;
+  }
   .cell.rock { background-color: #795548; }
   .cell.soil { background-color: #a1887f; }
   .cell.diamond { background-color: #fff; }

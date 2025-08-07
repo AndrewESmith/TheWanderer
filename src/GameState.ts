@@ -91,14 +91,14 @@ export function movePlayer(gameState: GameStateData, dx: number, dy: number): Ga
     return gameState;
   }
 
+  const { x, y } = gameState.player;
+  const newX = x + dx;
+  const newY = y + dy;
+
   // Check if player movement is blocked by boulder movement constraints
   if (shouldBlockPlayerMovement(gameState.boulderStateManager)) {
     return gameState;
   }
-
-  const { x, y } = gameState.player;
-  const newX = x + dx;
-  const newY = y + dy;
 
   // Check bounds
   if (!isValidPosition(gameState.maze, newX, newY)) {
