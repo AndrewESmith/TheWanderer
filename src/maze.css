@@ -225,9 +225,7 @@
   justify-content: center;
   /* Ensure perfect alignment with maze */
   max-width: 100%;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Remove positioning and use margin auto for proper centering */
 }
 .mobile-btn {
   font-size: 2rem;
