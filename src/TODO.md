@@ -55,22 +55,22 @@
 - [x] Remove cell borders and space between cells.
 - [x] ViewPort for mobiles
 
-## Version 7
+## Version 7 - Fizzbash
 
 - [ ] Create a how to play page
-- [ ] FizzBash - lets fix typescript errors
+- [ ] Fix typescript errors
 - [ ] Ensure working playwright tests
 
 ## Version 8
 
 - [ ] Boulders should not be able to fall through soil - update requirements.
-- [ ] Portrait mode doesn't work for mobile phones
+- [ ] Landscape mode doesn't work for mobile phones
 - [ ] Bombs should explode when you get too close
 - [ ] Assign passwords to maze levels to allow player jump to another maze level.
-- [ ] Missing Arrows. Original spec asked for arrows but where are they? They are mentioned in the code.
 
 ## Version 9
 
+- [ ] Missing Arrows. Original spec asked for arrows but where are they? They are mentioned in the code.
 - [ ] Boulders should be able to be pushed by player
 
 ## Version 10
