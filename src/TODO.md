@@ -53,7 +53,7 @@
 - [x] Move touch screen controls below info bar
 - [x] Center touch screen controls to maze
 - [x] Remove cell borders and space between cells.
-- [ ] ViewPort for mobiles
+- [x] ViewPort for mobiles
 
 ## Version 7
 
@@ -64,6 +64,7 @@
 ## Version 8
 
 - [ ] Boulders should not be able to fall through soil - update requirements.
+- [ ] Portrait mode doesn't work for mobile phones
 - [ ] Bombs should explode when you get too close
 - [ ] Assign passwords to maze levels to allow player jump to another maze level.
 - [ ] Missing Arrows. Original spec asked for arrows but where are they? They are mentioned in the code.
