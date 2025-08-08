@@ -647,3 +647,16 @@
     justify-content: center;
   }
 }
+/* Disabled mobile button styling when popup is open */
+.mobile-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #444;
+  color: #888;
+  border-color: #666;
+}
+
+.mobile-btn:disabled:hover {
+  background: #444;
+  color: #888;
+}

@@ -13,6 +13,8 @@ import { AudioErrorDisplay } from "./audio/components/audio-error-display";
 import { AudioInitialization } from "./audio/components/audio-initialization";
 import { AudioDebug } from "./audio/components/audio-debug";
 import { useDominantColors } from "./hooks/useDominantColors";
+import { HowToPlayPopup } from "./components/how-to-play/HowToPlayPopup";
+import { useHowToPlaySettings } from "./hooks/use-how-to-play-settings";
 
 // Image preloading system
 interface ImageLoadingState {
@@ -262,6 +264,18 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     fallbackMode,
   } = useSound();
 
+  // How to Play popup state management
+  const { shouldShowOnStartup } = useHowToPlaySettings();
+  const [isHowToPlayOpen, setIsHowToPlayOpen] = React.useState(false);
+
+  // First-visit detection and automatic popup display
+  React.useEffect(() => {
+    // Check if popup should show on startup for new users
+    if (shouldShowOnStartup()) {
+      setIsHowToPlayOpen(true);
+    }
+  }, [shouldShowOnStartup]);
+
   // Check URL parameters for test-specific maze
   const useTestMaze = React.useMemo(() => {
     if (typeof window !== "undefined") {
@@ -380,9 +394,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     [gameState, stopAllSounds, stableMazeRef, forceUpdate]
   );
 
-  // Handle keyboard input
+  // Handle keyboard input - block when popup is open
   React.useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      // Block game input when How to Play popup is open
+      if (isHowToPlayOpen) return;
       if (gameState.gameState !== "playing") return;
       if (["ArrowUp", "w", "W"].includes(e.key)) movePlayer(0, -1);
       if (["ArrowDown", "s", "S"].includes(e.key)) movePlayer(0, 1);
@@ -391,7 +407,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [movePlayer, gameState.gameState]);
+  }, [movePlayer, gameState.gameState, isHowToPlayOpen]);
 
   // Global image cache to prevent reloading
   const imageCache = React.useRef<Map<string, boolean>>(new Map());
@@ -587,7 +603,8 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
         <div className="mobile-controls">
           <button
             className="mobile-btn up"
-            onClick={() => movePlayer(0, -1)}
+            onClick={() => !isHowToPlayOpen && movePlayer(0, -1)}
+            disabled={isHowToPlayOpen}
             aria-label="Up"
           >
             ▲
@@ -595,21 +612,24 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           <div className="mobile-controls-horizontal">
             <button
               className="mobile-btn left"
-              onClick={() => movePlayer(-1, 0)}
+              onClick={() => !isHowToPlayOpen && movePlayer(-1, 0)}
+              disabled={isHowToPlayOpen}
               aria-label="Left"
             >
               ◀
             </button>
             <button
               className="mobile-btn down"
-              onClick={() => movePlayer(0, 1)}
+              onClick={() => !isHowToPlayOpen && movePlayer(0, 1)}
+              disabled={isHowToPlayOpen}
               aria-label="Down"
             >
               ▼
             </button>
             <button
               className="mobile-btn right"
-              onClick={() => movePlayer(1, 0)}
+              onClick={() => !isHowToPlayOpen && movePlayer(1, 0)}
+              disabled={isHowToPlayOpen}
               aria-label="Right"
             >
               ▶
@@ -617,6 +637,12 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           </div>
         </div>
       )}
+
+      {/* How to Play popup */}
+      <HowToPlayPopup
+        isOpen={isHowToPlayOpen}
+        onClose={() => setIsHowToPlayOpen(false)}
+      />
     </div>
   );
 };
