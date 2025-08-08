@@ -51,7 +51,7 @@ describe("HowToPlayPopup", () => {
   it("calls onClose when close button is clicked", () => {
     render(<HowToPlayPopup isOpen={true} onClose={mockOnClose} />);
 
-    const closeButton = screen.getByLabelText("Close How to Play");
+    const closeButton = screen.getByLabelText("Close dialog using X button");
     fireEvent.click(closeButton);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useHowToPlaySettings } from "../../hooks/use-how-to-play-settings";
 import { HowToPlayContent } from "./HowToPlayContent";
 import { createFocusTrap } from "../../utils/focus-trap";
@@ -42,6 +42,22 @@ export function HowToPlayPopup({
 
       // Prevent body scroll when modal is open
       document.body.style.overflow = "hidden";
+
+      // Announce to screen readers that dialog has opened
+      const announcement = document.createElement("div");
+      announcement.setAttribute("aria-live", "polite");
+      announcement.setAttribute("aria-atomic", "true");
+      announcement.className = "sr-only";
+      announcement.textContent =
+        "How to Play dialog opened. Press Escape to close.";
+      document.body.appendChild(announcement);
+
+      // Remove announcement after screen reader has time to read it
+      setTimeout(() => {
+        if (document.body.contains(announcement)) {
+          document.body.removeChild(announcement);
+        }
+      }, 1000);
     } else {
       document.removeEventListener("keydown", handleKeyDown);
 
@@ -94,38 +110,43 @@ export function HowToPlayPopup({
       aria-modal="true"
       aria-labelledby="how-to-play-title"
       aria-describedby="how-to-play-description"
+      aria-label="How to Play The Wanderer - Game Instructions Dialog"
     >
       <div
         className="how-to-play-panel"
         onClick={handlePanelClick}
         ref={modalRef}
         tabIndex={-1}
+        role="document"
+        aria-label="Game instructions and controls"
       >
-        <div className="how-to-play-header">
+        <header className="how-to-play-header" role="banner">
           <h2 id="how-to-play-title">How to Play The Wanderer</h2>
           <button
             className="close-button"
             onClick={onClose}
-            aria-label="Close How to Play dialog"
-            title="Close (Escape)"
+            aria-label="Close dialog using X button"
+            title="Close (Escape key)"
+            type="button"
           >
-            ×
+            <span aria-hidden="true">×</span>
+            <span className="sr-only">Close dialog</span>
           </button>
-        </div>
+        </header>
 
-        <div
+        <main
           className="how-to-play-content"
           id="how-to-play-description"
-          role="document"
+          role="main"
           aria-label="Game instructions and credits"
         >
           <HowToPlayContent className="popup-content" />
-        </div>
+        </main>
 
-        <div
+        <footer
           className="how-to-play-footer"
-          role="group"
-          aria-label="Dialog actions"
+          role="contentinfo"
+          aria-label="Dialog actions and preferences"
         >
           <label className="dont-show-again-toggle">
             <input
@@ -133,22 +154,25 @@ export function HowToPlayPopup({
               checked={settings.dontShowAgain}
               onChange={handleDontShowAgainChange}
               aria-describedby="dont-show-again-description"
+              aria-label="Don't show this dialog automatically on future visits"
             />
             <span className="checkbox-custom" aria-hidden="true"></span>
             <span className="checkbox-label">Don't show again</span>
             <span id="dont-show-again-description" className="sr-only">
               Check this box to prevent the How to Play dialog from appearing
-              automatically on future visits
+              automatically on future visits. You can still access it through
+              the settings menu.
             </span>
           </label>
           <button
             className="close-footer-button"
             onClick={onClose}
-            aria-label="Close How to Play dialog"
+            aria-label="Close How to Play dialog and return to game"
+            type="button"
           >
             Close
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   );

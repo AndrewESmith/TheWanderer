@@ -1,4 +1,3 @@
-import React from "react";
 import type {
   HowToPlayContentProps,
   GameInstructionsData,
@@ -81,9 +80,17 @@ export function HowToPlayContent({
   return (
     <div className={className}>
       {/* Game Instructions Sections */}
-      <section className="instructions-content" aria-label="Game instructions">
+      <section
+        className="instructions-content"
+        aria-label="Game instructions"
+        role="region"
+      >
         {instructions.map((instruction, index) => (
-          <article key={instruction.type} className="instruction-section">
+          <article
+            key={instruction.type}
+            className="instruction-section"
+            aria-labelledby={`instruction-${instruction.type}`}
+          >
             <h3
               className="instruction-title"
               id={`instruction-${instruction.type}`}
@@ -93,31 +100,51 @@ export function HowToPlayContent({
             <div
               className="instruction-content"
               aria-labelledby={`instruction-${instruction.type}`}
+              role="group"
             >
-              {instruction.content.split("\n").map((line, lineIndex) => (
-                <div key={lineIndex} className="instruction-line">
-                  {line}
-                </div>
-              ))}
+              {instruction.content.split("\n").map((line, lineIndex) => {
+                // Handle bullet points for better screen reader experience
+                if (line.trim().startsWith("•")) {
+                  return (
+                    <div
+                      key={lineIndex}
+                      className="instruction-line"
+                      role="listitem"
+                    >
+                      {line}
+                    </div>
+                  );
+                }
+                return (
+                  <div key={lineIndex} className="instruction-line">
+                    {line}
+                  </div>
+                );
+              })}
             </div>
             {index < instructions.length - 1 && (
-              <div className="instruction-divider" aria-hidden="true" />
+              <hr className="instruction-divider" aria-hidden="true" />
             )}
           </article>
         ))}
       </section>
 
       {/* Credits Section */}
-      <div className="credits-divider" aria-hidden="true" />
+      <hr className="credits-divider" aria-hidden="true" />
       <section
         className="credits-section"
         aria-label="Credits and acknowledgements"
+        role="region"
       >
         <h4 className="credits-title" id="credits-heading">
           Credits
         </h4>
 
-        <div className="credits-content" aria-labelledby="credits-heading">
+        <div
+          className="credits-content"
+          aria-labelledby="credits-heading"
+          role="group"
+        >
           <div className="credit-item">
             <strong>Author:</strong>{" "}
             <a

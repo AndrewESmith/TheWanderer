@@ -1,274 +1,317 @@
 /* How to Play Content Component Styles */
 
 .instructions-content {
-    margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .instruction-section {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .instruction-title {
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #fff;
-    margin: 0 0 0.5rem 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    /* Improve accessibility with better contrast */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-family: "Courier New", monospace;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  /* Improve accessibility with better contrast */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .instruction-content {
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    color: #e0e0e0;
-    line-height: 1.5;
-    /* Improved readability */
-    word-spacing: 0.1em;
+  font-family: "Courier New", monospace;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  line-height: 1.5;
+  /* Improved readability */
+  word-spacing: 0.1em;
 }
 
 .instruction-line {
-    margin-bottom: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 
 .instruction-line:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .instruction-divider {
-    height: 1px;
-    background-color: #444;
-    margin: 1rem 0;
+  height: 1px;
+  background-color: #444;
+  margin: 1rem 0;
 }
 
 .credits-divider {
-    height: 2px;
-    background-color: #555;
-    margin: 1.5rem 0 1rem 0;
+  height: 2px;
+  background-color: #555;
+  margin: 1.5rem 0 1rem 0;
 }
 
 .credits-section {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .credits-title {
-    font-family: 'Courier New', monospace;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    margin: 0 0 0.75rem 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .credits-content {
-    font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
-    color: #aaa;
-    line-height: 1.4;
-    /* Better spacing for readability */
-    word-spacing: 0.05em;
+  font-family: "Courier New", monospace;
+  font-size: 0.75rem;
+  color: #aaa;
+  line-height: 1.4;
+  /* Better spacing for readability */
+  word-spacing: 0.05em;
 }
 
 .credit-item {
-    margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .credit-item:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .credit-link {
-    color: #4a9eff;
-    text-decoration: none;
-    transition: color 0.2s ease;
+  color: #4a9eff;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .credit-link:hover {
-    color: #66b3ff;
-    text-decoration: underline;
+  color: #66b3ff;
+  text-decoration: underline;
 }
 
 .credit-link:focus {
-    outline: 2px solid #4a9eff;
-    outline-offset: 2px;
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
 }
 
 .credit-list {
-    margin: 0.25rem 0 0 1rem;
-    padding: 0;
-    list-style-type: disc;
+  margin: 0.25rem 0 0 1rem;
+  padding: 0;
+  list-style-type: disc;
 }
 
 .credit-list li {
-    margin-bottom: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 .credit-list li:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 /* Responsive Design */
 
 /* Tablet styles */
 @media (max-width: 768px) {
-    .instruction-title {
-        font-size: 1rem;
-        margin-bottom: 0.6rem;
-    }
-    
-    .instruction-content {
-        font-size: 0.85rem;
-        line-height: 1.6;
-    }
-    
-    .credits-content {
-        font-size: 0.7rem;
-        line-height: 1.5;
-    }
-    
-    .credit-list {
-        margin-left: 0.75rem;
-    }
-    
-    .instruction-section {
-        margin-bottom: 1.2rem;
-    }
+  .instruction-title {
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .instruction-content {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .credits-content {
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .credit-list {
+    margin-left: 0.75rem;
+  }
+
+  .instruction-section {
+    margin-bottom: 1.2rem;
+  }
 }
 
 /* Mobile styles */
 @media (max-width: 480px) {
-    .instruction-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.7rem;
-    }
-    
-    .instruction-content {
-        font-size: 0.8rem;
-        line-height: 1.7;
-    }
-    
-    .credits-content {
-        font-size: 0.65rem;
-        line-height: 1.6;
-    }
-    
-    .instruction-divider,
-    .credits-divider {
-        margin: 0.75rem 0;
-    }
-    
-    .instruction-section {
-        margin-bottom: 1.4rem;
-    }
-    
-    .credit-item {
-        margin-bottom: 0.7rem;
-    }
+  .instruction-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .instruction-content {
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+
+  .credits-content {
+    font-size: 0.65rem;
+    line-height: 1.6;
+  }
+
+  .instruction-divider,
+  .credits-divider {
+    margin: 0.75rem 0;
+  }
+
+  .instruction-section {
+    margin-bottom: 1.4rem;
+  }
+
+  .credit-item {
+    margin-bottom: 0.7rem;
+  }
 }
 
 /* Large screen optimization */
 @media (min-width: 1200px) {
-    .instruction-title {
-        font-size: 1.2rem;
-    }
-    
-    .instruction-content {
-        font-size: 0.95rem;
-        line-height: 1.6;
-    }
-    
-    .credits-content {
-        font-size: 0.8rem;
-        line-height: 1.5;
-    }
+  .instruction-title {
+    font-size: 1.2rem;
+  }
+
+  .instruction-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .credits-content {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-    .instruction-content {
-        color: #fff;
-    }
-    
-    .credits-content {
-        color: #ddd;
-    }
-    
-    .instruction-divider,
-    .credits-divider {
-        background-color: #777;
-    }
-    
-    .credit-link {
-        color: #66b3ff;
-    }
-    
-    .credit-link:hover {
-        color: #80c7ff;
-    }
+  .instruction-content {
+    color: #fff;
+  }
+
+  .credits-content {
+    color: #ddd;
+  }
+
+  .instruction-divider,
+  .credits-divider {
+    background-color: #777;
+  }
+
+  .credit-link {
+    color: #66b3ff;
+  }
+
+  .credit-link:hover {
+    color: #80c7ff;
+  }
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-    .credit-link {
-        transition: none;
-    }
+  .credit-link {
+    transition: none;
+  }
 }
 
 /* Focus management for screen readers */
 .instructions-content:focus {
-    outline: none;
+  outline: none;
+}
+
+/* Accessibility improvements */
+.instruction-section[role="listitem"] {
+  list-style: none;
+}
+
+/* Better focus indicators for interactive content */
+.credits-section a:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+  background-color: rgba(74, 158, 255, 0.1);
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+/* Improve readability for users with dyslexia */
+@media (prefers-reduced-motion: no-preference) {
+  .instruction-content,
+  .credits-content {
+    /* Slightly increased letter spacing for better readability */
+    letter-spacing: 0.02em;
+  }
+}
+
+/* Support for users who prefer larger text */
+@media (min-resolution: 2dppx) {
+  .instruction-title,
+  .credits-title {
+    /* Slightly bolder text on high-DPI displays */
+    font-weight: 700;
+  }
+}
+
+/* Ensure sufficient color contrast */
+.instruction-content {
+  /* Improved contrast ratio */
+  color: #e8e8e8;
+}
+
+.credits-content {
+  /* Improved contrast ratio for smaller text */
+  color: #c0c0c0;
 }
 
 /* Improve visual hierarchy */
 .instruction-section:first-child .instruction-title {
-    color: #4a9eff;
+  color: #4a9eff;
 }
 
 /* Better bullet points for instruction content */
 .instruction-content .instruction-line {
-    position: relative;
+  position: relative;
 }
 
 .instruction-content .instruction-line:first-child:not(:only-child) {
-    margin-bottom: 0.4rem;
+  margin-bottom: 0.4rem;
 }
 
 /* Style bullet points in instruction content */
 .instruction-line:not(:first-child):not(:empty)::before {
-    content: '•';
-    color: #4a9eff;
-    margin-right: 0.5rem;
-    font-weight: bold;
+  content: "•";
+  color: #4a9eff;
+  margin-right: 0.5rem;
+  font-weight: bold;
 }
 
 /* Ensure proper spacing for multi-line content */
 .instruction-content .instruction-line:empty {
-    margin-bottom: 0.2rem;
+  margin-bottom: 0.2rem;
 }
 
 /* Print styles */
 @media print {
-    .instruction-title,
-    .credits-title {
-        color: #000 !important;
-        text-shadow: none;
-    }
-    
-    .instruction-content,
-    .credits-content {
-        color: #333 !important;
-    }
-    
-    .credit-link {
-        color: #0066cc !important;
-        text-decoration: underline;
-    }
-    
-    .instruction-divider,
-    .credits-divider {
-        background-color: #ccc !important;
-    }
+  .instruction-title,
+  .credits-title {
+    color: #000 !important;
+    text-shadow: none;
+  }
+
+  .instruction-content,
+  .credits-content {
+    color: #333 !important;
+  }
+
+  .credit-link {
+    color: #0066cc !important;
+    text-decoration: underline;
+  }
+
+  .instruction-divider,
+  .credits-divider {
+    background-color: #ccc !important;
+  }
 }

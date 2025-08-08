@@ -51,10 +51,7 @@
   - Ensure proper state management between settings and popup
   - _Requirements: 3.1, 3.2, 3.4_
 
-- [ ] 8. Implement keyboard navigation and accessibility
-
-
-
+- [x] 8. Implement keyboard navigation and accessibility
 
   - Add proper ARIA labels and roles for screen readers
   - Implement focus trapping within modal when open
@@ -74,6 +71,7 @@
   - Test HowToPlayPopup component open/close behavior and checkbox functionality
   - Test integration with settings hook and preference updates
   - Test keyboard event handling and accessibility features
+  - Ensure Playwright tests relating to play testing are updated to disable or close popup window before they run.
   - _Requirements: 1.1, 1.2, 1.3, 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
 - [ ] 11. Create integration tests for popup workflow

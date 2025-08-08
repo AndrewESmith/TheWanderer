@@ -343,6 +343,58 @@
   border: 0;
 }
 
+/* Focus management for modal */
+.how-to-play-panel:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: -2px;
+}
+
+/* Ensure interactive elements have proper focus indicators */
+.how-to-play-panel a:focus {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+  background-color: rgba(74, 158, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* Skip link for keyboard users (if needed in future) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1001;
+}
+
+.skip-link:focus {
+  top: 6px;
+  outline: 2px solid #4a9eff;
+}
+
+/* Improve focus visibility for checkbox */
+.dont-show-again-toggle:focus-within {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Better focus indicator for close button */
+.close-button:focus-visible {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+  background-color: #444;
+}
+
+.close-footer-button:focus-visible {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+  background: #555;
+}
+
 /* Print styles (hide popup in print) */
 @media print {
   .how-to-play-overlay {

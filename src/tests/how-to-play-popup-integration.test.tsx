@@ -238,7 +238,9 @@ describe("How to Play Popup Integration", () => {
     });
 
     // Check the "Don't show again" checkbox
-    const checkbox = screen.getByLabelText("Don't show again");
+    const checkbox = screen.getByLabelText(
+      "Don't show this dialog automatically on future visits"
+    );
     fireEvent.click(checkbox);
 
     // Close the popup
