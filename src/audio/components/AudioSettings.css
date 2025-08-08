@@ -1,246 +1,275 @@
 .audio-settings-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .audio-settings-panel {
-    background: #2a2a2a;
-    border: 2px solid #444;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90vw;
-    max-height: 80vh;
-    overflow-y: auto;
-    color: #fff;
-    font-family: 'Courier New', monospace;
+  background: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: #fff;
+  font-family: "Courier New", monospace;
 }
 
 .audio-settings-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #444;
 }
 
 .audio-settings-header h2 {
-    margin: 0;
-    font-size: 18px;
-    color: #fff;
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
 }
 
 .close-button {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .close-button:hover {
-    background-color: #444;
+  background-color: #444;
 }
 
 .audio-settings-content {
-    padding: 20px;
+  padding: 20px;
 }
 
 .setting-group {
-    margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 .setting-group:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .setting-group h3 {
-    margin: 0 0 12px 0;
-    font-size: 16px;
-    color: #ccc;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #ccc;
 }
 
 .setting-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #ccc;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #ccc;
 }
 
 /* Override for toggle labels */
 .setting-group .mute-toggle,
 .setting-group .debug-toggle {
-    display: flex !important;
+  display: flex !important;
 }
 
 .setting-group small {
-    display: block;
-    margin-top: 4px;
-    font-size: 12px;
-    color: #888;
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #888;
 }
 
 /* Toggle Switch Styles (shared by mute and debug toggles) */
 .mute-toggle,
 .debug-toggle {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
 }
 
 .toggle-label {
-    margin-left: 12px;
-    color: #ccc;
-    font-size: 14px;
-    flex: 1;
-    order: 2;
+  margin-left: 12px;
+  color: #ccc;
+  font-size: 14px;
+  flex: 1;
+  order: 2;
 }
 
 .mute-toggle input[type="checkbox"],
 .debug-toggle input[type="checkbox"] {
-    display: none;
+  display: none;
 }
 
 .toggle-slider {
-    position: relative;
-    width: 50px;
-    height: 24px;
-    background-color: #444;
-    border-radius: 12px;
-    flex-shrink: 0;
-    transition: background-color 0.3s;
-    order: 1;
+  position: relative;
+  width: 50px;
+  height: 24px;
+  background-color: #444;
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: background-color 0.3s;
+  order: 1;
 }
 
 .toggle-slider::before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 20px;
-    height: 20px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: transform 0.3s;
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
 }
 
 .mute-toggle input[type="checkbox"]:checked + .toggle-slider {
-    background-color: #ff4444;
+  background-color: #ff4444;
 }
 
 .debug-toggle input[type="checkbox"]:checked + .toggle-slider {
-    background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 .mute-toggle input[type="checkbox"]:checked + .toggle-slider::before,
 .debug-toggle input[type="checkbox"]:checked + .toggle-slider::before {
-    transform: translateX(26px);
+  transform: translateX(26px);
 }
 
 /* Volume Sliders */
 .volume-slider {
-    width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: #444;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #444;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #4CAF50;
-    cursor: pointer;
-    border: 2px solid #fff;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+  border: 2px solid #fff;
 }
 
 .volume-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #4CAF50;
-    cursor: pointer;
-    border: 2px solid #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4caf50;
+  cursor: pointer;
+  border: 2px solid #fff;
 }
 
 .volume-slider:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .volume-slider:disabled::-webkit-slider-thumb {
-    cursor: not-allowed;
-    background: #666;
+  cursor: not-allowed;
+  background: #666;
 }
 
 .volume-slider:disabled::-moz-range-thumb {
-    cursor: not-allowed;
-    background: #666;
+  cursor: not-allowed;
+  background: #666;
 }
 
 .category-volume {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .category-volume:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* How to Play Button */
+.how-to-play-button {
+  background: #4caf50;
+  border: 1px solid #45a049;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.how-to-play-button:hover {
+  background: #45a049;
+}
+
+.how-to-play-button:active {
+  background: #3d8b40;
+}
+
+.how-to-play-button:disabled {
+  background: #666;
+  border-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* Reset Button */
 .reset-button {
-    background: #444;
-    border: 1px solid #666;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    transition: background-color 0.2s;
+  background: #444;
+  border: 1px solid #666;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .reset-button:hover {
-    background: #555;
+  background: #555;
 }
 
 .reset-button:active {
-    background: #333;
+  background: #333;
 }
 
 /* Responsive Design */
 @media (max-width: 480px) {
-    .audio-settings-panel {
-        width: 95vw;
-        margin: 10px;
-    }
-    
-    .audio-settings-header {
-        padding: 12px 16px;
-    }
-    
-    .audio-settings-content {
-        padding: 16px;
-    }
+  .audio-settings-panel {
+    width: 95vw;
+    margin: 10px;
+  }
+
+  .audio-settings-header {
+    padding: 12px 16px;
+  }
+
+  .audio-settings-content {
+    padding: 16px;
+  }
 }

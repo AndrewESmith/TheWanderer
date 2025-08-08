@@ -45,6 +45,10 @@
   - _Requirements: 1.1, 1.2, 1.4, 2.3_
 
 - [ ] 7. Add "How to Play" option to AudioSettings menu
+
+
+
+
   - Modify AudioSettings component to include "How to Play" button
   - Implement click handler to open popup from settings
   - Ensure proper state management between settings and popup

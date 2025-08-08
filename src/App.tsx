@@ -578,7 +578,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           )}
         </div>
         <div className="hud-right">
-          <AudioControl />
+          <AudioControl onOpenHowToPlay={() => setIsHowToPlayOpen(true)} />
           {hasPlaybackErrors && (
             <button
               onClick={handleAudioReset}

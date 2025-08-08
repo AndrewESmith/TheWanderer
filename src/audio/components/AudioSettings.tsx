@@ -7,11 +7,13 @@ import type { JSX } from "react/jsx-runtime";
 interface AudioSettingsProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenHowToPlay?: () => void;
 }
 
 export function AudioSettings({
   isOpen,
   onClose,
+  onOpenHowToPlay,
 }: AudioSettingsProps): JSX.Element {
   const {
     isMuted,
@@ -44,6 +46,12 @@ export function AudioSettings({
 
   const handleDebugPanelToggle = () => {
     setShowDebugPanel(!showDebugPanel);
+  };
+
+  const handleHowToPlayClick = () => {
+    if (onOpenHowToPlay) {
+      onOpenHowToPlay();
+    }
   };
 
   if (!isOpen) {
@@ -137,6 +145,17 @@ export function AudioSettings({
               </label>
             </div>
           )}
+
+          {/* How to Play Button */}
+          <div className="setting-group">
+            <button
+              className="how-to-play-button"
+              onClick={handleHowToPlayClick}
+              disabled={!onOpenHowToPlay}
+            >
+              How to Play
+            </button>
+          </div>
 
           {/* Reset Button */}
           <div className="setting-group">
