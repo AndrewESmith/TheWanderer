@@ -13,7 +13,7 @@ const gameInstructionsData: GameInstructionsData = {
     {
       title: "Objective",
       content:
-        "Navigate through the maze, collect all diamonds, avoid dangers, and reach the exit to complete each level.",
+        "Navigate through the maze, collect all diamonds, avoid dangers, and reach the exit before you run out of moves. There are multiple levels.",
       type: "objective",
     },
     {
@@ -24,36 +24,35 @@ const gameInstructionsData: GameInstructionsData = {
     },
     {
       title: "Game Objects",
-      content: `• Rocks (gray): Immovable barriers that block your path
-• Soil (brown): Can be dug through by moving into it
-• Boulders (dark gray): Heavy objects that fall when unsupported and can be pushed
-• Arrows: Move continuously in their direction until hitting an obstacle
-• Diamonds (blue): Collect these to complete the level
-• Bombs (red): Explode when touched, ending the game
-• Exit (green): The goal - reach this after collecting all diamonds`,
+      content: `
+Walls: Immovable barriers that block your path
+Soil (brown): Can be dug through by moving into it
+Boulders: Heavy objects that fall when unsupported and can be pushed
+Arrows: Move continuously in their direction until hitting an obstacle
+Diamonds: Collect these to complete the level
+Bombs: Explode when touched, ending the game
+Exit (door): The goal - reach this after collecting all diamonds`,
       type: "objects",
     },
     {
       title: "Movement Rules",
-      content: `• Boulders fall down when there's empty space below them
-• Boulders can be pushed left or right if there's space
-• Arrows move continuously until they hit a wall or object
-• Being hit by a falling boulder or moving arrow will end the game
-• You can only move into empty spaces or soil`,
+      content: `
+Boulders fall down when there's empty space below them
+Being hit by a falling boulder or touching a bomb will end the game
+If you run out of moves the game will end
+You can only move into empty spaces or dig through soil`,
       type: "mechanics",
     },
   ],
   credits: {
-    author: "Your Name",
-    authorLink: "https://linkedin.com/in/yourprofile",
+    author: "Andrew Smith",
+    authorLink: "https://www.linkedin.com/in/andrewesmith/",
     aiAssistance: [
-      "Claude AI for code generation and debugging assistance",
-      "GitHub Copilot for code completion",
+      "Kiro/Claude Sonnet 4.0, 3.7 and Chat GPT 4.1  for code generation and debugging assistance",
+      "Microsoft Copilot for hints and tips",
     ],
-    imageSources:
-      "Game sprites created using pixel art tools and open source assets",
-    soundSources:
-      "Sound effects sourced from freesound.org and custom recordings",
+    imageSources: "Game sprites created using CoPilot",
+    soundSources: "Sound effects sourced from freesound.org",
     originalGame: {
       name: "Wanderer",
       link: "https://en.wikipedia.org/wiki/Wanderer_(1988_video_game)",
@@ -62,8 +61,7 @@ const gameInstructionsData: GameInstructionsData = {
     },
     acknowledgements: [
       "Original Wanderer game concept by Steven Shipway",
-      "React and TypeScript communities for excellent documentation",
-      "Open source contributors for tools and libraries used",
+      "David Broadfoot for helping to point the way, Nick Ellercamp for feedback on generated code.",
     ],
   },
 };

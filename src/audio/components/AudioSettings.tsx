@@ -64,11 +64,28 @@ export function AudioSettings({
         className="audio-settings-panel"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="audio-settings-header">
-          <h2>Audio Settings</h2>
+        {/* Settings title and close button on same line */}
+        <div className="settings-header">
+          <h1>Settings</h1>
           <button className="close-button" onClick={onClose} aria-label="Close">
             ×
           </button>
+        </div>
+
+        {/* How to Play Button */}
+        <div className="how-to-play-section">
+          <button
+            className="how-to-play-button-top"
+            onClick={handleHowToPlayClick}
+            disabled={!onOpenHowToPlay}
+          >
+            How to Play
+          </button>
+        </div>
+
+        {/* Audio Settings Subtitle */}
+        <div className="audio-settings-subtitle">
+          <h2>Audio Settings</h2>
         </div>
 
         <div className="audio-settings-content">
@@ -145,17 +162,6 @@ export function AudioSettings({
               </label>
             </div>
           )}
-
-          {/* How to Play Button */}
-          <div className="setting-group">
-            <button
-              className="how-to-play-button"
-              onClick={handleHowToPlayClick}
-              disabled={!onOpenHowToPlay}
-            >
-              How to Play
-            </button>
-          </div>
 
           {/* Reset Button */}
           <div className="setting-group">
