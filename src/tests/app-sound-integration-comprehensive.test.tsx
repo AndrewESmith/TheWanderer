@@ -113,6 +113,24 @@ vi.mock("../audio/hooks/use-sound", () => ({
 
 import App from "../App";
 
+// Helper function to close How to Play popup if it's open
+async function closeHowToPlayPopupIfOpen() {
+  const howToPlayPopup = screen.queryByRole("dialog");
+  if (howToPlayPopup) {
+    // Use the X button (close-button class) to close the popup
+    const closeButton = howToPlayPopup.querySelector(
+      ".close-button"
+    ) as HTMLElement;
+    if (closeButton) {
+      fireEvent.click(closeButton);
+    }
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  }
+}
+
 describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
   beforeEach(() => {
     // Reset mocks
@@ -146,9 +164,18 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
       dispatchEvent: vi.fn(),
     })) as any;
 
-    // Mock localStorage
+    // Mock localStorage with How to Play settings to prevent popup from showing
     const localStorageMock = {
-      getItem: vi.fn(() => null),
+      getItem: vi.fn((key: string) => {
+        if (key === "wanderer-how-to-play-settings") {
+          return JSON.stringify({
+            dontShowAgain: true,
+            hasSeenInstructions: true,
+            lastViewedVersion: "1.0.0",
+          });
+        }
+        return null;
+      }),
       setItem: vi.fn(),
       removeItem: vi.fn(),
       clear: vi.fn(),
@@ -209,6 +236,9 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
       await waitFor(() => {
         expect(screen.getByText(/Score:/)).toBeInTheDocument();
       });
+
+      // Ensure How to Play popup is not blocking movement
+      await closeHowToPlayPopupIfOpen();
 
       // Trigger a movement to test playSound
       fireEvent.keyDown(window, { key: "ArrowRight" });
@@ -273,6 +303,9 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
         expect(screen.getByText(/Score:/)).toBeInTheDocument();
       });
 
+      // Ensure How to Play popup is not blocking movement
+      await closeHowToPlayPopupIfOpen();
+
       // Test arrow key movement - should trigger sound events
       mockPlaySound.mockClear();
       fireEvent.keyDown(window, { key: "ArrowRight" });
@@ -297,6 +330,9 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
         expect(screen.getByText(/Score:/)).toBeInTheDocument();
       });
 
+      // Ensure How to Play popup is not blocking movement
+      await closeHowToPlayPopupIfOpen();
+
       // Test that WASD keys are handled by the keyboard event system
       // We'll verify this by checking that the moves counter changes when valid moves are made
       const initialMoves = parseInt(
@@ -320,6 +356,54 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
 
       // At least one WASD key should have triggered a sound (successful movement)
       expect(soundTriggered).toBe(true);
+    });
+
+    it("should not trigger sounds when How to Play popup is open", async () => {
+      // Mock localStorage to show popup on startup
+      const localStorageMock = {
+        getItem: vi.fn(() => null), // No settings = popup shows
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      };
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+        writable: true,
+      });
+
+      render(<App />);
+
+      await waitFor(() => {
+        expect(screen.getByText(/Score:/)).toBeInTheDocument();
+      });
+
+      // Verify popup is open
+      expect(screen.queryByRole("dialog")).toBeInTheDocument();
+
+      // Clear previous sound calls
+      mockPlaySound.mockClear();
+
+      // Try to move while popup is open (should not work)
+      fireEvent.keyDown(window, { key: "ArrowRight" });
+
+      // Should not emit any sounds because popup blocks movement
+      expect(mockPlaySound).not.toHaveBeenCalled();
+
+      // Close popup and verify movement works
+      const popup = screen.getByRole("dialog");
+      const closeButton = popup.querySelector(".close-button") as HTMLElement;
+      fireEvent.click(closeButton);
+
+      await waitFor(() => {
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      });
+
+      // Now movement should work and trigger sounds
+      fireEvent.keyDown(window, { key: "ArrowRight" });
+
+      await waitFor(() => {
+        expect(mockPlaySound).toHaveBeenCalled();
+      });
     });
 
     it("should not trigger sounds when game is not in playing state", async () => {
@@ -396,6 +480,9 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
       await waitFor(() => {
         expect(screen.getByText(/Score:/)).toBeInTheDocument();
       });
+
+      // Ensure How to Play popup is not blocking movement
+      await closeHowToPlayPopupIfOpen();
 
       // The sound event callback should be set up
       // This is verified by the fact that movement triggers sounds
@@ -560,6 +647,9 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
       expect(screen.getByLabelText("Mute audio")).toBeInTheDocument();
       expect(screen.getByLabelText("Open audio settings")).toBeInTheDocument();
 
+      // Ensure How to Play popup is not blocking movement
+      await closeHowToPlayPopupIfOpen();
+
       // 2. User input should trigger sounds
       fireEvent.keyDown(window, { key: "ArrowRight" });
 
@@ -602,6 +692,9 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
 
       // 1. Game start - audio should be initialized
       expect(screen.getByLabelText("Mute audio")).toBeInTheDocument();
+
+      // Ensure How to Play popup is not blocking movement
+      await closeHowToPlayPopupIfOpen();
 
       // 2. Player movement - should trigger sounds
       fireEvent.keyDown(window, { key: "ArrowRight" });

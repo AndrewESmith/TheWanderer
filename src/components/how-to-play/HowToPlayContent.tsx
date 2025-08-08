@@ -1,8 +1,10 @@
+import React from "react";
 import type {
   HowToPlayContentProps,
   GameInstructionsData,
 } from "../../Interfaces/IHowToPlayPopup";
 import "./HowToPlayContent.css";
+import type { JSX } from "react/jsx-runtime";
 
 /**
  * Game instructions data containing all the content for the How to Play popup
@@ -79,11 +81,19 @@ export function HowToPlayContent({
   return (
     <div className={className}>
       {/* Game Instructions Sections */}
-      <div className="instructions-content">
+      <section className="instructions-content" aria-label="Game instructions">
         {instructions.map((instruction, index) => (
-          <div key={instruction.type} className="instruction-section">
-            <h3 className="instruction-title">{instruction.title}</h3>
-            <div className="instruction-content">
+          <article key={instruction.type} className="instruction-section">
+            <h3
+              className="instruction-title"
+              id={`instruction-${instruction.type}`}
+            >
+              {instruction.title}
+            </h3>
+            <div
+              className="instruction-content"
+              aria-labelledby={`instruction-${instruction.type}`}
+            >
               {instruction.content.split("\n").map((line, lineIndex) => (
                 <div key={lineIndex} className="instruction-line">
                   {line}
@@ -91,18 +101,23 @@ export function HowToPlayContent({
               ))}
             </div>
             {index < instructions.length - 1 && (
-              <div className="instruction-divider" />
+              <div className="instruction-divider" aria-hidden="true" />
             )}
-          </div>
+          </article>
         ))}
-      </div>
+      </section>
 
       {/* Credits Section */}
-      <div className="credits-divider" />
-      <div className="credits-section">
-        <h4 className="credits-title">Credits</h4>
+      <div className="credits-divider" aria-hidden="true" />
+      <section
+        className="credits-section"
+        aria-label="Credits and acknowledgements"
+      >
+        <h4 className="credits-title" id="credits-heading">
+          Credits
+        </h4>
 
-        <div className="credits-content">
+        <div className="credits-content" aria-labelledby="credits-heading">
           <div className="credit-item">
             <strong>Author:</strong>{" "}
             <a
@@ -110,6 +125,7 @@ export function HowToPlayContent({
               target="_blank"
               rel="noopener noreferrer"
               className="credit-link"
+              aria-label={`Visit ${credits.author}'s LinkedIn profile (opens in new tab)`}
             >
               {credits.author}
             </a>
@@ -117,7 +133,10 @@ export function HowToPlayContent({
 
           <div className="credit-item">
             <strong>AI Assistance:</strong>
-            <ul className="credit-list">
+            <ul
+              className="credit-list"
+              aria-label="AI tools used in development"
+            >
               {credits.aiAssistance.map((tool, index) => (
                 <li key={index}>{tool}</li>
               ))}
@@ -139,6 +158,7 @@ export function HowToPlayContent({
               target="_blank"
               rel="noopener noreferrer"
               className="credit-link"
+              aria-label={`Learn more about ${credits.originalGame.name} (opens in new tab)`}
             >
               {credits.originalGame.name}
             </a>{" "}
@@ -148,6 +168,7 @@ export function HowToPlayContent({
               target="_blank"
               rel="noopener noreferrer"
               className="credit-link"
+              aria-label={`Visit ${credits.originalGame.author}'s website (opens in new tab)`}
             >
               {credits.originalGame.author}
             </a>
@@ -155,14 +176,14 @@ export function HowToPlayContent({
 
           <div className="credit-item">
             <strong>Acknowledgements:</strong>
-            <ul className="credit-list">
+            <ul className="credit-list" aria-label="Special acknowledgements">
               {credits.acknowledgements.map((ack, index) => (
                 <li key={index}>{ack}</li>
               ))}
             </ul>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

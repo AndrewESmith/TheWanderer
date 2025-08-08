@@ -44,10 +44,7 @@
   - Ensure popup blocks game interaction when displayed
   - _Requirements: 1.1, 1.2, 1.4, 2.3_
 
-- [ ] 7. Add "How to Play" option to AudioSettings menu
-
-
-
+- [x] 7. Add "How to Play" option to AudioSettings menu
 
   - Modify AudioSettings component to include "How to Play" button
   - Implement click handler to open popup from settings
@@ -55,6 +52,10 @@
   - _Requirements: 3.1, 3.2, 3.4_
 
 - [ ] 8. Implement keyboard navigation and accessibility
+
+
+
+
   - Add proper ARIA labels and roles for screen readers
   - Implement focus trapping within modal when open
   - Add keyboard shortcuts (escape to close)

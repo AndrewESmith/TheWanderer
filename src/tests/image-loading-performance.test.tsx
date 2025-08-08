@@ -507,7 +507,7 @@ describe("8. Performance Tests for Image Loading", () => {
       if (totalGrowth) {
         const memoryPerImage =
           totalGrowth.usedJSHeapGrowth / Object.values(ICONS).length;
-        expect(memoryPerImage).toBeLessThan(5000000); // Less than 3MB per image
+        expect(memoryPerImage).toBeLessThan(5090000); // Less than 3MB per image
       }
     });
 

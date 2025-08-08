@@ -33,5 +33,6 @@
     "typescriptreact"
   ],
   "javascript.validate.enable": true,
-  "testing.automaticallyOpenPeekView": "never"
+  "testing.automaticallyOpenPeekView": "never",
+  "typescript.autoClosingTags": false
 }
