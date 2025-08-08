@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobile Maze Test</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #333;
+        color: white;
+      }
+
+      .test-container {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .device-info {
+        background: #444;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+
+      .maze-preview {
+        width: 532px;
+        height: 340px;
+        background: #222;
+        margin: 20px auto;
+        border: 2px solid #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform-origin: center top;
+        transition: transform 0.3s ease;
+      }
+
+      /* Mobile scaling simulation */
+      @media (max-width: 768px) and (orientation: portrait) {
+        .maze-preview {
+          transform: scale(calc((100vw - 40px) / 532));
+          margin-bottom: calc(340px * (calc((100vw - 40px) / 532) - 1));
+        }
+      }
+
+      @media (max-width: 480px) and (orientation: portrait) {
+        .maze-preview {
+          transform: scale(calc((100vw - 20px) / 532));
+          margin-bottom: calc(340px * (calc((100vw - 20px) / 532) - 1));
+        }
+      }
+
+      @media (max-width: 768px) and (orientation: landscape) {
+        .maze-preview {
+          transform: scale(calc((100vh - 160px) / 340));
+          transform-origin: center center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>Mobile Maze Scaling Test</h1>
+
+      <div class="device-info">
+        <p>Screen: <span id="screen-size"></span></p>
+        <p>Viewport: <span id="viewport-size"></span></p>
+        <p>Orientation: <span id="orientation"></span></p>
+        <p>Scale Factor: <span id="scale-factor"></span></p>
+      </div>
+
+      <div class="maze-preview">
+        <p>Maze Preview<br />532px × 340px</p>
+      </div>
+
+      <p>This simulates how the maze will scale on your device.</p>
+      <p>The maze should always fit within the screen bounds.</p>
+    </div>
+
+    <script>
+      function updateDeviceInfo() {
+        document.getElementById(
+          "screen-size"
+        ).textContent = `${screen.width} × ${screen.height}`;
+        document.getElementById(
+          "viewport-size"
+        ).textContent = `${window.innerWidth} × ${window.innerHeight}`;
+        document.getElementById("orientation").textContent =
+          window.innerHeight > window.innerWidth ? "Portrait" : "Landscape";
+
+        // Calculate scale factor
+        let scaleFactor = 1;
+        if (window.innerWidth <= 768) {
+          if (window.innerHeight > window.innerWidth) {
+            // Portrait
+            const availableWidth =
+              window.innerWidth - (window.innerWidth <= 480 ? 20 : 40);
+            scaleFactor = Math.min(1, availableWidth / 532);
+          } else {
+            // Landscape
+            const availableHeight = window.innerHeight - 160;
+            scaleFactor = Math.min(1, availableHeight / 340);
+          }
+        }
+        document.getElementById("scale-factor").textContent = `${(
+          scaleFactor * 100
+        ).toFixed(1)}%`;
+      }
+
+      updateDeviceInfo();
+      window.addEventListener("resize", updateDeviceInfo);
+      window.addEventListener("orientationchange", () => {
+        setTimeout(updateDeviceInfo, 100);
+      });
+    </script>
+  </body>
+</html>

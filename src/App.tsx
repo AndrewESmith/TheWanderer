@@ -289,11 +289,53 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
   );
 
   const [showMobileControls, setShowMobileControls] = React.useState(false);
+  const [mobileScale, setMobileScale] = React.useState(1);
+
+  // Calculate maze dimensions and set CSS custom properties
+  // Memoize to prevent recalculation on every render
+  const mazeDimensions = React.useMemo(() => {
+    const mazeWidth = gameState.maze[0]?.length || 16;
+    const mazeHeight = gameState.maze.length || 10;
+    return { mazeWidth, mazeHeight };
+  }, [gameState.maze.length, gameState.maze[0]?.length]);
+
   React.useEffect(() => {
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const isSmallScreen = window.innerWidth <= 800;
     setShowMobileControls(isTouch || isSmallScreen);
-  }, []);
+
+    // Calculate mobile scale factor
+    const updateMobileScale = () => {
+      const { mazeWidth, mazeHeight } = mazeDimensions;
+      const mazePixelWidth = mazeWidth * 32 + 20;
+      const mazePixelHeight = mazeHeight * 32 + 20;
+
+      if (window.innerWidth <= 768) {
+        if (window.innerHeight > window.innerWidth) {
+          // Portrait mode
+          const availableWidth = window.innerWidth - 40;
+          const scaleX = Math.min(1, availableWidth / mazePixelWidth);
+          setMobileScale(scaleX);
+        } else {
+          // Landscape mode
+          const availableHeight = window.innerHeight - 160;
+          const scaleY = Math.min(1, availableHeight / mazePixelHeight);
+          setMobileScale(scaleY);
+        }
+      } else {
+        setMobileScale(1);
+      }
+    };
+
+    updateMobileScale();
+    window.addEventListener("resize", updateMobileScale);
+    window.addEventListener("orientationchange", updateMobileScale);
+
+    return () => {
+      window.removeEventListener("resize", updateMobileScale);
+      window.removeEventListener("orientationchange", updateMobileScale);
+    };
+  }, [mazeDimensions]);
 
   // Set up sound event callback and game end sound manager
   React.useEffect(() => {
@@ -434,14 +476,6 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     }
   }, [resetAudioSystem]);
 
-  // Calculate maze dimensions and set CSS custom properties
-  // Memoize to prevent recalculation on every render
-  const mazeDimensions = React.useMemo(() => {
-    const mazeWidth = gameState.maze[0]?.length || 16;
-    const mazeHeight = gameState.maze.length || 10;
-    return { mazeWidth, mazeHeight };
-  }, [gameState.maze.length, gameState.maze[0]?.length]);
-
   React.useEffect(() => {
     const { mazeWidth, mazeHeight } = mazeDimensions;
     // Calculate exact maze width: cells + padding
@@ -450,7 +484,19 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     // Note: gap is 0 in CSS, so no gap calculation needed
     const calculatedWidth = `calc(${mazeWidth} * 32px + 20px)`;
 
+    // Calculate pixel dimensions for mobile scaling
+    const pixelWidth = mazeWidth * 32 + 20;
+    const pixelHeight = mazeHeight * 32 + 20;
+
     document.documentElement.style.setProperty("--maze-width", calculatedWidth);
+    document.documentElement.style.setProperty(
+      "--maze-pixel-width",
+      `${pixelWidth}px`
+    );
+    document.documentElement.style.setProperty(
+      "--maze-pixel-height",
+      `${pixelHeight}px`
+    );
     document.documentElement.style.setProperty(
       "--maze-columns",
       `repeat(${mazeWidth}, 32px)`
@@ -466,7 +512,24 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       <AudioErrorDisplay />
       <AudioDebug />
       <div className="maze-container" style={{ position: "relative" }}>
-        <div className="maze-grid">
+        <div
+          className="maze-grid"
+          style={
+            {
+              "--maze-pixel-width": `${mazeDimensions.mazeWidth * 32 + 20}px`,
+              "--maze-pixel-height": `${mazeDimensions.mazeHeight * 32 + 20}px`,
+              ...(window.innerWidth <= 768 && mobileScale < 1
+                ? {
+                    transform: `scale(${mobileScale})`,
+                    transformOrigin:
+                      window.innerHeight > window.innerWidth
+                        ? "center top"
+                        : "center center",
+                  }
+                : {}),
+            } as React.CSSProperties
+          }
+        >
           {React.useMemo(
             () =>
               stableMazeRef.map((row: MazeCell[], y: number) =>

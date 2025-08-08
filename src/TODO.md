@@ -50,8 +50,8 @@
 
 - [x] Improve Graphics
 - [x] Fix flickering
-- [ ] Move touch screen controls below info bar
-- [ ] Center touch screen controls to maze
+- [x] Move touch screen controls below info bar
+- [x] Center touch screen controls to maze
 - [x] Remove cell borders and space between cells.
 - [ ] ViewPort for mobiles
 
@@ -59,6 +59,7 @@
 
 - [ ] Create a how to play page
 - [ ] FizzBash - lets fix typescript errors
+- [ ] Ensure working playwright tests
 
 ## Version 8
 
