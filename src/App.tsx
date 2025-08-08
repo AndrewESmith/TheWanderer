@@ -289,7 +289,6 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
   );
 
   const [showMobileControls, setShowMobileControls] = React.useState(false);
-  const [mobileScale, setMobileScale] = React.useState(1);
 
   // Calculate maze dimensions and set CSS custom properties
   // Memoize to prevent recalculation on every render
@@ -304,38 +303,20 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     const isSmallScreen = window.innerWidth <= 800;
     setShowMobileControls(isTouch || isSmallScreen);
 
-    // Calculate mobile scale factor
-    const updateMobileScale = () => {
-      const { mazeWidth, mazeHeight } = mazeDimensions;
-      const mazePixelWidth = mazeWidth * 32 + 20;
-      const mazePixelHeight = mazeHeight * 32 + 20;
-
-      if (window.innerWidth <= 768) {
-        if (window.innerHeight > window.innerWidth) {
-          // Portrait mode
-          const availableWidth = window.innerWidth - 40;
-          const scaleX = Math.min(1, availableWidth / mazePixelWidth);
-          setMobileScale(scaleX);
-        } else {
-          // Landscape mode
-          const availableHeight = window.innerHeight - 160;
-          const scaleY = Math.min(1, availableHeight / mazePixelHeight);
-          setMobileScale(scaleY);
-        }
-      } else {
-        setMobileScale(1);
-      }
+    const handleResize = () => {
+      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth <= 800;
+      setShowMobileControls(isTouch || isSmallScreen);
     };
 
-    updateMobileScale();
-    window.addEventListener("resize", updateMobileScale);
-    window.addEventListener("orientationchange", updateMobileScale);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
 
     return () => {
-      window.removeEventListener("resize", updateMobileScale);
-      window.removeEventListener("orientationchange", updateMobileScale);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
     };
-  }, [mazeDimensions]);
+  }, []);
 
   // Set up sound event callback and game end sound manager
   React.useEffect(() => {
@@ -518,15 +499,6 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
             {
               "--maze-pixel-width": `${mazeDimensions.mazeWidth * 32 + 20}px`,
               "--maze-pixel-height": `${mazeDimensions.mazeHeight * 32 + 20}px`,
-              ...(window.innerWidth <= 768 && mobileScale < 1
-                ? {
-                    transform: `scale(${mobileScale})`,
-                    transformOrigin:
-                      window.innerHeight > window.innerWidth
-                        ? "center top"
-                        : "center center",
-                  }
-                : {}),
             } as React.CSSProperties
           }
         >

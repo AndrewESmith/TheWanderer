@@ -244,15 +244,18 @@
 @media (max-width: 600px) {
   .hud {
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     align-items: stretch;
-    padding: 10px 12px;
+    padding: 8px 12px;
     font-size: 13px;
+    width: calc(100vw - 32px);
+    margin: 10px auto;
   }
   
   .hud-left {
     justify-content: center;
-    gap: 5px 14px;
+    gap: 4px 12px;
+    flex-wrap: wrap;
   }
   
   .hud-right {
@@ -262,123 +265,167 @@
   
   .hud span {
     font-size: 13px;
+    line-height: 1.3;
   }
 }
 
 /* Extra small screens - more compact layout */
 @media (max-width: 400px) {
   .hud {
-    padding: 8px 10px;
+    padding: 6px 8px;
     font-size: 12px;
-    gap: 10px;
+    gap: 6px;
+    width: calc(100vw - 16px);
+    margin: 8px auto;
   }
   
   .hud-left {
-    gap: 4px 12px;
+    gap: 3px 10px;
   }
   
   .hud span {
     font-size: 12px;
+    line-height: 1.2;
   }
   
   .level-info, .moves-info, .game-status {
-    padding: 3px 6px;
+    padding: 2px 5px;
     font-size: 11px;
   }
 }
 
 /* Mobile portrait mode - scale maze to fit screen */
 @media (max-width: 768px) and (orientation: portrait) {
+  .game-wrapper {
+    padding: 10px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  
   .maze-container {
     display: flex;
     justify-content: center;
     align-items: flex-start;
     width: 100%;
-    padding: 0 10px;
+    padding: 0;
     box-sizing: border-box;
+    overflow: hidden;
   }
   
   .maze-grid {
-    /* Simple scaling without positioning conflicts */
-    transform: scale(0.6);
-    transform-origin: center center;
+    /* Calculate scale to fit width with proper margins */
+    transform: scale(min(0.8, calc((100vw - 20px) / var(--maze-pixel-width, 532px))));
+    transform-origin: center top;
     margin: 0 auto;
-  }
-  
-  /* Dynamic scaling based on maze size */
-  .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 40px) / var(--maze-pixel-width, 532px))));
+    /* Ensure maze stays within viewport */
+    max-width: calc(100vw - 20px);
   }
   
   .hud {
-    width: calc(100vw - 32px);
+    width: calc(100vw - 20px);
     max-width: none;
-    margin: 12px 16px;
+    margin: 10px auto;
+    font-size: 13px;
   }
   
   .mobile-controls {
-    width: calc(100vw - 32px);
+    width: calc(100vw - 20px);
     max-width: none;
-    margin: 12px 16px;
+    margin: 10px auto;
   }
 }
 
 /* Very small screens - more aggressive scaling */
 @media (max-width: 480px) and (orientation: portrait) {
+  .game-wrapper {
+    padding: 5px;
+  }
+  
   .maze-container {
-    padding: 0 5px;
+    padding: 0;
   }
   
   .maze-grid {
-    transform: scale(0.45);
-    transform-origin: center center;
+    /* More aggressive scaling for small screens */
+    transform: scale(min(0.6, calc((100vw - 10px) / var(--maze-pixel-width, 532px))));
+    transform-origin: center top;
     margin: 0 auto;
-  }
-  
-  /* Dynamic scaling for very small screens */
-  .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 20px) / var(--maze-pixel-width, 532px))));
+    max-width: calc(100vw - 10px);
   }
   
   .hud {
-    margin: 8px 10px;
-    width: calc(100vw - 20px);
+    margin: 8px auto;
+    width: calc(100vw - 10px);
+    font-size: 12px;
+    padding: 8px 10px;
   }
   
   .mobile-controls {
-    margin: 8px 10px;
-    width: calc(100vw - 20px);
+    margin: 8px auto;
+    width: calc(100vw - 10px);
+  }
+  
+  .mobile-btn {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1.6rem;
+    padding: 10px;
   }
 }
 
 /* Landscape mobile - different approach */
 @media (max-width: 768px) and (orientation: landscape) {
+  .game-wrapper {
+    padding: 5px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+  }
+  
   .maze-container {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 0 10px;
+    padding: 0;
     box-sizing: border-box;
+    overflow: hidden;
   }
   
   .maze-grid {
-    transform: scale(0.7);
+    /* Scale to fit both width and height in landscape */
+    transform: scale(min(
+      calc((100vw - 20px) / var(--maze-pixel-width, 532px)),
+      calc((100vh - 120px) / var(--maze-pixel-height, 340px))
+    ));
     transform-origin: center center;
     margin: 0 auto;
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 120px);
   }
   
-  /* Dynamic scaling for landscape */
-  .maze-grid[style*="--maze-pixel-height"] {
-    transform: scale(min(1, calc((100vh - 160px) / var(--maze-pixel-height, 340px))));
+  .hud {
+    width: calc(100vw - 20px);
+    max-width: none;
+    margin: 5px auto;
+    font-size: 12px;
+    padding: 6px 10px;
   }
   
-  .game-wrapper {
-    padding: 5px 0;
-    min-height: 100vh;
-    justify-content: center;
-    overflow: hidden;
-    width: 100%;
+  .mobile-controls {
+    width: calc(100vw - 20px);
+    max-width: none;
+    margin: 5px auto;
+  }
+  
+  .mobile-btn {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.4rem;
+    padding: 8px;
   }
 }
 
@@ -389,6 +436,14 @@
     min-height: 100vh;
     min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    width: 100%;
+  }
+  
+  /* Ensure maze container doesn't cause overflow */
+  .maze-container {
+    overflow: visible; /* Allow scaled content to be visible */
+    width: 100%;
   }
   
   /* Prevent zoom on input focus */
@@ -412,36 +467,34 @@
 
 /* Foldable phones and very narrow screens */
 @media (max-width: 360px) and (orientation: portrait) {
-  .maze-grid {
-    transform: scale(0.4);
-    transform-origin: center center;
-    margin: 0 auto;
-  }
-  
-  .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 15px) / var(--maze-pixel-width, 532px))));
-  }
-  
   .game-wrapper {
-    padding: 2px 0;
+    padding: 2px;
+  }
+  
+  .maze-grid {
+    transform: scale(min(0.5, calc((100vw - 8px) / var(--maze-pixel-width, 532px))));
+    transform-origin: center top;
+    margin: 0 auto;
+    max-width: calc(100vw - 8px);
   }
   
   .hud {
-    margin: 5px 8px;
-    width: calc(100vw - 16px);
+    margin: 5px auto;
+    width: calc(100vw - 8px);
     font-size: 11px;
+    padding: 6px 8px;
   }
   
   .mobile-controls {
-    margin: 5px 8px;
-    width: calc(100vw - 16px);
+    margin: 5px auto;
+    width: calc(100vw - 8px);
   }
   
   .mobile-btn {
-    min-width: 40px;
-    min-height: 40px;
-    font-size: max(16px, 1.6rem);
-    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: max(16px, 1.4rem);
+    padding: 6px;
   }
 }
 
@@ -491,14 +544,11 @@
 /* Additional responsive adjustments for mobile controls */
 @media (max-width: 600px) {
   .mobile-controls {
-    /* On small screens, use the maze width if available, otherwise fallback to a reasonable width */
-    width: var(--maze-width, 320px);
-    max-width: 100%;
-    padding: 0 16px;
+    width: calc(100vw - 32px);
+    max-width: none;
+    padding: 0;
     box-sizing: border-box;
-    /* Ensure centering on small screens */
-    margin-left: auto;
-    margin-right: auto;
+    margin: 12px auto;
   }
   
   .mobile-btn {
@@ -506,9 +556,13 @@
     min-height: 48px;
     font-size: 1.8rem;
     padding: 12px;
+    /* Ensure buttons are touch-friendly */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
   }
   
   .mobile-controls-horizontal {
-    gap: 6px;
+    gap: 8px;
+    justify-content: center;
   }
 }
