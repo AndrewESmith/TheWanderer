@@ -244,17 +244,17 @@
 @media (max-width: 600px) {
   .hud {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     align-items: stretch;
-    padding: 8px 12px;
-    font-size: 13px;
-    width: calc(100vw - 32px);
-    margin: 10px auto;
+    padding: 6px 10px;
+    font-size: 12px;
+    width: calc(100vw - 20px);
+    margin: 8px auto;
   }
   
   .hud-left {
     justify-content: center;
-    gap: 4px 12px;
+    gap: 3px 10px;
     flex-wrap: wrap;
   }
   
@@ -264,8 +264,39 @@
   }
   
   .hud span {
-    font-size: 13px;
-    line-height: 1.3;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+}
+
+/* Landscape mobile HUD - more compact */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hud {
+    flex-direction: row !important;
+    gap: 4px !important;
+    padding: 3px 6px !important;
+    font-size: 9px !important;
+  }
+  
+  .hud-left {
+    gap: 2px 6px !important;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  .hud-right {
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  
+  .hud span {
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+  
+  .level-info, .moves-info, .game-status {
+    padding: 1px 3px !important;
+    font-size: 8px !important;
   }
 }
 
@@ -297,92 +328,14 @@
 /* Mobile portrait mode - scale maze to fit screen */
 @media (max-width: 768px) and (orientation: portrait) {
   .game-wrapper {
-    padding: 10px;
+    padding: 8px;
     min-height: 100vh;
     min-height: 100dvh;
     overflow-x: hidden;
-  }
-  
-  .maze-container {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
-    padding: 0;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-  
-  .maze-grid {
-    /* Calculate scale to fit width with proper margins */
-    transform: scale(min(0.8, calc((100vw - 20px) / var(--maze-pixel-width, 532px))));
-    transform-origin: center top;
-    margin: 0 auto;
-    /* Ensure maze stays within viewport */
-    max-width: calc(100vw - 20px);
-  }
-  
-  .hud {
-    width: calc(100vw - 20px);
-    max-width: none;
-    margin: 10px auto;
-    font-size: 13px;
-  }
-  
-  .mobile-controls {
-    width: calc(100vw - 20px);
-    max-width: none;
-    margin: 10px auto;
-  }
-}
-
-/* Very small screens - more aggressive scaling */
-@media (max-width: 480px) and (orientation: portrait) {
-  .game-wrapper {
-    padding: 5px;
-  }
-  
-  .maze-container {
-    padding: 0;
-  }
-  
-  .maze-grid {
-    /* More aggressive scaling for small screens */
-    transform: scale(min(0.6, calc((100vw - 10px) / var(--maze-pixel-width, 532px))));
-    transform-origin: center top;
-    margin: 0 auto;
-    max-width: calc(100vw - 10px);
-  }
-  
-  .hud {
-    margin: 8px auto;
-    width: calc(100vw - 10px);
-    font-size: 12px;
-    padding: 8px 10px;
-  }
-  
-  .mobile-controls {
-    margin: 8px auto;
-    width: calc(100vw - 10px);
-  }
-  
-  .mobile-btn {
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 1.6rem;
-    padding: 10px;
-  }
-}
-
-/* Landscape mobile - different approach */
-@media (max-width: 768px) and (orientation: landscape) {
-  .game-wrapper {
-    padding: 5px;
-    min-height: 100vh;
-    min-height: 100dvh;
-    justify-content: center;
-    overflow: hidden;
-    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
   
   .maze-container {
@@ -392,33 +345,66 @@
     width: 100%;
     padding: 0;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
+    margin: 0;
   }
   
   .maze-grid {
-    /* Scale to fit both width and height in landscape */
-    transform: scale(min(
-      calc((100vw - 20px) / var(--maze-pixel-width, 532px)),
-      calc((100vh - 120px) / var(--maze-pixel-height, 340px))
-    ));
+    /* Calculate scale to fit width with proper margins */
+    transform: scale(min(0.85, calc((100vw - 16px) / var(--maze-pixel-width, 532px))));
     transform-origin: center center;
-    margin: 0 auto;
-    max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 120px);
+    margin: 0;
+    /* Ensure maze stays within viewport */
+    max-width: none;
+    position: relative;
   }
   
   .hud {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 16px);
     max-width: none;
-    margin: 5px auto;
+    margin: 8px auto;
     font-size: 12px;
-    padding: 6px 10px;
+    padding: 8px 12px;
+    order: -1; /* Move HUD above maze */
   }
   
   .mobile-controls {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 16px);
     max-width: none;
-    margin: 5px auto;
+    margin: 8px auto;
+  }
+}
+
+/* Very small screens - more aggressive scaling */
+@media (max-width: 480px) and (orientation: portrait) {
+  .game-wrapper {
+    padding: 4px;
+  }
+  
+  .maze-container {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .maze-grid {
+    /* More aggressive scaling for small screens */
+    transform: scale(min(0.7, calc((100vw - 8px) / var(--maze-pixel-width, 532px))));
+    transform-origin: center center;
+    margin: 0;
+    max-width: none;
+    position: relative;
+  }
+  
+  .hud {
+    margin: 6px auto;
+    width: calc(100vw - 8px);
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  
+  .mobile-controls {
+    margin: 6px auto;
+    width: calc(100vw - 8px);
   }
   
   .mobile-btn {
@@ -426,6 +412,75 @@
     min-height: 40px;
     font-size: 1.4rem;
     padding: 8px;
+  }
+}
+
+/* Landscape mobile - different approach */
+@media (max-width: 768px) and (orientation: landscape) {
+  .game-wrapper {
+    padding: 4px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .maze-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: visible;
+    flex: 1;
+    margin: 0;
+  }
+  
+  .maze-grid {
+    /* Scale to fit both width and height in landscape */
+    transform: scale(min(
+      calc((100vw - 8px) / var(--maze-pixel-width, 532px)),
+      calc((100vh - 80px) / var(--maze-pixel-height, 340px))
+    ));
+    transform-origin: center center;
+    margin: 0;
+    max-width: none;
+    max-height: none;
+    position: relative;
+  }
+  
+  .hud {
+    width: calc(100vw - 8px);
+    max-width: none;
+    margin: 2px auto;
+    font-size: 10px;
+    padding: 4px 8px;
+    order: -1; /* Move HUD above maze */
+    flex-shrink: 0;
+  }
+  
+  .mobile-controls {
+    width: calc(100vw - 8px);
+    max-width: none;
+    margin: 2px auto;
+    flex-shrink: 0;
+  }
+  
+  .mobile-btn {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 1.2rem;
+    padding: 6px;
+    margin: 2px;
+  }
+  
+  .mobile-controls-horizontal {
+    gap: 4px;
   }
 }
 
@@ -438,17 +493,29 @@
     box-sizing: border-box;
     overflow-x: hidden; /* Prevent horizontal scrolling */
     width: 100%;
+    position: relative;
   }
   
   /* Ensure maze container doesn't cause overflow */
   .maze-container {
     overflow: visible; /* Allow scaled content to be visible */
     width: 100%;
+    position: relative;
   }
   
-  /* Prevent zoom on input focus */
+  /* Prevent zoom on input focus and ensure touch-friendly sizes */
   .mobile-btn {
-    font-size: max(16px, 2rem);
+    font-size: max(16px, 1.8rem);
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  
+  /* Prevent text selection on mobile */
+  .hud, .mobile-controls {
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 
@@ -472,29 +539,31 @@
   }
   
   .maze-grid {
-    transform: scale(min(0.5, calc((100vw - 8px) / var(--maze-pixel-width, 532px))));
-    transform-origin: center top;
-    margin: 0 auto;
-    max-width: calc(100vw - 8px);
+    transform: scale(min(0.6, calc((100vw - 4px) / var(--maze-pixel-width, 532px))));
+    transform-origin: center center;
+    margin: 0;
+    max-width: none;
+    position: relative;
   }
   
   .hud {
-    margin: 5px auto;
-    width: calc(100vw - 8px);
-    font-size: 11px;
-    padding: 6px 8px;
+    margin: 4px auto;
+    width: calc(100vw - 4px);
+    font-size: 10px;
+    padding: 4px 6px;
   }
   
   .mobile-controls {
-    margin: 5px auto;
-    width: calc(100vw - 8px);
+    margin: 4px auto;
+    width: calc(100vw - 4px);
   }
   
   .mobile-btn {
-    min-width: 36px;
-    min-height: 36px;
-    font-size: max(16px, 1.4rem);
-    padding: 6px;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: max(16px, 1.2rem);
+    padding: 4px;
+    margin: 1px;
   }
 }
 
@@ -510,6 +579,18 @@
   /* Center the controls relative to the maze */
   position: relative;
   gap: 8px; /* Space between up button and horizontal controls */
+}
+
+/* Landscape mobile controls - more compact */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-controls {
+    gap: 4px !important;
+    margin: 2px auto !important;
+  }
+  
+  .mobile-controls-horizontal {
+    gap: 2px !important;
+  }
 }
 .mobile-btn {
   font-size: 2rem;
