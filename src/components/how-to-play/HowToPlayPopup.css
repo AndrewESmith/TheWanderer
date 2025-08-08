@@ -1,0 +1,197 @@
+/* How to Play Popup Styles - Following AudioSettings pattern */
+
+.how-to-play-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.how-to-play-panel {
+    background: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+}
+
+.how-to-play-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #444;
+    flex-shrink: 0;
+}
+
+.how-to-play-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.close-button:hover {
+    background-color: #444;
+}
+
+.how-to-play-content {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.how-to-play-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid #444;
+    flex-shrink: 0;
+}
+
+/* Custom Checkbox Styles */
+.dont-show-again-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.dont-show-again-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    background-color: #444;
+    border: 2px solid #666;
+    border-radius: 3px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.checkbox-custom::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.dont-show-again-toggle input[type="checkbox"]:checked + .checkbox-custom {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.dont-show-again-toggle input[type="checkbox"]:checked + .checkbox-custom::after {
+    opacity: 1;
+}
+
+.checkbox-label {
+    color: #ccc;
+    font-size: 14px;
+}
+
+/* Close Footer Button */
+.close-footer-button {
+    background: #444;
+    border: 1px solid #666;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.close-footer-button:hover {
+    background: #555;
+}
+
+.close-footer-button:active {
+    background: #333;
+}
+
+/* Content Styling for Popup Context */
+.popup-content {
+    /* Ensure content fits well within popup */
+    max-height: none;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .how-to-play-panel {
+        width: 95vw;
+        margin: 10px;
+    }
+    
+    .how-to-play-header {
+        padding: 12px 16px;
+    }
+    
+    .how-to-play-content {
+        padding: 16px;
+    }
+    
+    .how-to-play-footer {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+    
+    .close-footer-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .how-to-play-header h2 {
+        font-size: 16px;
+    }
+    
+    .checkbox-label {
+        font-size: 13px;
+    }
+}

@@ -20,7 +20,12 @@
   - Add credits section with proper formatting and external links
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-- [ ] 4. Implement main HowToPlayPopup component
+- [x] 4. Implement main HowToPlayPopup component
+
+
+
+
+
   - Create modal overlay component following AudioSettings pattern
   - Implement "Don't show again" checkbox with state management
   - Add close button and escape key handling
