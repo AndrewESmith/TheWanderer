@@ -11,6 +11,17 @@
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    /* Smooth fade-in animation */
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .how-to-play-panel {
@@ -25,6 +36,21 @@
     font-family: 'Courier New', monospace;
     display: flex;
     flex-direction: column;
+    /* Smooth scale-in animation */
+    animation: scaleIn 0.2s ease-out;
+    /* Focus management for accessibility */
+    outline: none;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .how-to-play-header {
@@ -60,6 +86,16 @@
 
 .close-button:hover {
     background-color: #444;
+}
+
+.close-button:focus {
+    outline: 2px solid #4a9eff;
+    outline-offset: 2px;
+    background-color: #444;
+}
+
+.close-button:active {
+    background-color: #333;
 }
 
 .how-to-play-content {
@@ -126,6 +162,11 @@
     opacity: 1;
 }
 
+.dont-show-again-toggle:focus-within .checkbox-custom {
+    outline: 2px solid #4a9eff;
+    outline-offset: 2px;
+}
+
 .checkbox-label {
     color: #ccc;
     font-size: 14px;
@@ -148,6 +189,12 @@
     background: #555;
 }
 
+.close-footer-button:focus {
+    outline: 2px solid #4a9eff;
+    outline-offset: 2px;
+    background: #555;
+}
+
 .close-footer-button:active {
     background: #333;
 }
@@ -159,10 +206,25 @@
 }
 
 /* Responsive Design */
+
+/* Tablet styles */
+@media (max-width: 768px) {
+    .how-to-play-panel {
+        width: 90vw;
+        max-height: 85vh;
+    }
+    
+    .how-to-play-header h2 {
+        font-size: 17px;
+    }
+}
+
+/* Mobile styles */
 @media (max-width: 600px) {
     .how-to-play-panel {
         width: 95vw;
         margin: 10px;
+        max-height: 90vh;
     }
     
     .how-to-play-header {
@@ -183,6 +245,15 @@
     .close-footer-button {
         width: 100%;
         text-align: center;
+        padding: 12px 16px;
+        font-size: 16px;
+        /* Larger touch target for mobile */
+        min-height: 44px;
+    }
+    
+    .dont-show-again-toggle {
+        justify-content: center;
+        padding: 8px 0;
     }
 }
 
@@ -193,5 +264,73 @@
     
     .checkbox-label {
         font-size: 13px;
+    }
+    
+    .close-button {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .how-to-play-panel {
+        border-color: #666;
+        background: #1a1a1a;
+    }
+    
+    .how-to-play-header,
+    .how-to-play-footer {
+        border-color: #666;
+    }
+    
+    .close-button:hover,
+    .close-button:focus {
+        background-color: #555;
+    }
+    
+    .close-footer-button {
+        border-color: #888;
+    }
+    
+    .close-footer-button:hover,
+    .close-footer-button:focus {
+        background: #666;
+    }
+    
+    .checkbox-custom {
+        border-color: #888;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .how-to-play-overlay {
+        animation: none;
+    }
+    
+    .how-to-play-panel {
+        animation: none;
+    }
+    
+    .close-button,
+    .close-footer-button,
+    .checkbox-custom {
+        transition: none;
+    }
+}
+
+/* Large screen optimization */
+@media (min-width: 1200px) {
+    .how-to-play-panel {
+        width: 600px;
+    }
+}
+
+/* Print styles (hide popup in print) */
+@media print {
+    .how-to-play-overlay {
+        display: none;
     }
 }

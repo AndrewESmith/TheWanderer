@@ -22,17 +22,14 @@
 
 - [x] 4. Implement main HowToPlayPopup component
 
-
-
-
-
   - Create modal overlay component following AudioSettings pattern
   - Implement "Don't show again" checkbox with state management
   - Add close button and escape key handling
   - Integrate with settings hook for preference management
   - _Requirements: 1.1, 1.4, 2.1, 2.2, 6.1, 6.2, 6.5_
 
-- [ ] 5. Create CSS styling for popup components
+- [x] 5. Create CSS styling for popup components
+
   - Style modal overlay and panel following game's dark theme
   - Implement responsive design for desktop, tablet, and mobile
   - Add proper typography and spacing for readability
