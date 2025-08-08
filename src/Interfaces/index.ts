@@ -13,3 +13,6 @@ export * from './ISoundEvent';
 export * from './IAudioManager';
 export * from './ISoundAsset';
 export * from './IUseSoundHook';
+
+// Export how-to-play popup interfaces
+export * from './IHowToPlayPopup';

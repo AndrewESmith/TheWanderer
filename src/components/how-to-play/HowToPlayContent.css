@@ -1,0 +1,166 @@
+/* How to Play Content Component Styles */
+
+.instructions-content {
+    margin-bottom: 1.5rem;
+}
+
+.instruction-section {
+    margin-bottom: 1rem;
+}
+
+.instruction-title {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.instruction-content {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.instruction-line {
+    margin-bottom: 0.3rem;
+}
+
+.instruction-line:last-child {
+    margin-bottom: 0;
+}
+
+.instruction-divider {
+    height: 1px;
+    background-color: #444;
+    margin: 1rem 0;
+}
+
+.credits-divider {
+    height: 2px;
+    background-color: #555;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.credits-section {
+    margin-top: 1rem;
+}
+
+.credits-title {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 0 0 0.75rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.credits-content {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    color: #888;
+    line-height: 1.3;
+}
+
+.credit-item {
+    margin-bottom: 0.5rem;
+}
+
+.credit-item:last-child {
+    margin-bottom: 0;
+}
+
+.credit-link {
+    color: #4a9eff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.credit-link:hover {
+    color: #66b3ff;
+    text-decoration: underline;
+}
+
+.credit-link:focus {
+    outline: 2px solid #4a9eff;
+    outline-offset: 2px;
+}
+
+.credit-list {
+    margin: 0.25rem 0 0 1rem;
+    padding: 0;
+    list-style-type: disc;
+}
+
+.credit-list li {
+    margin-bottom: 0.2rem;
+}
+
+.credit-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .instruction-title {
+        font-size: 1rem;
+    }
+    
+    .instruction-content {
+        font-size: 0.85rem;
+    }
+    
+    .credits-content {
+        font-size: 0.7rem;
+    }
+    
+    .credit-list {
+        margin-left: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .instruction-title {
+        font-size: 0.95rem;
+    }
+    
+    .instruction-content {
+        font-size: 0.8rem;
+    }
+    
+    .credits-content {
+        font-size: 0.65rem;
+    }
+    
+    .instruction-divider,
+    .credits-divider {
+        margin: 0.75rem 0;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .instruction-content {
+        color: #fff;
+    }
+    
+    .credits-content {
+        color: #ccc;
+    }
+    
+    .instruction-divider,
+    .credits-divider {
+        background-color: #666;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .credit-link {
+        transition: none;
+    }
+}

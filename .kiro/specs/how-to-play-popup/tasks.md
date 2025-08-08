@@ -1,17 +1,20 @@
 # Implementation Plan
 
-- [ ] 1. Create TypeScript interfaces and types
+- [x] 1. Create TypeScript interfaces and types
+
   - Define HowToPlayPopupProps, HowToPlaySettings, and related interfaces
   - Create types for game instructions content structure and credits data
   - _Requirements: 1.1, 4.1, 5.1_
 
-- [ ] 2. Implement settings management hook
+- [x] 2. Implement settings management hook
+
   - Create use-how-to-play-settings.ts hook for localStorage operations
   - Implement preference persistence with graceful fallback for localStorage failures
   - Add methods for managing "Don't show again" and first-visit detection
   - _Requirements: 2.1, 2.2, 2.3, 3.3_
 
-- [ ] 3. Create HowToPlayContent component
+- [x] 3. Create HowToPlayContent component
+
   - Build component to render structured game instructions (objective, controls, mechanics)
   - Include comprehensive game object descriptions and movement rules
   - Add credits section with proper formatting and external links
