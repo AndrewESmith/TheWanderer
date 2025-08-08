@@ -60,7 +60,8 @@ You can only move into empty spaces or dig through soil`,
       authorLink: "https://www.steveshipway.org/",
     },
     acknowledgements: [
-      "David Broadfoot for helping to point the way, Nick Ellercamp for feedback on generated code.",
+      "David Broadfoot for helping to point the way",
+      "Nick Ellercamp for feedback on generated code."
     ],
   },
 };
