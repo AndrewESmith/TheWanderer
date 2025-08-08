@@ -51,15 +51,16 @@
         transition: transform 0.3s ease;
       }
 
-      /* Mobile scaling simulation - matches the actual game CSS */
+      /* Mobile scaling simulation - FIXED VERSION - matches the actual game CSS */
       @media (max-width: 768px) and (orientation: portrait) {
         .maze-container-test {
           padding: 0 10px;
         }
 
         .maze-preview {
-          transform: translateX(-50%) scale(calc((100vw - 40px) / 532));
-          left: 50%;
+          transform: scale(calc((100vw - 40px) / 532));
+          transform-origin: center center;
+          margin: 0 auto;
         }
       }
 
@@ -69,7 +70,9 @@
         }
 
         .maze-preview {
-          transform: translateX(-50%) scale(calc((100vw - 20px) / 532));
+          transform: scale(calc((100vw - 20px) / 532));
+          transform-origin: center center;
+          margin: 0 auto;
         }
       }
 
@@ -79,14 +82,17 @@
         }
 
         .maze-preview {
-          transform: translateX(-50%) scale(calc((100vh - 160px) / 340));
-          left: 50%;
+          transform: scale(calc((100vh - 160px) / 340));
+          transform-origin: center center;
+          margin: 0 auto;
         }
       }
 
       @media (max-width: 360px) and (orientation: portrait) {
         .maze-preview {
-          transform: translateX(-50%) scale(calc((100vw - 15px) / 532));
+          transform: scale(calc((100vw - 15px) / 532));
+          transform-origin: center center;
+          margin: 0 auto;
         }
       }
     </style>
@@ -114,12 +120,18 @@
       </p>
 
       <div class="device-info">
-        <p><strong>Expected behavior:</strong></p>
+        <p><strong>FIXED VERSION - Expected behavior:</strong></p>
         <ul style="text-align: left; display: inline-block">
-          <li>Maze should be horizontally centered</li>
-          <li>No horizontal scrolling should occur</li>
-          <li>Border should be complete on all sides</li>
-          <li>Scaling should maintain aspect ratio</li>
+          <li>✅ Maze should be horizontally centered</li>
+          <li>✅ No horizontal scrolling should occur</li>
+          <li>✅ Border should be complete on all sides</li>
+          <li>✅ Scaling should maintain aspect ratio</li>
+          <li style="color: #4ade80">
+            ✅ FIXED: Removed translateX(-50%) and left: 50% positioning
+          </li>
+          <li style="color: #4ade80">
+            ✅ FIXED: Using simple transform: scale() with margin: 0 auto
+          </li>
         </ul>
       </div>
     </div>
