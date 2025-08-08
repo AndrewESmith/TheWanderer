@@ -16,9 +16,14 @@
     /* Center the maze */
     display: flex;
     justify-content: center;
+    align-items: flex-start;
     /* Ensure container doesn't overflow on mobile */
     max-width: 100vw;
+    width: 100%;
     overflow: hidden;
+    /* Ensure proper centering on all devices */
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 
   .maze-grid {
@@ -40,6 +45,11 @@
     max-height: calc(100vh - 200px); /* Account for HUD and controls */
     /* Smooth scaling transitions */
     transition: transform 0.2s ease-out;
+    /* Ensure proper positioning */
+    position: relative;
+    margin: 0 auto;
+    /* Ensure the border is complete */
+    box-sizing: border-box;
   }
   
   .cell {
@@ -280,30 +290,38 @@
 /* Mobile portrait mode - scale maze to fit screen */
 @media (max-width: 768px) and (orientation: portrait) {
   .maze-container {
-    /* Scale the entire maze container to fit mobile screens */
-    transform-origin: center top;
-    /* Use a more conservative scaling approach */
-    max-width: calc(100vw - 20px);
-    overflow: visible; /* Allow for scaled content */
+    /* Center the maze container properly */
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden; /* Prevent horizontal scroll */
+    padding: 0 10px;
+    box-sizing: border-box;
   }
   
   .maze-grid {
     /* Fallback scaling for when CSS custom properties aren't available */
     transform: scale(0.6);
-    transform-origin: center top;
-    margin: 0 auto;
+    transform-origin: center center;
+    /* Ensure the scaled maze stays centered */
+    margin: 0;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%) scale(0.6);
   }
   
   /* Dynamic scaling based on maze size */
   .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 40px) / var(--maze-pixel-width, 532px))));
+    transform: translateX(-50%) scale(min(1, calc((100vw - 40px) / var(--maze-pixel-width, 532px))));
   }
   
   .game-wrapper {
     padding: 10px 0;
     overflow-x: hidden; /* Prevent horizontal scroll */
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .hud {
@@ -324,17 +342,19 @@
 /* Very small screens - more aggressive scaling */
 @media (max-width: 480px) and (orientation: portrait) {
   .maze-container {
-    max-width: calc(100vw - 10px);
+    padding: 0 5px;
+    max-width: 100vw;
   }
   
   .maze-grid {
     /* Fallback scaling for very small screens */
-    transform: scale(0.45);
+    transform: translateX(-50%) scale(0.45);
+    left: 50%;
   }
   
   /* Dynamic scaling for very small screens */
   .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 20px) / var(--maze-pixel-width, 532px))));
+    transform: translateX(-50%) scale(min(1, calc((100vw - 20px) / var(--maze-pixel-width, 532px))));
   }
   
   .game-wrapper {
@@ -356,21 +376,26 @@
 @media (max-width: 768px) and (orientation: landscape) {
   .maze-container {
     max-height: calc(100vh - 120px);
-    overflow: visible;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
   }
   
   .maze-grid {
     /* Fallback scaling for landscape */
-    transform: scale(0.7);
+    transform: translateX(-50%) scale(0.7);
     transform-origin: center center;
+    left: 50%;
+    position: relative;
   }
   
   /* Dynamic scaling for landscape */
   .maze-grid[style*="--maze-pixel-height"] {
-    transform: scale(min(1, calc((100vh - 160px) / var(--maze-pixel-height, 340px))));
+    transform: translateX(-50%) scale(min(1, calc((100vh - 160px) / var(--maze-pixel-height, 340px))));
   }
   
   .game-wrapper {
@@ -378,6 +403,7 @@
     min-height: 100vh;
     justify-content: center;
     overflow: hidden;
+    width: 100%;
   }
 }
 
@@ -400,11 +426,12 @@
 @media (max-width: 480px) and (min-height: 800px) and (orientation: portrait) {
   .maze-grid {
     /* Less aggressive scaling for tall phones */
-    transform: scale(0.55);
+    transform: translateX(-50%) scale(0.55);
+    left: 50%;
   }
   
   .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 30px) / var(--maze-pixel-width, 532px))));
+    transform: translateX(-50%) scale(min(1, calc((100vw - 30px) / var(--maze-pixel-width, 532px))));
   }
 }
 
@@ -412,11 +439,12 @@
 @media (max-width: 360px) and (orientation: portrait) {
   .maze-grid {
     /* Very aggressive scaling for narrow screens */
-    transform: scale(0.4);
+    transform: translateX(-50%) scale(0.4);
+    left: 50%;
   }
   
   .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 15px) / var(--maze-pixel-width, 532px))));
+    transform: translateX(-50%) scale(min(1, calc((100vw - 15px) / var(--maze-pixel-width, 532px))));
   }
   
   .game-wrapper {
