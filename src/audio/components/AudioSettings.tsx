@@ -51,6 +51,7 @@ export function AudioSettings({
   const handleHowToPlayClick = () => {
     if (onOpenHowToPlay) {
       onOpenHowToPlay();
+      onClose(); // Close settings panel when opening How to Play
     }
   };
 
