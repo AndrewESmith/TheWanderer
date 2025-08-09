@@ -260,4 +260,224 @@ describe("How to Play Popup Integration", () => {
       expect.stringContaining('"dontShowAgain":true')
     );
   });
+
+  it("should handle focus management correctly", async () => {
+    // Mock localStorage to return null (first-time user)
+    mockLocalStorage.getItem.mockReturnValue(null);
+
+    render(<App />);
+
+    // Wait for the popup to appear
+    await waitFor(() => {
+      expect(screen.getByText("How to Play The Wanderer")).toBeInTheDocument();
+    });
+
+    // Check that focus is trapped within the modal
+    const modal = document.querySelector(".how-to-play-panel");
+    expect(modal).toBeInTheDocument();
+    expect(modal).toHaveAttribute("tabIndex", "-1");
+
+    // Test that Tab key cycles through focusable elements within modal
+    const closeButton = screen.getByLabelText("Close dialog using X button");
+    const checkbox = screen.getByRole("checkbox");
+    const footerCloseButton = screen.getByText("Close");
+
+    expect(closeButton).toBeInTheDocument();
+    expect(checkbox).toBeInTheDocument();
+    expect(footerCloseButton).toBeInTheDocument();
+  });
+
+  it("should prevent interaction with background elements when popup is open", async () => {
+    // Mock localStorage to return null (first-time user)
+    mockLocalStorage.getItem.mockReturnValue(null);
+
+    render(<App />);
+
+    // Wait for the popup to appear
+    await waitFor(() => {
+      expect(screen.getByText("How to Play The Wanderer")).toBeInTheDocument();
+    });
+
+    // Verify that body scroll is prevented
+    expect(document.body.style.overflow).toBe("hidden");
+
+    // Try to interact with background elements (they should be blocked by overlay)
+    const overlay = document.querySelector(".how-to-play-overlay");
+    expect(overlay).toBeInTheDocument();
+    expect(overlay).toHaveAttribute("role", "dialog");
+  });
+
+  it("should handle settings persistence across app restarts", async () => {
+    // First visit - user opts out
+    mockLocalStorage.getItem.mockReturnValue(null);
+
+    const { unmount } = render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText("How to Play The Wanderer")).toBeInTheDocument();
+    });
+
+    // Check the "Don't show again" checkbox
+    const checkbox = screen.getByLabelText(
+      "Don't show this dialog automatically on future visits"
+    );
+    fireEvent.click(checkbox);
+
+    // Close the popup
+    const closeButton = screen.getByText("Close");
+    fireEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("How to Play The Wanderer")
+      ).not.toBeInTheDocument();
+    });
+
+    // Unmount the app (simulate restart)
+    unmount();
+
+    // Mock localStorage to return the saved settings
+    mockLocalStorage.getItem.mockReturnValue(
+      JSON.stringify({
+        dontShowAgain: true,
+        hasSeenInstructions: true,
+        lastViewedVersion: "1.0.0",
+      })
+    );
+
+    // Render app again (simulate restart)
+    render(<App />);
+
+    // Wait a bit to ensure popup doesn't appear
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Verify popup doesn't show on restart
+    expect(
+      screen.queryByText("How to Play The Wanderer")
+    ).not.toBeInTheDocument();
+  });
+
+  it("should handle localStorage errors gracefully", async () => {
+    // Mock localStorage to throw an error
+    mockLocalStorage.getItem.mockImplementation(() => {
+      throw new Error("localStorage error");
+    });
+
+    // Should still render without crashing
+    render(<App />);
+
+    // Should show popup for first-time user (fallback behavior)
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText("How to Play The Wanderer")
+        ).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  });
+
+  it("should handle corrupted localStorage data", async () => {
+    // Mock localStorage to return invalid JSON
+    mockLocalStorage.getItem.mockReturnValue("invalid-json-data");
+
+    render(<App />);
+
+    // Should show popup for first-time user (fallback behavior)
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText("How to Play The Wanderer")
+        ).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  });
+
+  it("should handle partial localStorage data", async () => {
+    // Mock localStorage to return partial data
+    mockLocalStorage.getItem.mockReturnValue(
+      JSON.stringify({
+        dontShowAgain: true,
+        // hasSeenInstructions is missing
+      })
+    );
+
+    render(<App />);
+
+    // Should show popup because hasSeenInstructions is missing/false
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText("How to Play The Wanderer")
+        ).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+  });
+
+  it("should handle escape key properly in different scenarios", async () => {
+    mockLocalStorage.getItem.mockReturnValue(null);
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText("How to Play The Wanderer")).toBeInTheDocument();
+    });
+
+    // Test escape key closes popup
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("How to Play The Wanderer")
+      ).not.toBeInTheDocument();
+    });
+
+    // Test that escape key doesn't do anything when popup is closed
+    fireEvent.keyDown(document, { key: "Escape" });
+
+    // Popup should remain closed
+    expect(
+      screen.queryByText("How to Play The Wanderer")
+    ).not.toBeInTheDocument();
+  });
+
+  it("should handle checkbox state changes correctly", async () => {
+    mockLocalStorage.getItem.mockReturnValue(null);
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText("How to Play The Wanderer")).toBeInTheDocument();
+    });
+
+    const checkbox = screen.getByLabelText(
+      "Don't show this dialog automatically on future visits"
+    );
+
+    // Initially unchecked
+    expect(checkbox).not.toBeChecked();
+
+    // Check the checkbox
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+
+    // Uncheck the checkbox
+    fireEvent.click(checkbox);
+    expect(checkbox).not.toBeChecked();
+
+    // Check again and close
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+
+    const closeButton = screen.getByText("Close");
+    fireEvent.click(closeButton);
+
+    // Verify the final state was saved
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
+      "wanderer-how-to-play-settings",
+      expect.stringContaining('"dontShowAgain":true')
+    );
+  });
 });

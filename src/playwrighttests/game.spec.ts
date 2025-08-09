@@ -4,6 +4,30 @@ test.describe('Game functionality', () => {
     test.beforeEach(async ({ page }) => {
         // Navigate to the game before each test
         await page.goto('/');
+
+        // Handle the How to Play popup if it appears
+        try {
+            // Wait for either the popup or the game to be ready
+            await Promise.race([
+                page.waitForSelector('.how-to-play-overlay', { timeout: 2000 }),
+                page.waitForSelector('.maze-grid', { timeout: 2000 })
+            ]);
+
+            // If popup is visible, close it
+            const popup = await page.locator('.how-to-play-overlay').first();
+            if (await popup.isVisible()) {
+                // Close the popup by clicking the close button
+                await page.click('button:has-text("Close")');
+                // Wait for popup to disappear
+                await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout: 1000 });
+            }
+        } catch (error) {
+            // If popup handling fails, continue - the game might be ready
+            console.log('Popup handling skipped:', error);
+        }
+
+        // Ensure the game is ready
+        await page.waitForSelector('.maze-grid');
     });
 
     test('maze grid renders with correct cells', async ({ page }) => {
