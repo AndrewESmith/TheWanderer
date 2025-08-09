@@ -84,7 +84,12 @@
   - Updated existing Playwright tests to handle popup presence
   - All tests passing (54 total how-to-play related tests)
 
-- [ ] 11. Create integration tests for popup workflow
+- [x] 11. Create integration tests for popup workflow
+
+
+
+
+
   - Test complete first-visit user journey from app load to popup dismissal
   - Test settings menu integration and popup reopening functionality
   - Test preference persistence across page refreshes
