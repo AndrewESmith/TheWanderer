@@ -3,8 +3,7 @@ import { createMazeLevelManager } from '../levels/maze-level-manager';
 import { createLevelProgressionHandler } from '../levels/level-progression-handler';
 import { createInitialGameState, movePlayer } from '../GameState';
 import type { GameStateData } from '../GameState';
-import type { MazeLevelManager } from '../Interfaces/IMazeLevelManager';
-import type { LevelProgressionHandler } from '../levels/level-progression-handler';
+// (removed unused types)
 import { CELL } from '../maze';
 
 // Mock the sound event emitter
@@ -19,14 +18,7 @@ vi.mock('../audio/events/game-end-sound-manager', () => ({
 }));
 
 describe('Level Management Comprehensive Tests', () => {
-    let levelManager: MazeLevelManager;
-    let progressionHandler: LevelProgressionHandler;
-    let gameState: GameStateData;
-
     beforeEach(() => {
-        levelManager = createMazeLevelManager();
-        progressionHandler = createLevelProgressionHandler();
-        gameState = createInitialGameState();
         vi.clearAllMocks();
     });
 

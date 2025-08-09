@@ -17,6 +17,7 @@ export function HowToPlayPopup({
   const { settings, setDontShowAgain, markAsViewed } = useHowToPlaySettings();
   const modalRef = useRef<HTMLDivElement>(null);
   const focusTrapCleanupRef = useRef<(() => void) | null>(null);
+  const announcementTimeoutRef = useRef<number | null>(null);
 
   // Handle escape key press to close popup
   const handleKeyDown = useCallback(
@@ -30,6 +31,11 @@ export function HowToPlayPopup({
 
   // Add/remove escape key listener and focus trap when popup opens/closes
   useEffect(() => {
+    // Guard for non-DOM environments (SSR/tests without jsdom)
+    if (typeof document === "undefined") {
+      return () => {};
+    }
+
     if (isOpen) {
       document.addEventListener("keydown", handleKeyDown);
       // Mark as viewed when popup is opened
@@ -53,8 +59,8 @@ export function HowToPlayPopup({
       document.body.appendChild(announcement);
 
       // Remove announcement after screen reader has time to read it
-      setTimeout(() => {
-        if (document.body.contains(announcement)) {
+      announcementTimeoutRef.current = window.setTimeout(() => {
+        if (typeof document !== "undefined" && document.body && document.body.contains(announcement)) {
           document.body.removeChild(announcement);
         }
       }, 1000);
@@ -69,6 +75,12 @@ export function HowToPlayPopup({
 
       // Restore body scroll
       document.body.style.overflow = "";
+
+      // Clear any pending announcement removal
+      if (announcementTimeoutRef.current !== null) {
+        clearTimeout(announcementTimeoutRef.current);
+        announcementTimeoutRef.current = null;
+      }
     }
 
     return () => {
@@ -78,6 +90,12 @@ export function HowToPlayPopup({
         focusTrapCleanupRef.current = null;
       }
       document.body.style.overflow = "";
+
+      // Clear any pending announcement removal on unmount
+      if (announcementTimeoutRef.current !== null) {
+        clearTimeout(announcementTimeoutRef.current);
+        announcementTimeoutRef.current = null;
+      }
     };
   }, [isOpen, handleKeyDown, markAsViewed]);
 

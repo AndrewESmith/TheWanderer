@@ -78,7 +78,11 @@ describe("React Sound System Integration Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAudioManager = createMockAudioManager();
-    mockLocalStorage.getItem.mockReturnValue(null);
+    mockLocalStorage.getItem.mockImplementation((key: string) =>
+      key === 'wanderer-how-to-play-settings'
+        ? JSON.stringify({ dontShowAgain: true, hasSeenInstructions: true })
+        : null
+    );
 
     // Mock performance for timing tests
     global.performance = {

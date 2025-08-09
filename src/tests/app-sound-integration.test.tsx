@@ -138,7 +138,12 @@ describe('App Sound Integration', () => {
 
         // Mock localStorage
         const localStorageMock = {
-            getItem: vi.fn(() => null),
+            getItem: vi.fn((key: string) => {
+                if (key === 'wanderer-how-to-play-settings') {
+                    return JSON.stringify({ dontShowAgain: true, hasSeenInstructions: true });
+                }
+                return null;
+            }),
             setItem: vi.fn(),
             removeItem: vi.fn(),
             clear: vi.fn()

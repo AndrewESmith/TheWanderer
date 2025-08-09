@@ -244,10 +244,9 @@ describe("How to Play Popup Workflow Integration", () => {
         ).toBeInTheDocument();
       });
 
-      // Step 4: Verify both settings panel and popup are visible
-      // (The settings panel doesn't automatically close when popup opens)
-      expect(screen.getByText("Audio Settings")).toBeInTheDocument();
+      // Step 4: Verify popup opens and settings panel is closed by design
       expect(screen.getByText("How to Play The Wanderer")).toBeInTheDocument();
+      expect(screen.queryByText("Settings")).not.toBeInTheDocument();
 
       // Step 5: Verify checkbox shows current preference state (Requirement 3.3)
       const checkbox = screen.getByLabelText(
