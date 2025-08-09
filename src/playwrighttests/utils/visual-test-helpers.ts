@@ -1,4 +1,5 @@
-import { Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /**
  * Visual regression test utilities for The Wanderer game
@@ -31,8 +32,24 @@ export async function waitForGameStable(
 ): Promise<void> {
     const opts = { ...DEFAULT_VISUAL_OPTIONS, ...options };
 
+    // Set localStorage to prevent "How to Play" dialog from showing
+    await page.evaluate(() => {
+        localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
+            dontShowAgain: true,
+            hasSeenInstructions: true,
+            lastViewedVersion: '1.0.0'
+        }));
+    });
+
     // Wait for the maze grid to be visible
     await page.waitForSelector('.maze-grid', { timeout: 5000 });
+
+    // Close any open dialogs that might still appear
+    const closeButton = page.locator('button:has-text("Close"), button[aria-label*="Close"], button:has-text("×")');
+    if (await closeButton.count() > 0) {
+        await closeButton.first().click();
+        await page.waitForTimeout(500);
+    }
 
     // Wait for images to load by checking for image-loaded class on cells
     await page.waitForFunction(
@@ -104,6 +121,28 @@ export async function verifyCellTypes(page: Page): Promise<void> {
 }
 
 /**
+ * Setup test environment with consistent state
+ */
+export async function setupTestEnvironment(page: Page): Promise<void> {
+    // Set localStorage to prevent dialogs and ensure consistent state
+    await page.evaluate(() => {
+        // Prevent "How to Play" dialog
+        localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
+            dontShowAgain: true,
+            hasSeenInstructions: true,
+            lastViewedVersion: '1.0.0'
+        }));
+
+        // Set audio preferences to avoid audio-related popups
+        localStorage.setItem('wanderer-audio-settings', JSON.stringify({
+            enabled: false,
+            volume: 0.5,
+            userHasInteracted: true
+        }));
+    });
+}
+
+/**
  * Test responsive behavior across different viewport sizes
  */
 export async function testResponsiveLayout(
@@ -119,6 +158,10 @@ export async function testResponsiveLayout(
 
     for (const viewport of viewports) {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+        // Setup environment before navigating
+        await setupTestEnvironment(page);
+        await page.goto('/');
         await waitForGameStable(page);
 
         // Take full page screenshot

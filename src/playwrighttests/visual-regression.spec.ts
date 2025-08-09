@@ -9,10 +9,12 @@ import {
     verifyImageLoadingStates,
     testGameStateChanges,
     verifyCrossBrowserConsistency,
+    setupTestEnvironment,
 } from './utils/visual-test-helpers';
 
 test.describe('Visual Regression Tests - Core Interface', () => {
     test.beforeEach(async ({ page }) => {
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
     });
@@ -52,13 +54,13 @@ test.describe('Visual Regression Tests - Core Interface', () => {
 
 test.describe('Visual Regression Tests - Responsive Design', () => {
     test('responsive layout across different screen sizes', async ({ page }) => {
-        await page.goto('/');
         await testResponsiveLayout(page, 'responsive-layout');
     });
 
     test('mobile controls visibility and layout', async ({ page }) => {
         // Test mobile viewport specifically
         await page.setViewportSize({ width: 375, height: 667 });
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
 
@@ -73,6 +75,7 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
     test('tablet layout verification', async ({ page }) => {
         await page.setViewportSize({ width: 768, height: 1024 });
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
 
@@ -89,6 +92,7 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
         for (const viewport of viewports) {
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
+            await setupTestEnvironment(page);
             await page.goto('/');
             await waitForGameStable(page);
 
@@ -100,6 +104,7 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
 test.describe('Visual Regression Tests - Cross-Browser Consistency', () => {
     test.beforeEach(async ({ page }) => {
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
     });
@@ -131,6 +136,7 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
         // Block all image requests to test fallback behavior
         await simulateImageLoadingFailures(page);
 
+        await setupTestEnvironment(page);
         await page.goto('/');
         await page.waitForSelector('.maze-grid');
 
@@ -157,6 +163,7 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
         // Block some images but not others to test mixed states
         await simulatePartialImageFailures(page, ['boulder.png', 'bomb.png']);
 
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page, { minLoadedPercentage: 0.5 });
 
@@ -174,6 +181,7 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
         // Block specific images to test error indicators
         await page.route('**/boulder.png', route => route.abort());
 
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page, { minLoadedPercentage: 0.7 });
 
@@ -193,6 +201,7 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
 
 test.describe('Visual Regression Tests - Game State Changes', () => {
     test.beforeEach(async ({ page }) => {
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
     });
@@ -231,6 +240,7 @@ test.describe('Visual Regression Tests - Game State Changes', () => {
 
     test('game over state visual verification', async ({ page }) => {
         // Navigate to test maze with bomb next to player
+        await setupTestEnvironment(page);
         await page.goto('/?testMaze=bomb');
         await waitForGameStable(page);
 
@@ -275,6 +285,7 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     test('high contrast mode compatibility', async ({ page }) => {
         // Simulate high contrast mode
         await page.emulateMedia({ colorScheme: 'dark' });
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
 
@@ -285,6 +296,7 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     test('reduced motion preferences', async ({ page }) => {
         // Simulate reduced motion preference
         await page.emulateMedia({ reducedMotion: 'reduce' });
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
 
@@ -292,6 +304,7 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     });
 
     test('zoom level compatibility', async ({ page }) => {
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
 
@@ -309,6 +322,7 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     });
 
     test('keyboard navigation visual feedback', async ({ page }) => {
+        await setupTestEnvironment(page);
         await page.goto('/');
         await waitForGameStable(page);
 
