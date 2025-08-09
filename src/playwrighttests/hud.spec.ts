@@ -35,7 +35,35 @@ test('game HUD displays score, diamonds, and moves', async ({ page }) => {
 
 // Test keyboard controls
 test('player moves with keyboard controls', async ({ page }) => {
+    // Clear localStorage to ensure clean state
     await page.goto('/');
+    await page.evaluate(() => {
+        localStorage.clear();
+    });
+    await page.reload();
+
+    // Wait for the game to be fully loaded
+    await page.waitForSelector('.maze-grid');
+    await page.waitForSelector('.hud');
+
+    // Handle the How to Play popup that appears for first-time users
+    const popup = page.locator('[data-testid="how-to-play-popup"]');
+
+    try {
+        // Wait for popup to appear (it should appear automatically for first-time users)
+        await expect(popup).toBeVisible({ timeout: 2000 });
+
+        // Close the popup to allow game interaction
+        const closeButton = page.locator('[data-testid="close-button"]');
+        await closeButton.click();
+        await expect(popup).not.toBeVisible();
+    } catch (error) {
+        // If popup doesn't appear, that's fine - continue with the test
+        console.log('How to Play popup did not appear, continuing with test');
+    }
+
+    // Wait for game to be ready for interaction
+    await page.waitForTimeout(500);
 
     // Find the player cell
     const playerCell = page.locator('.cell.player');
@@ -44,11 +72,17 @@ test('player moves with keyboard controls', async ({ page }) => {
     // Get the initial position
     const initialPosition = await playerCell.boundingBox();
 
+    // Ensure the game area has focus by clicking on it
+    await page.locator('.maze-container').click();
+
+    // Wait a moment for focus to be established
+    await page.waitForTimeout(100);
+
     // Press the right arrow key
     await page.keyboard.press('ArrowRight');
 
     // Wait for animation or movement to complete
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(500);
 
     // Get the new position
     const newPlayerCell = page.locator('.cell.player');
@@ -65,6 +99,17 @@ test('game shows game over when player hits bomb', async ({ page }) => {
 
     // Wait for the game to load
     await page.waitForSelector('.maze-grid');
+
+    // Handle the How to Play popup that appears for first-time users
+    const popup = page.locator('[data-testid="how-to-play-popup"]');
+    const isPopupVisible = await popup.isVisible();
+
+    if (isPopupVisible) {
+        // Close the popup to allow game interaction
+        const closeButton = page.locator('[data-testid="close-button"]');
+        await closeButton.click();
+        await expect(popup).not.toBeVisible();
+    }
 
     // In our test maze, the bomb is directly to the right of the player
     await page.keyboard.press('ArrowRight');
