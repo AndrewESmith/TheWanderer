@@ -1,4 +1,14 @@
 classDiagram
+  class PositionUpdate {
+    +Position from
+    +Position to
+  }
+  class BoulderCategories {
+    +Position[] moving
+    +Position[] stationary
+    +Position[] triggered
+    +number total
+  }
   class PhysicsSimulationResult {
     +MazeCell[][] newMaze
     +SoundEvent[] soundEvents
@@ -7,7 +17,7 @@ classDiagram
     +Position[] movingBoulders
     +Position[] completedBoulders
     +Position[] playerCollisions
-    +{from:Position,to:Position}[] positionUpdates
+    +PositionUpdate[] positionUpdates
   }
 
   class PhysicsEngine {
@@ -22,7 +32,7 @@ classDiagram
     +getMovingBoulderPositions(BoulderStateManager): Position[]
     +getStationaryBoulderPositions(BoulderStateManager): Position[]
     +getTriggeredBoulderPositions(BoulderStateManager): Position[]
-    +categorizeBoulders(BoulderStateManager): {moving,stationary,triggered,total}
+    +categorizeBoulders(BoulderStateManager): BoulderCategories
   }
 
   class BoulderStateManager {
@@ -32,6 +42,7 @@ classDiagram
 
   PhysicsEngine ..> BoulderStateManager : uses
   PhysicsEngine --> PhysicsSimulationResult : returns
+
 
 
 
