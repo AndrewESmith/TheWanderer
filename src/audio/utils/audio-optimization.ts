@@ -24,7 +24,6 @@ export interface AudioMetrics {
  * Audio format detection and validation utilities
  */
 export class AudioFormatUtils {
-    private static readonly SUPPORTED_FORMATS = ['mp3', 'ogg', 'wav', 'm4a', 'aac'];
 
     private static readonly MIME_TYPES: Record<string, string> = {
         mp3: 'audio/mpeg',

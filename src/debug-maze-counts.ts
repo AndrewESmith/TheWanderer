@@ -42,8 +42,9 @@ function countElements(maze: any[][]) {
     let rocks = 0;
 
     for (let y = 0; y < maze.length; y++) {
-        for (let x = 0; x < maze[y].length; x++) {
-            const cell = maze[y][x];
+        const row = maze[y]!;
+        for (let x = 0; x < row.length; x++) {
+            const cell = row[x];
             switch (cell) {
                 case CELL.DIAMOND:
                     diamonds++;

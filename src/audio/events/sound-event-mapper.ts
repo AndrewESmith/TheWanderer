@@ -5,7 +5,7 @@ import { SOUND_IDS } from '../config/sound-config';
 
 // Pure function to map player movement to sound events
 export function mapPlayerMovementToSound(
-    fromCell: MazeCell,
+    _fromCell: MazeCell,
     toCell: MazeCell
 ): SoundEvent | null {
     // Player entering soil should play dig sound
@@ -45,7 +45,7 @@ export function mapPlayerMovementToSound(
 export function mapGameStateChangeToSound(
     newGameState: 'playing' | 'dead' | 'won',
     previousGameState: 'playing' | 'dead' | 'won',
-    targetCell?: MazeCell
+    _targetCell?: MazeCell
 ): SoundEvent | null {
     // Death sound when player dies
     if (newGameState === 'dead' && previousGameState === 'playing') {

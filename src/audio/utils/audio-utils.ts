@@ -166,7 +166,7 @@ export async function canAutoplay(): Promise<boolean> {
         // Try to resume and see if it works
         try {
             await audioContext.resume();
-            const result = audioContext.state === 'running';
+            const result = audioContext.state !== 'suspended' && audioContext.state !== 'closed';
             audioContext.close();
             return result;
         } catch (e) {

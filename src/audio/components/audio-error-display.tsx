@@ -13,7 +13,7 @@ interface AudioErrorDisplayProps {
 export function AudioErrorDisplay({
   showAlways = false,
 }: AudioErrorDisplayProps) {
-  const { error, fallbackMode, autoplayAllowed, reinitializeAudio } =
+  const { error, fallbackMode, autoplayAllowed } =
     useAudioContext();
   const { resetAudioSystem, hasPlaybackErrors } = useSound();
   const [dismissed, setDismissed] = useState(false);

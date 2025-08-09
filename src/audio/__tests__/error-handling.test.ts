@@ -154,7 +154,7 @@ describe('Audio Error Handling and Fallbacks', () => {
             const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
             // Create WebAudioManager instance to trigger event listener setup
-            const manager = new WebAudioManager();
+            new WebAudioManager();
 
             // Verify that event listeners were added
             expect(addEventListenerSpy).toHaveBeenCalledWith(
@@ -194,7 +194,7 @@ describe('Audio Error Handling and Fallbacks', () => {
             // Spy on document.addEventListener to capture the actual event handlers
             const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
 
-            const manager = new WebAudioManager();
+            new WebAudioManager();
 
             // Get the click handler that was added by the WebAudioManager
             const clickHandler = addEventListenerSpy.mock.calls
@@ -459,7 +459,7 @@ describe('Audio Error Handling and Fallbacks', () => {
 
             global.AudioContext = vi.fn(() => interruptedContext) as any;
 
-            const manager = new WebAudioManager();
+            new WebAudioManager();
 
             // Simulate state change to interrupted
             const stateChangeHandler = mockAudioContext.addEventListener.mock.calls

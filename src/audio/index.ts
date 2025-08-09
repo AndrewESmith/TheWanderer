@@ -1,9 +1,12 @@
 // Audio system exports
 export * from './config/sound-config';
-export * from './managers/audio-manager';
-export * from './managers/audio-manager-factory';
-export * from './managers/html5-audio-manager';
-export * from './managers/silent-audio-manager';
+
+// Avoid duplicate exports by explicitly selecting symbols
+export { WebAudioManager } from './managers/audio-manager';
+export { createAudioManager, createSpecificAudioManager } from './managers/audio-manager-factory';
+export { HTML5AudioManager } from './managers/html5-audio-manager';
+export { SilentAudioManager } from './managers/silent-audio-manager';
+
 export * from './hooks/use-sound';
 export * from './hooks/use-audio-settings';
 export * from './context/audio-context';

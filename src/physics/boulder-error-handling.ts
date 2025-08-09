@@ -1,7 +1,7 @@
 import type { MazeCell } from '../maze';
 import { CELL } from '../maze';
 import type { Position, BoulderState, BoulderStateManager } from './boulder-state-manager';
-import { createPositionKey, parsePositionKey, findBoulderPositions } from './boulder-state-manager';
+import { createPositionKey, findBoulderPositions } from './boulder-state-manager';
 
 // Error types for boulder system
 export interface BoulderSystemError {

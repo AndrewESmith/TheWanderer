@@ -1,7 +1,6 @@
 import type { MazeLevelData } from "../Interfaces/IMazeLevelData";
 import type { LevelValidationError } from "./level-validation";
 import { CELL, initialMaze } from "../maze";
-import type { IPlayerPos } from "../Interfaces/IPlayerPos";
 
 /**
  * Error types for level management operations

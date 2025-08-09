@@ -175,7 +175,7 @@ export class AudioErrorHandler {
     /**
      * Handle audio context creation failure
      */
-    private async handleContextCreationFailure(error: AudioError): Promise<boolean> {
+    private async handleContextCreationFailure(_error: AudioError): Promise<boolean> {
         // Try different AudioContext constructors
         const constructors = [
             () => new AudioContext(),
@@ -202,7 +202,7 @@ export class AudioErrorHandler {
     /**
      * Handle audio context suspension
      */
-    private async handleContextSuspension(error: AudioError): Promise<boolean> {
+    private async handleContextSuspension(_error: AudioError): Promise<boolean> {
         // Set up user interaction handlers to resume context
         return new Promise((resolve) => {
             const resumeHandlers = {
@@ -285,7 +285,7 @@ export class AudioErrorHandler {
     /**
      * Handle network error
      */
-    private async handleNetworkError(error: AudioError): Promise<boolean> {
+    private async handleNetworkError(_error: AudioError): Promise<boolean> {
         console.log('Network error detected, checking connectivity and retrying');
 
         // Check if we're online

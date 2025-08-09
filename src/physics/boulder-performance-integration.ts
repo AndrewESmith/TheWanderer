@@ -2,7 +2,6 @@ import type { MazeCell } from '../maze';
 import type { Position, BoulderStateManager } from './boulder-state-manager';
 import {
     createBoulderStateManager,
-    identifyTriggeredBoulders,
     updateBoulderTriggers,
     updateBoulderMovement,
     updateBoulderPositions

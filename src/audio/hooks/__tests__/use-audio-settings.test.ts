@@ -25,17 +25,17 @@ Object.defineProperty(window, 'localStorage', {
 
 // Mock audio context
 const mockAudioManager = {
-    setMuted: jest.fn(),
-    isMuted: jest.fn(() => false),
-    setGlobalVolume: jest.fn(),
-    getGlobalVolume: jest.fn(() => 0.8),
-    setCategoryVolume: jest.fn(),
-    getCategoryVolume: jest.fn(() => 1.0),
-    getAllCategoryVolumes: jest.fn(() => ({}))
+    setMuted: vi.fn(),
+    isMuted: vi.fn(() => false),
+    setGlobalVolume: vi.fn(),
+    getGlobalVolume: vi.fn(() => 0.8),
+    setCategoryVolume: vi.fn(),
+    getCategoryVolume: vi.fn(() => 1.0),
+    getAllCategoryVolumes: vi.fn(() => ({}))
 };
 
 // Mock the audio context
-jest.mock('../../context/audio-context', () => ({
+vi.mock('../../context/audio-context', () => ({
     useAudioContext: () => ({
         audioManager: mockAudioManager,
         isLoading: false,
@@ -46,7 +46,7 @@ jest.mock('../../context/audio-context', () => ({
 describe('useAudioSettings', () => {
     beforeEach(() => {
         mockLocalStorage.clear();
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     describe('initialization', () => {
@@ -262,11 +262,11 @@ describe('useAudioSettings', () => {
     describe('localStorage error handling', () => {
         it('should handle localStorage save errors gracefully', () => {
             const originalSetItem = mockLocalStorage.setItem;
-            mockLocalStorage.setItem = jest.fn(() => {
+            mockLocalStorage.setItem = vi.fn(() => {
                 throw new Error('Storage quota exceeded');
             });
 
-            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+            const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
             const { result } = renderHook(() => useAudioSettings());
 

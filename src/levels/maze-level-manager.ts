@@ -7,8 +7,7 @@ import {
     createErrorRecoveryStrategy,
     logLevelError,
     withLevelErrorHandling,
-    attemptLevelRepair,
-    createFallbackLevel
+    attemptLevelRepair
 } from "./level-error-handler";
 
 /**

@@ -1,10 +1,9 @@
 import type { IGameState } from "./Interfaces/IGameState";
-import { CELL, initialMaze, getPlayerPosition } from "./maze";
+import { CELL, getPlayerPosition } from "./maze";
 import type { MazeCell } from "./maze";
 import type { IPlayerPos } from "./Interfaces/IPlayerPos";
 import { generatePlayerMoveEvents } from "./audio/events/sound-event-mapper";
 import { emitSoundEvents } from "./audio/events/sound-event-emitter";
-import { simulatePhysicsStep, simulatePhysicsStepWithState } from "./physics/physics-engine";
 import { handleGameEndSounds } from "./audio/events/game-end-sound-manager";
 import type { BoulderStateManager, MovementConstraint } from "./physics/boulder-state-manager";
 import {
@@ -20,6 +19,7 @@ import type { MazeLevelManager } from "./Interfaces/IMazeLevelManager";
 import { createMazeLevelManager } from "./levels/maze-level-manager";
 import type { LevelProgressionHandler } from "./levels/level-progression-handler";
 import { createLevelProgressionHandler } from "./levels/level-progression-handler";
+import { simulatePhysicsStepWithState } from "./physics/physics-engine";
 
 // Game state type following TypeScript standards
 export interface GameStateData {

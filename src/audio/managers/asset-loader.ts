@@ -345,7 +345,6 @@ export class AssetLoader {
     }> {
         try {
             const response = await fetch(url, { method: 'HEAD' });
-            const contentType = response.headers.get('content-type') || '';
             const contentLength = parseInt(response.headers.get('content-length') || '0');
 
             // For full validation, we'd need to load and decode the file

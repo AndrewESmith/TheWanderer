@@ -2,9 +2,6 @@
  * Asset resolver utility for handling sound file paths in different environments
  */
 
-// Check if we're in development mode
-const isDevelopment = import.meta.env.DEV;
-
 /**
  * Resolve asset path for the current environment
  */

@@ -156,16 +156,17 @@ function validateElementCounts(level: MazeLevelData): LevelValidationError[] {
         });
     }
 
-    if (actualCounts.diamonds < ELEMENT_CONSTRAINTS.diamonds.min ||
-        actualCounts.diamonds > ELEMENT_CONSTRAINTS.diamonds.max) {
+    const diamondsCount = actualCounts.diamonds ?? 0;
+    if (diamondsCount < ELEMENT_CONSTRAINTS.diamonds.min ||
+        diamondsCount > ELEMENT_CONSTRAINTS.diamonds.max) {
         errors.push({
             type: 'element_count',
-            message: `Diamond count out of range: expected ${ELEMENT_CONSTRAINTS.diamonds.min}-${ELEMENT_CONSTRAINTS.diamonds.max}, got ${actualCounts.diamonds}`,
+            message: `Diamond count out of range: expected ${ELEMENT_CONSTRAINTS.diamonds.min}-${ELEMENT_CONSTRAINTS.diamonds.max}, got ${diamondsCount}`,
             levelNumber: level.levelNumber,
             details: {
                 min: ELEMENT_CONSTRAINTS.diamonds.min,
                 max: ELEMENT_CONSTRAINTS.diamonds.max,
-                actual: actualCounts.diamonds
+                actual: diamondsCount
             }
         });
     }
@@ -180,16 +181,17 @@ function validateElementCounts(level: MazeLevelData): LevelValidationError[] {
         });
     }
 
-    if (actualCounts.bombs < ELEMENT_CONSTRAINTS.bombs.min ||
-        actualCounts.bombs > ELEMENT_CONSTRAINTS.bombs.max) {
+    const bombsCount = actualCounts.bombs ?? 0;
+    if (bombsCount < ELEMENT_CONSTRAINTS.bombs.min ||
+        bombsCount > ELEMENT_CONSTRAINTS.bombs.max) {
         errors.push({
             type: 'element_count',
-            message: `Bomb count out of range: expected ${ELEMENT_CONSTRAINTS.bombs.min}-${ELEMENT_CONSTRAINTS.bombs.max}, got ${actualCounts.bombs}`,
+            message: `Bomb count out of range: expected ${ELEMENT_CONSTRAINTS.bombs.min}-${ELEMENT_CONSTRAINTS.bombs.max}, got ${bombsCount}`,
             levelNumber: level.levelNumber,
             details: {
                 min: ELEMENT_CONSTRAINTS.bombs.min,
                 max: ELEMENT_CONSTRAINTS.bombs.max,
-                actual: actualCounts.bombs
+                actual: bombsCount
             }
         });
     }

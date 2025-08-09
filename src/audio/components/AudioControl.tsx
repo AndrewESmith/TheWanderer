@@ -9,7 +9,7 @@ interface AudioControlProps {
 
 export function AudioControl({
   onOpenHowToPlay,
-}: AudioControlProps = {}): JSX.Element {
+}: AudioControlProps = {}): React.ReactElement {
   const { isMuted, toggleMute } = useAudioSettings();
   const [showSettings, setShowSettings] = useState(false);
 
@@ -44,8 +44,9 @@ export function AudioControl({
           title="Audio Settings"
           data-testid="settings-button"
           aria-label="Open audio settings"
+          aria-expanded={showSettings}
         >
-          ⚙️
+          <span aria-hidden="true">⚙️</span>
         </button>
       </div>
 

@@ -103,8 +103,7 @@ export function createLevelProgressionHandler(): LevelProgressionHandler {
 
             emitSoundEvent(soundEvent);
         }, 'level_progression_failed', {
-            operationName: 'Emit level progression sound',
-            context: { soundType: result.soundToPlay, isGameComplete: result.isGameComplete }
+            operationName: `Emit level progression sound (${result.soundToPlay}, isGameComplete=${result.isGameComplete})`
         });
     };
 

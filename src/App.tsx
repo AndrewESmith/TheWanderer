@@ -58,43 +58,6 @@ function areMazesStructurallyEqual(
   return true;
 }
 
-// Utility function to handle image loading with retry logic
-function loadImageWithRetry(
-  imagePath: string,
-  maxRetries: number = 2
-): Promise<boolean> {
-  return new Promise((resolve) => {
-    let retryCount = 0;
-
-    const attemptLoad = () => {
-      const img = new Image();
-
-      img.onload = () => {
-        resolve(true);
-      };
-
-      img.onerror = () => {
-        retryCount++;
-        if (retryCount <= maxRetries) {
-          console.warn(
-            `Image load failed, retrying (${retryCount}/${maxRetries}): ${imagePath}`
-          );
-          setTimeout(attemptLoad, 1000 * retryCount); // Exponential backoff
-        } else {
-          console.error(
-            `Image load failed after ${maxRetries} retries: ${imagePath}`
-          );
-          resolve(false);
-        }
-      };
-
-      img.src = imagePath;
-    };
-
-    attemptLoad();
-  });
-}
-
 function preloadImages(): Promise<ImageLoadingState> {
   const imagePaths = Object.values(ICONS);
   const totalCount = imagePaths.length;
@@ -412,9 +375,6 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
   // Global image cache to prevent reloading
   const imageCache = React.useRef<Map<string, boolean>>(new Map());
 
-  // Memoized image loading function to prevent recreation
-  const loadImageWithRetryMemo = React.useCallback(loadImageWithRetry, []);
-
   // Optimized cell component with essential flickering prevention
   const Cell: React.FC<{
     type: MazeCell;
@@ -679,7 +639,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
 };
 
 const App: React.FC = () => {
-  const [imageLoadingState, setImageLoadingState] =
+  const [, setImageLoadingState] =
     React.useState<ImageLoadingState>({
       isLoading: true,
       loadedCount: 0,
@@ -688,7 +648,7 @@ const App: React.FC = () => {
     });
 
   // Load dominant colors for soil and rock
-  const { dominantColors, isLoading: colorsLoading } = useDominantColors();
+  const { dominantColors} = useDominantColors();
 
   // Preload images on app initialization
   React.useEffect(() => {

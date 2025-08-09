@@ -1,6 +1,6 @@
 import type { MazeCell } from '../maze';
 import { CELL } from '../maze';
-import type { Position, BoulderState, BoulderStateManager } from './boulder-state-manager';
+import type { Position, BoulderStateManager } from './boulder-state-manager';
 
 // Performance monitoring interface
 export interface PerformanceMetrics {
@@ -285,13 +285,15 @@ export class BoulderPositionTracker {
 
     getPositions(): Position[] {
         if (this.isDirty || !this.positionArray) {
-            this.positionArray = Array.from(this.positions).map(key => {
-                const [x, y] = key.split(',').map(Number);
+            this.positionArray = Array.from(this.positions).map((key): Position => {
+                const [xStr, yStr] = key.split(',');
+                const x = Number(xStr);
+                const y = Number(yStr);
                 return { x, y };
             });
             this.isDirty = false;
         }
-        return this.positionArray;
+        return this.positionArray!;
     }
 
     size(): number {

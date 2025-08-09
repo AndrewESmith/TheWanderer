@@ -27,7 +27,7 @@ export function useSound(): UseSoundHook {
     // Listen for audio errors
     useEffect(() => {
         const handleAudioError = (event: CustomEvent) => {
-            const { type, error, details } = event.detail;
+            const { type, details } = event.detail;
 
             // Only handle playback errors here
             if (type === 'PLAYBACK_ERROR' || type === 'SOUND_PLAY_ERROR') {
