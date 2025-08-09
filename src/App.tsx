@@ -508,7 +508,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     <div className="game-wrapper">
       <AudioErrorDisplay />
       <AudioDebug />
-      <div className="maze-container" style={{ position: "relative" }}>
+      <div
+        className="maze-container"
+        style={{ position: "relative" }}
+        data-testid="maze-container"
+      >
         <div
           className="maze-grid"
           style={

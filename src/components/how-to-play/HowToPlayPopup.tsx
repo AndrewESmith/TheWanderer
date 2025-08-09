@@ -111,6 +111,7 @@ export function HowToPlayPopup({
       aria-labelledby="how-to-play-title"
       aria-describedby="how-to-play-description"
       aria-label="How to Play The Wanderer - Game Instructions Dialog"
+      data-testid="how-to-play-popup"
     >
       <div
         className="how-to-play-panel"
@@ -128,6 +129,7 @@ export function HowToPlayPopup({
             aria-label="Close dialog using X button"
             title="Close (Escape key)"
             type="button"
+            data-testid="close-button"
           >
             <span aria-hidden="true">×</span>
             <span className="sr-only">Close dialog</span>
@@ -139,6 +141,7 @@ export function HowToPlayPopup({
           id="how-to-play-description"
           role="main"
           aria-label="Game instructions and credits"
+          data-testid="how-to-play-content"
         >
           <HowToPlayContent className="popup-content" />
         </main>
@@ -155,6 +158,7 @@ export function HowToPlayPopup({
               onChange={handleDontShowAgainChange}
               aria-describedby="dont-show-again-description"
               aria-label="Don't show this dialog automatically on future visits"
+              data-testid="dont-show-again-checkbox"
             />
             <span className="checkbox-custom" aria-hidden="true"></span>
             <span className="checkbox-label">Don't show again</span>

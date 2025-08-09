@@ -63,6 +63,7 @@ export function AudioSettings({
       <div
         className="audio-settings-panel"
         onClick={(e) => e.stopPropagation()}
+        data-testid="audio-settings-panel"
       >
         {/* Settings title and close button on same line */}
         <div className="settings-header">

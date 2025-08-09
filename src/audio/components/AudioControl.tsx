@@ -42,6 +42,7 @@ export function AudioControl({
           className="audio-button settings-button"
           onClick={handleSettingsClick}
           title="Audio Settings"
+          data-testid="settings-button"
           aria-label="Open audio settings"
         >
           ⚙️

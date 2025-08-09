@@ -86,17 +86,14 @@
 
 - [x] 11. Create integration tests for popup workflow
 
-
-
-
-
   - Test complete first-visit user journey from app load to popup dismissal
   - Test settings menu integration and popup reopening functionality
   - Test preference persistence across page refreshes
   - Test interaction blocking while popup is displayed
   - _Requirements: 1.1, 1.4, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 12. Add E2E tests for user workflows
+- [x] 12. Add E2E tests for user workflows
+
   - Test new user experience with automatic popup display
   - Test returning user experience with popup suppression
   - Test settings access workflow for reopening instructions
