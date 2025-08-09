@@ -324,25 +324,32 @@ test.describe('How to Play User Workflows E2E', () => {
             const popup = page.locator('[data-testid="how-to-play-popup"]');
             await expect(popup).toBeVisible();
 
-            // Test tab navigation through interactive elements
-            await page.keyboard.press('Tab');
-
-            // Should focus on checkbox first
-            const checkbox = page.locator('[data-testid="dont-show-again-checkbox"]');
-            await expect(checkbox).toBeFocused();
-
-            // Tab to close button
-            await page.keyboard.press('Tab');
+            // Focus trap initially focuses the close button
             const closeButton = page.locator('[data-testid="close-button"]');
             await expect(closeButton).toBeFocused();
 
+            // Test tab navigation through interactive elements
+            // First tab goes to first link (Andrew Smith)
+            await page.keyboard.press('Tab');
+            const andrewLink = page.locator('a[href*="linkedin"]');
+            await expect(andrewLink).toBeFocused();
+
+            // Tab through the other links to get to checkbox
+            await page.keyboard.press('Tab'); // Wanderer link
+            await page.keyboard.press('Tab'); // Steven Shipway link
+            await page.keyboard.press('Tab'); // Checkbox
+
+            const checkbox = page.locator('[data-testid="dont-show-again-checkbox"]');
+            await expect(checkbox).toBeFocused();
+
             // Test space key to activate checkbox
-            await page.keyboard.press('Shift+Tab'); // Back to checkbox
             await page.keyboard.press('Space');
             await expect(checkbox).toBeChecked();
 
-            // Test Enter key to activate close button
-            await page.keyboard.press('Tab'); // To close button
+            // Test Enter key to activate close footer button
+            await page.keyboard.press('Tab'); // To close footer button
+            const closeFooterButton = page.locator('.close-footer-button');
+            await expect(closeFooterButton).toBeFocused();
             await page.keyboard.press('Enter');
             await expect(popup).not.toBeVisible();
         });
@@ -352,34 +359,57 @@ test.describe('How to Play User Workflows E2E', () => {
             const popup = page.locator('[data-testid="how-to-play-popup"]');
             await expect(popup).toBeVisible();
 
-            // Get all focusable elements
-            const checkbox = page.locator('[data-testid="dont-show-again-checkbox"]');
+            // Get focusable elements in actual DOM order
             const closeButton = page.locator('[data-testid="close-button"]');
+            const andrewLink = page.locator('a[href*="linkedin"]');
+            const wandererLink = page.locator('a[href*="wikipedia"]');
+            const stevenLink = page.locator('a[href*="steveshipway"]');
+            const checkbox = page.locator('[data-testid="dont-show-again-checkbox"]');
+            const closeFooterButton = page.locator('.close-footer-button');
+
+            // Focus trap initially focuses the close button
+            await expect(closeButton).toBeFocused();
 
             // Tab through elements and verify focus stays within popup
             await page.keyboard.press('Tab');
+            await expect(andrewLink).toBeFocused();
+
+            await page.keyboard.press('Tab');
+            await expect(wandererLink).toBeFocused();
+
+            await page.keyboard.press('Tab');
+            await expect(stevenLink).toBeFocused();
+
+            await page.keyboard.press('Tab');
             await expect(checkbox).toBeFocused();
 
+            await page.keyboard.press('Tab');
+            await expect(closeFooterButton).toBeFocused();
+
+            // Tab again should cycle back to first element (close button in header)
             await page.keyboard.press('Tab');
             await expect(closeButton).toBeFocused();
 
-            // Tab again should cycle back to checkbox
-            await page.keyboard.press('Tab');
-            await expect(checkbox).toBeFocused();
-
-            // Shift+Tab should go to close button
+            // Shift+Tab should go to last element (close footer button)
             await page.keyboard.press('Shift+Tab');
-            await expect(closeButton).toBeFocused();
+            await expect(closeFooterButton).toBeFocused();
         });
 
         test('should restore focus after closing popup', async ({ page }) => {
+            // First close the automatically opened popup
+            const initialPopup = page.locator('[data-testid="how-to-play-popup"]');
+            await expect(initialPopup).toBeVisible();
+            const initialCloseButton = page.locator('[data-testid="close-button"]');
+            await initialCloseButton.click();
+            await expect(initialPopup).not.toBeVisible();
+
             // Focus on settings button before opening popup
             const settingsButton = page.locator('[data-testid="settings-button"]');
             await settingsButton.focus();
 
             // Open settings and then how-to-play
             await settingsButton.click();
-            const howToPlayButton = page.locator('text=How to Play');
+            const howToPlayButton = page.locator('button', { hasText: 'How to Play' });
             await howToPlayButton.click();
 
             // Wait for popup to appear
