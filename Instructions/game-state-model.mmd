@@ -1,0 +1,40 @@
+classDiagram
+  class GameStateData {
+    +MazeCell[][] maze
+    +IPlayerPos player
+    +number score
+    +number moves
+    +number diamonds
+    +string gameState
+    +BoulderStateManager boulderStateManager
+    +MovementConstraint movementConstraint
+    +number currentLevel
+    +MazeLevelManager levelManager
+    +LevelProgressionHandler levelProgressionHandler
+    +boolean isGameComplete
+  }
+  class IGameState {
+    +MazeCell[][] maze
+    +IPlayerPos player
+    +number score
+    +number moves
+    +number diamonds
+    +string gameState
+    +BoulderStateManager boulderStateManager
+    +MovementConstraint movementConstraint
+    +number currentLevel
+    +MazeLevelManager levelManager
+    +LevelProgressionHandler levelProgressionHandler
+    +boolean isGameComplete
+    +void movePlayer(number dx, number dy)
+  }
+  IGameState ..> GameStateData : exposes
+  GameStateData --> MazeLevelManager
+  GameStateData --> LevelProgressionHandler
+  GameStateData --> BoulderStateManager
+  GameStateData --> MovementConstraint
+  GameStateData --> IPlayerPos
+  GameStateData --> MazeCell
+
+
+

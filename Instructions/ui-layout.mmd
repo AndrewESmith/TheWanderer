@@ -1,0 +1,13 @@
+graph TB
+  Root[".game-wrapper (App.tsx)"]
+  Root --> HUD[".hud"]
+  HUD --> HUDL[".hud-left: level, score, diamonds, moves, status, audio fallback"]
+  HUD --> HUDR[".hud-right: controls (AudioControl, HowToPlay)"]
+  Root --> MazeContainer[".maze-container"]
+  MazeContainer --> Grid[".maze-grid (16xN)"]
+  Grid --> Cell[".cell (ICONS by CELL type)"]
+  Root --> MobileControls[".mobile-controls (conditional; buttons Up/Down/Left/Right)"]
+  Overlay["HowToPlayPopup (modal)"] -. "blocks input when open" .-> Root
+
+
+

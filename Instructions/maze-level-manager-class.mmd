@@ -1,0 +1,40 @@
+classDiagram
+  class MazeLevelData {
+    +number levelNumber
+    +MazeCell[][] maze
+    +number moveLimit
+    +number diamondCount
+    +number bombCount
+    +number rockCount
+    +IPlayerPos playerStartPosition
+    +IPlayerPos exitPosition
+  }
+
+  class MazeLevelManager {
+    +MazeLevelData getCurrentLevel()
+    +boolean hasNextLevel()
+    +MazeLevelData|null advanceToNextLevel()
+    +number getTotalLevels()
+    +number getCurrentLevelNumber()
+  }
+
+  class LevelValidation {
+    +validateLevel(level: MazeLevelData)
+    +validateLevels(levels: MazeLevelData[])
+  }
+
+  class LevelErrorHandler {
+    +withLevelErrorHandling(fn)
+    +createLevelError(type, message, options)
+    +attemptLevelRepair(level, errors)
+    +createFallbackLevel(levelNumber)
+    +createErrorRecoveryStrategy()
+    +logLevelError(error)
+  }
+
+  MazeLevelManager --> "1..*" MazeLevelData : manages
+  MazeLevelManager ..> LevelValidation : uses
+  MazeLevelManager ..> LevelErrorHandler : uses
+
+
+

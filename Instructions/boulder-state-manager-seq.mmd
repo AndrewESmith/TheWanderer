@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant App
+  participant GameState
+  participant BSM as BoulderStateManager
+  participant Phys as PhysicsEngine
+
+  App->>GameState: movePlayer(dx, dy)
+  GameState->>BSM: updatePlayerPosition(BSM, newPlayerPos)
+  GameState->>BSM: createProximityResult(curr, prev, BSM, maze)
+  GameState-->>GameState: {adjacentBoulders, newlyTriggeredBoulders}
+  GameState->>BSM: updateBoulderTriggers(BSM, newlyTriggeredBoulders, move#)
+  GameState->>Phys: simulatePhysicsStepWithState(maze, BSM, move#)
+  Phys-->>GameState: result {positionUpdates, movingBoulders, completedBoulders}
+  GameState->>BSM: updateBoulderMovement(BSM, movingBoulders, completedBoulders)
+  GameState->>BSM: updateBoulderPositions(BSM, positionUpdates)
+
+

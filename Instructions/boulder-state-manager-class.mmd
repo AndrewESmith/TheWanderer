@@ -1,0 +1,37 @@
+classDiagram
+  class Position { +number x +number y }
+  class BoulderState {
+    +Position position
+    +boolean isTriggered
+    +boolean isMoving
+    +number triggeredOnMove
+  }
+  class BoulderStateManager {
+    +Map<string,BoulderState> boulders
+    +number movingBoulderCount
+    +Position|null lastPlayerPosition
+  }
+  class BoulderAPI {
+    +createBoulderStateManager(maze, move#): BoulderStateManager
+    +findBoulderPositions(maze): Position[]
+    +createPositionKey(Position): string
+    +parsePositionKey(string): Position
+    +arePositionsAdjacent(a:Position,b:Position): boolean
+    +detectAdjacentBoulders(player:Position, boulders:Position[]): Position[]
+    +identifyTriggeredBoulders(prev:Position|null, curr:Position, mgr:BoulderStateManager, maze?): Position[]
+    +updateBoulderTriggers(mgr, triggered:Position[], move#): BoulderStateManager
+    +updateBoulderMovement(mgr, moving:Position[], stopped:Position[]): BoulderStateManager
+    +updateBoulderPositions(mgr, updates:{from:Position,to:Position}[]): BoulderStateManager
+    +hasMovingBoulders(mgr): boolean
+    +getTriggeredBouldersForMove(mgr, move#): Position[]
+    +updatePlayerPosition(mgr, pos:Position): BoulderStateManager
+    +createProximityResult(curr:Position, prev:Position|null, mgr:BoulderStateManager, maze?): {adjacentBoulders, newlyTriggeredBoulders}
+    +createMovementConstraint(mgr): {isPlayerMovementBlocked, blockingReason, estimatedDuration}
+  }
+
+  BoulderAPI ..> BoulderStateManager : creates/updates
+  BoulderStateManager o--> "*" BoulderState : tracks
+  BoulderState --> Position
+
+
+

@@ -1,0 +1,16 @@
+graph TD
+  AP["AudioProvider (context)"] --> US["useSound hook"]
+  US --> AMF["createAudioManager() (audio-manager-factory)"]
+  US --> SEE["SoundEventEmitter"]
+  GC["GameComponent"] --> US
+  GC --> GESM["GameEndSoundManager"]
+  MP["movePlayer()"] --> GPME["generatePlayerMoveEvents()"]
+  GPME --> ESE["emitSoundEvents()"]; 
+  ESE --> SEE
+  SEE --> AM["AudioManager.play/stop"]
+  AC["<AudioControl/>"] --> US
+  AED["<AudioErrorDisplay/>"] --> US
+  AI["<AudioInitialization/>"] --> AP
+
+
+

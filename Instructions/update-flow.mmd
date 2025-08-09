@@ -1,0 +1,32 @@
+flowchart LR
+  A["Keydown (Arrow/WASD)"] --> B["GameComponent.movePlayer(dx, dy)"]
+  B --> C{"shouldBlockPlayerMovement?\n(movement-constraint-system)"}
+  C -- "Yes" --> Z["Return (blocked)"]
+  C -- "No" --> D{"isValidPosition & targetCell"}
+  D -- "Invalid/undefined" --> Z
+  D -- "Valid" --> E{"isBlockingCell? (ROCK/BOULDER)"}
+  E -- "Yes" --> Z
+  E -- "No" --> F["Update maze: move PLAYER"]
+  F --> G{"Cell effects"}
+  G --> G1["DIAMOND: +score, -diamonds"]
+  G --> G2["BOMB: state='dead'"]
+  G --> G3["EXIT: if diamonds==0 then 'won' else block"]
+  G1 --> H["moves-- ; out of moves? -> 'dead'"]
+  G2 --> H
+  G3 --> H
+  H --> I["simulatePhysicsStepWithState()"]
+  I --> J["updateBoulderMovement/Positions"]
+  J --> K["updateMovementConstraints()"]
+  K --> L{"Level complete? (levelProgressionHandler)"}
+  L -- "Yes" --> M["processLevelCompletion -> next level or game complete"]
+  L -- "No" --> N["Stay on level"]
+  M --> O["Emit progression sounds"]
+  B --> P["generatePlayerMoveEvents()"]
+  P --> Q["emitSoundEvents()"]
+  Q --> R["AudioManager.play/stop via useSound"]
+  R --> S["UI rerender (forceUpdate)"]
+  N --> S
+  M --> S
+
+
+

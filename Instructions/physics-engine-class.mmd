@@ -1,0 +1,37 @@
+classDiagram
+  class PhysicsSimulationResult {
+    +MazeCell[][] newMaze
+    +SoundEvent[] soundEvents
+    +Position[] boulderPositions
+    +Position[] arrowPositions
+    +Position[] movingBoulders
+    +Position[] completedBoulders
+    +Position[] playerCollisions
+    +{from:Position,to:Position}[] positionUpdates
+  }
+
+  class PhysicsEngine {
+    +findBoulders(maze: MazeCell[][]): Position[]
+    +simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult
+    +simulateArrows(maze: MazeCell[][], arrows): PhysicsSimulationResult
+    +simulatePhysicsStep(maze: MazeCell[][], arrows?): PhysicsSimulationResult
+    +simulateGravityWithState(maze, BoulderStateManager, moveNum): PhysicsSimulationResult
+    +simulatePhysicsStepWithState(maze, BoulderStateManager, moveNum, arrows?): PhysicsSimulationResult
+    +shouldContinuePhysics(prev: MazeCell[][], curr: MazeCell[][]): boolean
+    +shouldContinuePhysicsWithState(BoulderStateManager): boolean
+    +getMovingBoulderPositions(BoulderStateManager): Position[]
+    +getStationaryBoulderPositions(BoulderStateManager): Position[]
+    +getTriggeredBoulderPositions(BoulderStateManager): Position[]
+    +categorizeBoulders(BoulderStateManager): {moving,stationary,triggered,total}
+  }
+
+  class BoulderStateManager {
+    +Map<string,BoulderState> boulders
+    +number movingBoulderCount
+  }
+
+  PhysicsEngine ..> BoulderStateManager : uses
+  PhysicsEngine --> PhysicsSimulationResult : returns
+
+
+

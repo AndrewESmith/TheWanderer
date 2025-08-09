@@ -1,0 +1,27 @@
+sequenceDiagram
+  participant App
+  participant GameState
+  participant LevelManager as MazeLevelManager
+  participant LevelProg as LevelProgressionHandler
+  participant Err as LevelErrorHandler
+  participant Valid as LevelValidation
+
+  App->>GameState: movePlayer() leads to 'won' with diamonds==0
+  GameState->>LevelProg: isLevelComplete('won', 0)
+  LevelProg-->>GameState: true
+  GameState->>LevelProg: processLevelCompletion(LevelManager)
+  LevelProg->>LevelManager: hasNextLevel()
+  alt has next level
+    LevelProg->>LevelManager: advanceToNextLevel()
+    LevelManager->>Valid: validateLevels(MAZE_LEVELS)
+    Note over LevelManager,Valid: Creation-time validation already performed
+    LevelManager-->>LevelProg: nextLevel
+    LevelProg-->>GameState: {success:true,nextLevel, soundToPlay: door_slam}
+  else no next level
+    LevelProg-->>GameState: {success:true,isGameComplete:true,soundToPlay: victory}
+  end
+  GameState->>LevelProg: emitLevelProgressionSound(result)
+  LevelProg->>App: emitSoundEvent(sound)
+
+
+
