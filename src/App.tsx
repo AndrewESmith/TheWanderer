@@ -430,20 +430,36 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       ? CELL.EMPTY
       : type;
 
+    // Track image loading state for visual regression tests
+    const [imageState, setImageState] = React.useState<CellImageState>({
+      loaded: false,
+      error: false,
+      retryCount: 0,
+    });
+
     // Simplified image loading with cache
     const imagePath = ICONS[actualCellType];
     const isImageCached = imageCache.current.has(imagePath);
 
-    // Cache image on first load
+    // Cache image on first load and track loading state
     React.useEffect(() => {
-      if (!isImageCached) {
+      if (!isImageCached && !imageState.loaded && !imageState.error) {
+        setImageState((prev) => ({ ...prev, loaded: false, error: false }));
+
         const img = new Image();
         img.onload = () => {
           imageCache.current.set(imagePath, true);
+          setImageState((prev) => ({ ...prev, loaded: true, error: false }));
+        };
+        img.onerror = () => {
+          setImageState((prev) => ({ ...prev, loaded: false, error: true }));
         };
         img.src = imagePath;
+      } else if (isImageCached && !imageState.loaded) {
+        // Image is already cached, mark as loaded
+        setImageState((prev) => ({ ...prev, loaded: true, error: false }));
       }
-    }, [imagePath, isImageCached]);
+    }, [imagePath, isImageCached, imageState.loaded, imageState.error]);
 
     // Simple styling with cached images and dominant colors for soil/rock
     const cellStyle: React.CSSProperties = {
@@ -461,7 +477,18 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       cellStyle.backgroundColor = dominantColors[actualCellType];
     }
 
-    return <div className={`cell ${actualCellType}`} style={cellStyle} />;
+    // Build CSS classes including image loading state
+    const cssClasses = [
+      "cell",
+      actualCellType,
+      imageState.loaded ? "image-loaded" : "",
+      imageState.error ? "image-error" : "",
+      !imageState.loaded && !imageState.error ? "image-loading" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return <div className={cssClasses} style={cellStyle} />;
   };
 
   // Handle audio system reset

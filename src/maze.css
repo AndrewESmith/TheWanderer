@@ -9,142 +9,126 @@
 }
 
 .maze-container {
-    /* Container optimizations to prevent flickering */
-    contain: layout style paint;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    /* Center the maze */
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    /* Ensure container doesn't overflow on mobile */
-    max-width: 100vw;
-    width: 100%;
-    overflow: hidden;
-    /* Ensure proper centering on all devices */
-    margin: 0 auto;
-    box-sizing: border-box;
-  }
+  /* Container optimizations to prevent flickering */
+  contain: layout style paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Center the maze */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  /* Ensure container doesn't overflow on mobile */
+  max-width: 100vw;
+  width: 100%;
+  overflow: hidden;
+  /* Ensure proper centering on all devices */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
 
-  .maze-grid {
-    display: grid;
-    grid-template-columns: var(--maze-columns, repeat(16, 32px));
-    grid-template-rows: var(--maze-rows, repeat(10, 32px));
-    gap: 0;
-    background: #222;
-    padding: 10px;
-    width: max-content;
-    /* Prevent layout shifts and improve performance */
-    will-change: auto;
-    contain: layout style;
-    /* Optimize for frequent updates */
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    /* Ensure maze fits on mobile screens */
-    max-width: calc(100vw - 20px);
-    max-height: calc(100vh - 200px); /* Account for HUD and controls */
-    /* Smooth scaling transitions */
-    transition: transform 0.2s ease-out;
-    /* Ensure proper positioning */
-    position: relative;
-    margin: 0 auto;
-    /* Ensure the border is complete */
-    box-sizing: border-box;
-  }
-  
-  .cell {
-    width: 32px;
-    height: 32px;
-    border-radius: 0;
-    box-sizing: border-box;
-    border: none;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* Optimize rendering performance and prevent flickering */
-    transform: translateZ(0); /* Force hardware acceleration */
-    backface-visibility: hidden; /* Prevent flickering during transforms */
-    will-change: auto; /* Let browser decide what to optimize */
-    contain: layout style paint; /* Contain rendering to this element */
-    /* Remove transitions to prevent flickering during rapid updates */
-    transition: none;
-    /* Ensure consistent rendering */
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
-    /* Additional anti-flicker optimizations */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    /* Prevent repaints during background changes */
-    background-attachment: local;
-    /* Optimize compositing */
-    isolation: isolate;
-    /* Responsive cell sizing */
-    min-width: 16px;
-    min-height: 16px;
-  }
-  
-  /* Fallback background colors - always present as base layer */
-  .cell.empty { background-color: #2e7d32; }
-  .cell.player { 
-    background-color: #f44336;
-    /* Additional optimization for player cell to prevent flickering */
-    z-index: 1;
-    position: relative;
-  }
-  .cell.rock { 
-    background-color: #795548; 
-    /* Dominant color will be applied via inline styles for rock cells */
-  }
-  .cell.soil { 
-    background-color: #a1887f; 
-    /* Dominant color will be applied via inline styles for soil cells */
-  }
-  .cell.diamond { background-color: #fff; }
-  .cell.boulder { background-color: #757575; }
-  .cell.bomb { background-color: #000; }
-  .cell.exit { background-color: #ffeb3b; }
+.maze-grid {
+  display: grid;
+  grid-template-columns: var(--maze-columns, repeat(16, 32px));
+  grid-template-rows: var(--maze-rows, repeat(10, 32px));
+  gap: 0;
+  background: #222;
+  padding: 10px;
+  width: max-content;
+  /* Prevent layout shifts and improve performance */
+  will-change: auto;
+  contain: layout style;
+  /* Optimize for frequent updates */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Ensure maze fits on mobile screens */
+  max-width: calc(100vw - 20px);
+  max-height: calc(100vh - 200px); /* Account for HUD and controls */
+  /* Smooth scaling transitions */
+  transition: transform 0.2s ease-out;
+  /* Ensure proper positioning */
+  position: relative;
+  margin: 0 auto;
+  /* Ensure the border is complete */
+  box-sizing: border-box;
+}
 
-  /* Enhanced fallback styling for image loading errors */
-  .cell.image-error {
-    /* Ensure fallback background color is visible */
-    background-image: none !important;
-    /* Add a subtle pattern to indicate error state */
-    position: relative;
-    /* Use outline instead of border to avoid affecting layout */
-    outline: 1px solid #ff6b6b;
-    outline-offset: -1px;
-  }
+.cell {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  box-sizing: border-box;
+  border: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Optimize rendering performance and prevent flickering */
+  transform: translateZ(0); /* Force hardware acceleration */
+  backface-visibility: hidden; /* Prevent flickering during transforms */
+  will-change: auto; /* Let browser decide what to optimize */
+  contain: layout style paint; /* Contain rendering to this element */
+  /* Remove transitions to prevent flickering during rapid updates */
+  transition: none;
+  /* Ensure consistent rendering */
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  /* Additional anti-flicker optimizations */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent repaints during background changes */
+  background-attachment: local;
+  /* Optimize compositing */
+  isolation: isolate;
+  /* Responsive cell sizing */
+  min-width: 16px;
+  min-height: 16px;
+}
 
-  .cell.image-error::after {
-    content: "⚠";
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    font-size: 8px;
-    color: #ff6b6b;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-  }
+/* Fallback background colors - always present as base layer */
+.cell.empty {
+  background-color: #2e7d32;
+}
+.cell.player {
+  background-color: #f44336;
+  /* Additional optimization for player cell to prevent flickering */
+  z-index: 1;
+  position: relative;
+}
+.cell.rock {
+  background-color: #795548;
+  /* Dominant color will be applied via inline styles for rock cells */
+}
+.cell.soil {
+  background-color: #a1887f;
+  /* Dominant color will be applied via inline styles for soil cells */
+}
+.cell.diamond {
+  background-color: #fff;
+}
+.cell.boulder {
+  background-color: #757575;
+}
+.cell.bomb {
+  background-color: #000;
+}
+.cell.exit {
+  background-color: #ffeb3b;
+}
 
-  /* Styling for successfully loaded images */
-  .cell.image-loaded {
-    /* Subtle indication that image loaded successfully */
-    outline: 1px solid #4caf50;
-    outline-offset: -1px;
-  }
+/* Enhanced fallback styling for image loading errors */
+.cell.image-error {
+  /* Ensure fallback background color is visible */
+  background-image: none !important;
+}
 
-  /* Loading state styling */
-  .cell.image-loading {
-    /* Subtle animation to indicate loading */
-    outline: 1px solid #ffa500;
-    outline-offset: -1px;
-    animation: loading-pulse 1.5s ease-in-out infinite;
-  }
+/* Image loading state classes are available for testing but don't affect visual appearance */
+.cell.image-loaded {
+  /* Class exists for testing purposes - no visual changes */
+}
 
-  @keyframes loading-pulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-  }
+.cell.image-loading {
+  /* Class exists for testing purposes - no visual changes */
+}
 /* HUD styles for the larger maze */
 .hud {
   display: flex;
@@ -236,8 +220,12 @@
 }
 
 @keyframes victory-pulse {
-  from { opacity: 0.8; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Responsive adjustments for smaller screens */
@@ -251,18 +239,18 @@
     width: calc(100vw - 20px);
     margin: 8px auto;
   }
-  
+
   .hud-left {
     justify-content: center;
     gap: 3px 10px;
     flex-wrap: wrap;
   }
-  
+
   .hud-right {
     justify-content: center;
     align-self: center;
   }
-  
+
   .hud span {
     font-size: 12px;
     line-height: 1.2;
@@ -277,24 +265,26 @@
     padding: 3px 6px !important;
     font-size: 9px !important;
   }
-  
+
   .hud-left {
     gap: 2px 6px !important;
     flex-wrap: wrap;
     justify-content: flex-start;
   }
-  
+
   .hud-right {
     justify-content: flex-end;
     gap: 4px;
   }
-  
+
   .hud span {
     font-size: 9px !important;
     line-height: 1.1 !important;
   }
-  
-  .level-info, .moves-info, .game-status {
+
+  .level-info,
+  .moves-info,
+  .game-status {
     padding: 1px 3px !important;
     font-size: 8px !important;
   }
@@ -309,17 +299,19 @@
     width: calc(100vw - 16px);
     margin: 8px auto;
   }
-  
+
   .hud-left {
     gap: 3px 10px;
   }
-  
+
   .hud span {
     font-size: 12px;
     line-height: 1.2;
   }
-  
-  .level-info, .moves-info, .game-status {
+
+  .level-info,
+  .moves-info,
+  .game-status {
     padding: 2px 5px;
     font-size: 11px;
   }
@@ -337,7 +329,7 @@
     align-items: center;
     justify-content: flex-start;
   }
-  
+
   .maze-container {
     display: flex;
     justify-content: center;
@@ -348,17 +340,19 @@
     overflow: visible;
     margin: 0;
   }
-  
+
   .maze-grid {
     /* Calculate scale to fit width with proper margins */
-    transform: scale(min(0.85, calc((100vw - 16px) / var(--maze-pixel-width, 532px))));
+    transform: scale(
+      min(0.85, calc((100vw - 16px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     margin: 0;
     /* Ensure maze stays within viewport */
     max-width: none;
     position: relative;
   }
-  
+
   .hud {
     width: calc(100vw - 16px);
     max-width: none;
@@ -367,7 +361,7 @@
     padding: 8px 12px;
     order: -1; /* Move HUD above maze */
   }
-  
+
   .mobile-controls {
     width: calc(100vw - 16px);
     max-width: none;
@@ -380,33 +374,35 @@
   .game-wrapper {
     padding: 4px;
   }
-  
+
   .maze-container {
     padding: 0;
     margin: 0;
   }
-  
+
   .maze-grid {
     /* More aggressive scaling for small screens */
-    transform: scale(min(0.7, calc((100vw - 8px) / var(--maze-pixel-width, 532px))));
+    transform: scale(
+      min(0.7, calc((100vw - 8px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     margin: 0;
     max-width: none;
     position: relative;
   }
-  
+
   .hud {
     margin: 6px auto;
     width: calc(100vw - 8px);
     font-size: 11px;
     padding: 6px 8px;
   }
-  
+
   .mobile-controls {
     margin: 6px auto;
     width: calc(100vw - 8px);
   }
-  
+
   .mobile-btn {
     min-width: 40px;
     min-height: 40px;
@@ -428,7 +424,7 @@
     flex-direction: column;
     align-items: center;
   }
-  
+
   .maze-container {
     display: flex;
     justify-content: center;
@@ -440,20 +436,22 @@
     flex: 1;
     margin: 0;
   }
-  
+
   .maze-grid {
     /* Scale to fit both width and height in landscape */
-    transform: scale(min(
-      calc((100vw - 8px) / var(--maze-pixel-width, 532px)),
-      calc((100vh - 80px) / var(--maze-pixel-height, 340px))
-    ));
+    transform: scale(
+      min(
+        calc((100vw - 8px) / var(--maze-pixel-width, 532px)),
+        calc((100vh - 80px) / var(--maze-pixel-height, 340px))
+      )
+    );
     transform-origin: center center;
     margin: 0;
     max-width: none;
     max-height: none;
     position: relative;
   }
-  
+
   .hud {
     width: calc(100vw - 8px);
     max-width: none;
@@ -463,14 +461,14 @@
     order: -1; /* Move HUD above maze */
     flex-shrink: 0;
   }
-  
+
   .mobile-controls {
     width: calc(100vw - 8px);
     max-width: none;
     margin: 2px auto;
     flex-shrink: 0;
   }
-  
+
   .mobile-btn {
     min-width: 32px;
     min-height: 32px;
@@ -478,7 +476,7 @@
     padding: 6px;
     margin: 2px;
   }
-  
+
   .mobile-controls-horizontal {
     gap: 4px;
   }
@@ -495,14 +493,14 @@
     width: 100%;
     position: relative;
   }
-  
+
   /* Ensure maze container doesn't cause overflow */
   .maze-container {
     overflow: visible; /* Allow scaled content to be visible */
     width: 100%;
     position: relative;
   }
-  
+
   /* Prevent zoom on input focus and ensure touch-friendly sizes */
   .mobile-btn {
     font-size: max(16px, 1.8rem);
@@ -511,9 +509,10 @@
     -webkit-user-select: none;
     touch-action: manipulation;
   }
-  
+
   /* Prevent text selection on mobile */
-  .hud, .mobile-controls {
+  .hud,
+  .mobile-controls {
     user-select: none;
     -webkit-user-select: none;
   }
@@ -526,9 +525,11 @@
     transform-origin: center center;
     margin: 0 auto;
   }
-  
+
   .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(min(1, calc((100vw - 30px) / var(--maze-pixel-width, 532px))));
+    transform: scale(
+      min(1, calc((100vw - 30px) / var(--maze-pixel-width, 532px)))
+    );
   }
 }
 
@@ -537,27 +538,29 @@
   .game-wrapper {
     padding: 2px;
   }
-  
+
   .maze-grid {
-    transform: scale(min(0.6, calc((100vw - 4px) / var(--maze-pixel-width, 532px))));
+    transform: scale(
+      min(0.6, calc((100vw - 4px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     margin: 0;
     max-width: none;
     position: relative;
   }
-  
+
   .hud {
     margin: 4px auto;
     width: calc(100vw - 4px);
     font-size: 10px;
     padding: 4px 6px;
   }
-  
+
   .mobile-controls {
     margin: 4px auto;
     width: calc(100vw - 4px);
   }
-  
+
   .mobile-btn {
     min-width: 32px;
     min-height: 32px;
@@ -572,7 +575,10 @@
   flex-direction: column;
   align-items: center;
   margin: 16px auto;
-  width: var(--maze-width, calc(16 * 32px + 20px)); /* Match the width of the maze grid: cells + padding */
+  width: var(
+    --maze-width,
+    calc(16 * 32px + 20px)
+  ); /* Match the width of the maze grid: cells + padding */
   justify-content: center;
   /* Ensure perfect alignment with maze */
   max-width: 100%;
@@ -587,7 +593,7 @@
     gap: 4px !important;
     margin: 2px auto !important;
   }
-  
+
   .mobile-controls-horizontal {
     gap: 2px !important;
   }
@@ -631,7 +637,7 @@
     box-sizing: border-box;
     margin: 12px auto;
   }
-  
+
   .mobile-btn {
     min-width: 48px;
     min-height: 48px;
@@ -639,9 +645,9 @@
     padding: 12px;
     /* Ensure buttons are touch-friendly */
     touch-action: manipulation;
-    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
-  
+
   .mobile-controls-horizontal {
     gap: 8px;
     justify-content: center;
