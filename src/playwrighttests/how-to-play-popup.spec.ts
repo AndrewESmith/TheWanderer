@@ -44,7 +44,7 @@ test.describe('How to Play Popup', () => {
         await page.waitForSelector('.how-to-play-overlay');
 
         // Click the footer close button
-        await page.click('button:has-text("Close")');
+        await page.click('button.close-footer-button');
 
         // Verify popup is closed
         await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
@@ -96,7 +96,7 @@ test.describe('How to Play Popup', () => {
         await expect(checkbox).toBeChecked();
 
         // Close the popup
-        await page.click('button:has-text("Close")');
+        await page.click('button.close-footer-button');
         await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
 
         // Reload the page
@@ -140,7 +140,7 @@ test.describe('How to Play Popup', () => {
         await expect(page.locator('.how-to-play-overlay')).toBeVisible();
 
         // Close popup
-        await page.click('button:has-text("Close")');
+        await page.click('button.close-footer-button');
         await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
 
         // Now game controls should work
@@ -164,7 +164,7 @@ test.describe('How to Play Popup', () => {
         // Should be able to focus on interactive elements
         const closeButton = page.locator('button[aria-label="Close dialog using X button"]');
         const checkbox = page.locator('input[type="checkbox"]');
-        const footerButton = page.locator('button:has-text("Close")');
+        const footerButton = page.locator('button.close-footer-button');
 
         await expect(closeButton).toBeVisible();
         await expect(checkbox).toBeVisible();
@@ -206,7 +206,7 @@ test.describe('How to Play Popup', () => {
         await page.waitForSelector('.how-to-play-overlay');
 
         // Don't check "Don't show again" - just close
-        await page.click('button:has-text("Close")');
+        await page.click('button.close-footer-button');
         await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
 
         // Reload the page
@@ -218,7 +218,7 @@ test.describe('How to Play Popup', () => {
 
         // Now check "Don't show again" and close
         await page.check('input[type="checkbox"]');
-        await page.click('button:has-text("Close")');
+        await page.click('button.close-footer-button');
         await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
 
         // Reload again

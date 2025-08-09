@@ -57,7 +57,7 @@
 
 ## Version 7 - Fizzbash
 
-- [ ] Create a how to play page
+- [x] Create a how to play page
 - [ ] Fix typescript errors
 - [ ] Ensure working playwright tests
 
