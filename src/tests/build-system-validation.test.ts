@@ -67,7 +67,7 @@ describe('Build System Asset Integration', () => {
 
             const publicDir = path.resolve(process.cwd(), 'public');
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const originalPath = path.join(publicDir, fileName);
                 const distPath = path.join(distDir, fileName);
@@ -123,7 +123,7 @@ describe('Build System Asset Integration', () => {
             });
 
             // All paths should follow the same format
-            pathFormats.forEach((format, index) => {
+            pathFormats.forEach((format, _index) => {
                 expect(format.startsWithSlash).toBe(true);
                 expect(format.endsWithPng).toBe(true);
                 expect(format.hasOnlyOneSlash).toBe(true);
@@ -138,9 +138,6 @@ describe('Build System Asset Integration', () => {
                 return;
             }
 
-            // Check that assets are properly organized
-            const assetsDir = path.join(distDir, 'assets');
-
             // Assets directory might exist for CSS/JS, but images from public are copied directly
             // This is expected Vite behavior for public folder assets
             expect(fs.existsSync(distDir)).toBe(true);
@@ -154,7 +151,7 @@ describe('Build System Asset Integration', () => {
 
             const pngSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const distPath = path.join(distDir, fileName);
 
@@ -177,7 +174,7 @@ describe('Build System Asset Integration', () => {
 
             const publicDir = path.resolve(process.cwd(), 'public');
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const originalPath = path.join(publicDir, fileName);
                 const distPath = path.join(distDir, fileName);

@@ -70,7 +70,7 @@ describe("Larger Maze UI Adaptation - Functional Implementation", () => {
 
             // Verify each row has the same length
             const expectedWidth = initialMaze[0]?.length ?? 0;
-            initialMaze.forEach((row, index) => {
+            initialMaze.forEach((row, _index) => {
                 expect(row.length).toBe(expectedWidth);
             });
         });
@@ -122,10 +122,11 @@ describe("Larger Maze UI Adaptation - Functional Implementation", () => {
 
         it("should have unique icons for different cell types", () => {
             const iconValues = Object.values(ICONS);
-            const uniqueIcons = new Set(iconValues);
+            new Set(iconValues);
 
-            // Allow empty string for EMPTY cell, but other icons should be unique
-            const nonEmptyIcons = iconValues.filter(icon => icon !== '');
+            // Exclude the EMPTY cell icon, but other icons should be unique
+            const emptyIcon = ICONS[CELL.EMPTY as keyof typeof ICONS];
+            const nonEmptyIcons = iconValues.filter(icon => icon !== emptyIcon);
             const uniqueNonEmptyIcons = new Set(nonEmptyIcons);
 
             expect(uniqueNonEmptyIcons.size).toBe(nonEmptyIcons.length);

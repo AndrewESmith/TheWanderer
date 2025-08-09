@@ -1,8 +1,5 @@
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { ICONS } from "../maze";
-import type { MazeCell } from "../maze";
 
 // Mock CSS imports
 vi.mock("../maze.css", () => ({}));

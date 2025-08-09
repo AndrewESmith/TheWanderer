@@ -13,8 +13,7 @@ import {
 import {
     createBoulderStateManager,
     updateBoulderTriggers,
-    updateBoulderMovement,
-    type BoulderStateManager
+    updateBoulderMovement
 } from '../physics/boulder-state-manager';
 
 describe('Enhanced Physics Engine', () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { performance } from 'perf_hooks';
 
 // Import sound system components for performance testing
-import { WebAudioManager, HTML5AudioManager, createAudioManager } from '../audio/managers/audio-manager';
+import { WebAudioManager, HTML5AudioManager} from '../audio/managers/audio-manager';
 import { SOUND_ASSETS, SOUND_IDS } from '../audio/config/sound-config';
 import { createSoundEventEmitter, getSoundEventEmitter } from '../audio/events/sound-event-emitter';
 import { generatePlayerMoveEvents } from '../audio/events/sound-event-mapper';
@@ -71,7 +71,7 @@ class PerformanceMockAudioContext {
         return buffer;
     }
 
-    decodeAudioData(arrayBuffer: ArrayBuffer) {
+    decodeAudioData(_arrayBuffer: ArrayBuffer) {
         const start = performance.now();
         const buffer = this.createBuffer(2, 44100, 44100);
         const decodeTime = performance.now() - start;
@@ -198,7 +198,7 @@ class PerformanceMockAudio {
 
 // Performance-focused mock fetch
 const createPerformanceMockFetch = (responseTime = 10) => {
-    return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    return vi.fn((_input: RequestInfo | URL, _init?: RequestInit) => {
         const start = performance.now();
         return new Promise(resolve => {
             setTimeout(() => {
@@ -212,7 +212,7 @@ const createPerformanceMockFetch = (responseTime = 10) => {
                         get: (name: string) => name === 'content-type' ? 'audio/mpeg' : null
                     },
                     arrayBuffer: () => {
-                        const bufferStart = performance.now();
+                        performance.now();
                         return new Promise(bufferResolve => {
                             setTimeout(() => {
                                 bufferResolve(new ArrayBuffer(1000));
@@ -561,7 +561,7 @@ describe('5. Performance Tests for Audio System', () => {
             const mockBuffer = mockAudioContext.createBuffer(2, 44100, 44100);
             (manager as any).state.soundBuffers.set(SOUND_IDS.PLAYER_WALK, mockBuffer);
 
-            const initialBufferSources = mockAudioContext.getBufferSourceCount();
+            mockAudioContext.getBufferSourceCount();
 
             // Create many audio sources
             for (let i = 0; i < 200; i++) {

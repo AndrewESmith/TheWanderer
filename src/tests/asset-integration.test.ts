@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { ICONS } from '../maze';
 import fs from 'fs';
 import path from 'path';
@@ -57,7 +57,7 @@ describe('Asset Integration Tests', () => {
             // For now, we'll validate file existence and basic properties
             const publicDir = path.resolve(process.cwd(), 'public');
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const fullPath = path.join(publicDir, fileName);
 
@@ -73,7 +73,7 @@ describe('Asset Integration Tests', () => {
             const publicDir = path.resolve(process.cwd(), 'public');
             const pngSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const fullPath = path.join(publicDir, fileName);
 

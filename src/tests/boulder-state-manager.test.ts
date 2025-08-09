@@ -16,9 +16,7 @@ import {
     createProximityResult,
     createMovementConstraint,
     type Position,
-    type BoulderStateManager,
-    type ProximityResult,
-    type MovementConstraint,
+    type BoulderStateManager
 } from '../physics/boulder-state-manager';
 import { CELL, type MazeCell } from '../maze';
 

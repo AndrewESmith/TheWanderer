@@ -22,7 +22,7 @@ describe('Sound System Infrastructure', () => {
         });
 
         it('should have proper sound asset structure', () => {
-            const playerWalk = SOUND_ASSETS.PLAYER_WALK;
+            const playerWalk = SOUND_ASSETS['PLAYER_WALK']!;
             expect(playerWalk.id).toBe('player_walk');
             expect(playerWalk.src).toBeInstanceOf(Array);
             expect(playerWalk.src.length).toBeGreaterThan(0);

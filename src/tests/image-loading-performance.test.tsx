@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { performance } from "perf_hooks";
-import { ICONS, CELL } from "../maze";
+import { ICONS } from "../maze";
 import type { MazeCell } from "../maze";
 
 // Mock CSS imports
@@ -305,7 +305,7 @@ describe("8. Performance Tests for Image Loading", () => {
 
       // Each image should load quickly (less than 20ms in test environment)
       imageLoadTimes.forEach((time, index) => {
-        const cellType = Object.keys(ICONS)[index];
+        Object.keys(ICONS)[index];
         expect(time).toBeLessThan(22);
       });
 
@@ -321,7 +321,7 @@ describe("8. Performance Tests for Image Loading", () => {
 
       // Load all images concurrently
       const loadPromises = Object.entries(ICONS).map(
-        ([cellType, imagePath]) => {
+        ([_cellType, imagePath]) => {
           return new Promise<number>((resolve) => {
             const start = performance.now();
             const img = new Image();
@@ -600,7 +600,7 @@ describe("8. Performance Tests for Image Loading", () => {
       });
 
       React.useEffect(() => {
-        const start = performance.now();
+        performance.now();
         const img = new Image();
 
         img.onload = () => {
@@ -691,8 +691,7 @@ describe("8. Performance Tests for Image Loading", () => {
       }
 
       // Each cell should render quickly (less than 40ms)
-      renderTimes.forEach((time, index) => {
-        const cellType = cellTypes[index];
+      renderTimes.forEach((time, _index) => {
         expect(time).toBeLessThan(70);
       });
 
@@ -714,7 +713,7 @@ describe("8. Performance Tests for Image Loading", () => {
       };
 
       // Render multiple cells simultaneously
-      const { container } = render(
+      render(
         <div>
           {cellTypes.map((cellType, index) => (
             <PerformanceTestCell

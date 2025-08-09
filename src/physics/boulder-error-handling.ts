@@ -335,7 +335,7 @@ export function createFallbackBoulderStateManager(maze: MazeCell[][]): BoulderSt
 export function handlePhysicsError(
     error: unknown,
     maze: MazeCell[][],
-    boulderStateManager: BoulderStateManager
+    _boulderStateManager: BoulderStateManager
 ): ErrorResult<{ maze: MazeCell[][]; manager: BoulderStateManager }> {
     try {
         // Create safe fallback state

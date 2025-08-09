@@ -64,8 +64,6 @@ export function createFocusTrap(modalElement: HTMLElement): () => void {
 
         // Get current focusable elements (in case DOM has changed)
         const focusableElements = getCurrentFocusableElements();
-        const firstFocusable = focusableElements[0];
-        const lastFocusable = focusableElements[focusableElements.length - 1];
 
         // If no focusable elements, prevent tabbing and focus modal container
         if (focusableElements.length === 0) {
@@ -77,9 +75,13 @@ export function createFocusTrap(modalElement: HTMLElement): () => void {
         // If only one focusable element, keep focus on it
         if (focusableElements.length === 1) {
             event.preventDefault();
-            firstFocusable.focus();
+            focusableElements[0]!.focus();
             return;
         }
+
+        // From here on, we have at least two focusable elements
+        const firstFocusable = focusableElements[0]!;
+        const lastFocusable = focusableElements[focusableElements.length - 1]!;
 
         // Handle tab navigation within the modal
         if (event.shiftKey) {

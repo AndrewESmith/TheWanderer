@@ -4,7 +4,6 @@ import {
   screen,
   fireEvent,
   waitFor,
-  act,
 } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 
@@ -333,12 +332,6 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
       // Ensure How to Play popup is not blocking movement
       await closeHowToPlayPopupIfOpen();
 
-      // Test that WASD keys are handled by the keyboard event system
-      // We'll verify this by checking that the moves counter changes when valid moves are made
-      const initialMoves = parseInt(
-        screen.getByText(/Moves:/).textContent?.match(/\d+/)?.[0] || "0"
-      );
-
       // Try different movement keys until we find one that works
       const keys = ["d", "D", "a", "A", "s", "S", "w", "W"];
       let soundTriggered = false;
@@ -528,7 +521,7 @@ describe("App Sound Integration - Comprehensive Task 10 Tests", () => {
     it("should not block game rendering during sound operations", async () => {
       render(<App />);
 
-      const initialScore = screen.getByText(/Score:/).textContent;
+      screen.getByText(/Score:/).textContent;
       const initialMoves = screen.getByText(/Moves:/).textContent;
 
       // Perform multiple sound-triggering actions rapidly

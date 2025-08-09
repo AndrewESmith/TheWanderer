@@ -189,7 +189,7 @@ describe('Boulder Performance Integration', () => {
 
             // Modify maze
             const modifiedMaze = testMaze.map(row => [...row]);
-            modifiedMaze[1][1] = CELL.SOIL; // Remove a boulder
+            modifiedMaze[1]![1] = CELL.SOIL; // Remove a boulder
 
             const hasChanged2 = performanceSystem.checkMazeChanges(modifiedMaze);
             expect(hasChanged2).toBe(true); // Maze changed
@@ -201,7 +201,7 @@ describe('Boulder Performance Integration', () => {
 
             // Remove a boulder from maze
             const modifiedMaze = testMaze.map(row => [...row]);
-            modifiedMaze[1][1] = CELL.SOIL;
+            modifiedMaze[1]![1] = CELL.SOIL;
 
             performanceSystem.checkMazeChanges(modifiedMaze);
 
@@ -319,8 +319,9 @@ describe('Boulder Performance Integration', () => {
             for (let i = 0; i < 100; i++) {
                 const boulders = performanceSystem.getBouldersByState('stationary');
                 if (boulders.length > 0) {
-                    performanceSystem.updateBoulderState([boulders[0]], [], [], [], i + 2);
-                    performanceSystem.updateBoulderState([], [], [boulders[0]], [], i + 3);
+                    const firstBoulder = boulders[0]!;
+                    performanceSystem.updateBoulderState([firstBoulder], [], [], [], i + 2);
+                    performanceSystem.updateBoulderState([], [], [firstBoulder], [], i + 3);
                 }
             }
 

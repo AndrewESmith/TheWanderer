@@ -1,17 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
     createInitialGameState,
-    movePlayer,
-    type GameStateData,
+    movePlayer
 } from '../GameState';
 import {
-    simulateGravityWithState,
-    type PhysicsSimulationResult
+    simulateGravityWithState
 } from '../physics/physics-engine';
 import {
-    createBoulderStateManager,
-    createPositionKey,
-    type BoulderStateManager
+    createPositionKey
 } from '../physics/boulder-state-manager';
 import { shouldBlockPlayerMovement } from '../physics/movement-constraint-system';
 import { CELL, type MazeCell } from '../maze';
@@ -77,7 +73,7 @@ describe('Boulder Player Experience End-to-End Tests', () => {
             );
 
             // Check if boulder is moving (which would block player)
-            const isBlocked = shouldBlockPlayerMovement(step2.boulderStateManager);
+            shouldBlockPlayerMovement(step2.boulderStateManager);
 
             // Phase 4: Verify audio feedback during boulder movement
             const boulderSounds = physicsResult.soundEvents.filter(
@@ -100,7 +96,6 @@ describe('Boulder Player Experience End-to-End Tests', () => {
             // Phase 6: Player moves around boulder and collects diamond
             const step4 = movePlayer(step3, 1, 0); // Try to move right to (2,3) - might be blocked by boulder
             // Check if player moved or stayed due to boulder blocking
-            const actualStep4Position = step4.player;
 
             // Continue navigation based on actual position
             let currentStep = step4;
@@ -413,8 +408,8 @@ describe('Boulder Player Experience End-to-End Tests', () => {
             const leftBoulderKey = createPositionKey({ x: 1, y: 1 });
             const rightBoulderKey = createPositionKey({ x: 4, y: 1 });
 
-            const leftBoulder = step1.boulderStateManager.boulders.get(leftBoulderKey);
-            const rightBoulder = step1.boulderStateManager.boulders.get(rightBoulderKey);
+            step1.boulderStateManager.boulders.get(leftBoulderKey);
+            step1.boulderStateManager.boulders.get(rightBoulderKey);
 
             // At least one boulder should be triggered
             const triggeredBoulders = Array.from(step1.boulderStateManager.boulders.values())
@@ -731,11 +726,6 @@ describe('Boulder Player Experience End-to-End Tests', () => {
             const step1 = movePlayer(gameState, 0, -1); // Move up to (3,2)
             expect(step1.player).toEqual({ x: 3, y: 2 });
 
-            // Check which boulders are triggered
-            const boulder1Key = createPositionKey({ x: 1, y: 1 });
-            const boulder2Key = createPositionKey({ x: 3, y: 1 });
-            const boulder3Key = createPositionKey({ x: 5, y: 1 });
-
             const triggeredBoulders = Array.from(step1.boulderStateManager.boulders.values())
                 .filter(state => state.isTriggered);
 
@@ -845,7 +835,7 @@ describe('Boulder Player Experience End-to-End Tests', () => {
             expect(currentState.gameState).toMatch(/playing|dead|won/);
 
             // System should handle rapid movements without errors
-            moveResults.forEach((result, index) => {
+            moveResults.forEach((result, _index) => {
                 expect(result.position.x).toBeGreaterThanOrEqual(0);
                 expect(result.position.y).toBeGreaterThanOrEqual(0);
                 expect(result.soundEventCount).toBeGreaterThanOrEqual(0);

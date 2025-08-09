@@ -5,7 +5,6 @@ import {
     type GameStateData,
 } from '../GameState';
 import {
-    updateBoulderTriggers,
     updateBoulderMovement,
     createPositionKey,
 } from '../physics/boulder-state-manager';
@@ -338,7 +337,7 @@ describe('Game State Boulder System Integration', () => {
             let currentState = gameState;
 
             // Perform 10 rapid moves
-            const moves = [
+            const moves: [number, number][] = [
                 [1, 0], [-1, 0], [0, 1], [0, -1], [1, 0],
                 [-1, 0], [0, 1], [0, -1], [1, 0], [-1, 0]
             ];

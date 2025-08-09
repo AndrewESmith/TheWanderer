@@ -3,10 +3,8 @@ import { CELL } from '../maze';
 import {
     validatePosition,
     validateBoulderStateManager,
-    recoverBoulderStateManager,
     createFallbackBoulderStateManager,
-    logBoulderError,
-    type ErrorResult
+    logBoulderError
 } from './boulder-error-handling';
 
 // Position interface (re-exported from collision-detection for consistency)

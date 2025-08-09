@@ -5,23 +5,17 @@ import {
     simulateBoulderFall,
     simulateEnhancedBoulderFall,
     simulateArrowMovement,
-    canBoulderFall,
     type Position
 } from './collision-detection';
 import type { BoulderStateManager } from './boulder-state-manager';
 import {
-    getTriggeredBouldersForMove,
-    updateBoulderMovement,
-    updateBoulderPositions,
-    createPositionKey
+    getTriggeredBouldersForMove
 } from './boulder-state-manager';
 import {
     validateMazeIntegrity,
     validateBoulderStateManager,
     handlePhysicsError,
-    createFallbackBoulderStateManager,
-    logBoulderError,
-    type ErrorResult
+    logBoulderError
 } from './boulder-error-handling';
 
 // Enhanced physics simulation result
@@ -291,20 +285,7 @@ export function simulateGravityWithState(
     }
 }
 
-// Helper function to find player position in maze
-function findPlayerPosition(maze: MazeCell[][]): Position | null {
-    for (let y = 0; y < maze.length; y++) {
-        const row = maze[y];
-        if (!row) continue;
-
-        for (let x = 0; x < row.length; x++) {
-            if (row[x] === CELL.PLAYER) {
-                return { x, y };
-            }
-        }
-    }
-    return null;
-}
+// (removed unused helper findPlayerPosition)
 
 // Pure function to simulate arrow movement (for future use)
 export function simulateArrows(

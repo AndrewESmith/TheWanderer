@@ -10,7 +10,7 @@ describe('Complete Asset Integration Validation', () => {
             const distDir = path.resolve(process.cwd(), 'dist');
 
             // Verify source assets exist
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const sourcePath = path.join(publicDir, fileName);
 
@@ -37,7 +37,7 @@ describe('Complete Asset Integration Validation', () => {
                 return;
             }
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const sourcePath = path.join(publicDir, fileName);
                 const distPath = path.join(distDir, fileName);
@@ -63,7 +63,7 @@ describe('Complete Asset Integration Validation', () => {
                 return;
             }
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const distPath = path.join(distDir, fileName);
 
@@ -81,7 +81,7 @@ describe('Complete Asset Integration Validation', () => {
                 return;
             }
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 // In production, paths should resolve to files in dist root
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const productionPath = path.join(distDir, fileName);
@@ -104,7 +104,7 @@ describe('Complete Asset Integration Validation', () => {
             // Verify assets are handled correctly
             const distDir = path.resolve(process.cwd(), 'dist');
             if (fs.existsSync(distDir)) {
-                Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+                Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                     const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                     const distPath = path.join(distDir, fileName);
 
@@ -130,7 +130,7 @@ describe('Complete Asset Integration Validation', () => {
         it('should work in development environment', () => {
             const publicDir = path.resolve(process.cwd(), 'public');
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 // Development: Vite serves from public folder
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const devPath = path.join(publicDir, fileName);
@@ -149,7 +149,7 @@ describe('Complete Asset Integration Validation', () => {
                 return;
             }
 
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 // Production: Assets copied to dist root
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
                 const prodPath = path.join(distDir, fileName);
@@ -212,7 +212,7 @@ describe('Complete Asset Integration Validation', () => {
         });
 
         it('should maintain consistent asset naming convention', () => {
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const fileName = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
 
                 // Should follow naming convention: .png extension and valid filename

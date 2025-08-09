@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createGameState, movePlayer, createInitialGameState, type GameStateData } from "../GameState";
+import { createGameState, movePlayer, type GameStateData } from "../GameState";
 import { CELL, type MazeCell } from "../maze";
 import type { IPlayerPos } from "../Interfaces/IPlayerPos";
 import { createBoulderStateManager } from "../physics/boulder-state-manager";

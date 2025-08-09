@@ -31,7 +31,7 @@ describe('Runtime Asset Validation', () => {
 
     describe('Image Loading Behavior', () => {
         it('should create valid Image objects for all icon paths', () => {
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 const img = new Image();
                 img.src = imagePath;
 
@@ -42,7 +42,7 @@ describe('Runtime Asset Validation', () => {
         });
 
         it('should handle successful image loading', async () => {
-            const loadPromises = Object.entries(ICONS).map(([cellType, imagePath]) => {
+            const loadPromises = Object.entries(ICONS).map(([_cellType, imagePath]) => {
                 return new Promise<void>((resolve, reject) => {
                     const img = new Image();
                     img.onload = () => resolve();
@@ -88,7 +88,7 @@ describe('Runtime Asset Validation', () => {
         });
 
         it('should not have any empty or undefined paths', () => {
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 expect(imagePath).toBeDefined();
                 expect(imagePath).not.toBe('');
                 expect(typeof imagePath).toBe('string');
@@ -118,7 +118,7 @@ describe('Runtime Asset Validation', () => {
 
         it('should have paths compatible with both environments', () => {
             // Paths should work in both dev (public folder) and prod (dist root)
-            Object.entries(ICONS).forEach(([cellType, imagePath]) => {
+            Object.entries(ICONS).forEach(([_cellType, imagePath]) => {
                 // Remove leading slash to get filename
                 const filename = imagePath.slice(1);
 

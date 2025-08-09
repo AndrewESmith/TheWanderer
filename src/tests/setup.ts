@@ -1,11 +1,7 @@
 // This file contains setup code for tests
-import { expect, vi, beforeEach, afterEach } from 'vitest';
+import { vi, beforeEach, afterEach } from 'vitest';
 
-// Ensure we're using Vitest's globals
-global.expect = expect;
-global.vi = vi;
-global.beforeEach = beforeEach;
-global.afterEach = afterEach;
+// Vitest globals are already enabled via config
 
 // Mock CSS imports
 vi.mock('*.css', () => ({}));

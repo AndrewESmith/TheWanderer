@@ -1,20 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
     createInitialGameState,
-    movePlayer,
-    type GameStateData,
+    movePlayer
 } from '../GameState';
 import {
-    simulatePhysicsStepWithState,
-    simulateGravityWithState,
-    type PhysicsSimulationResult
+    simulateGravityWithState
 } from '../physics/physics-engine';
 import {
-    createBoulderStateManager,
-    updateBoulderTriggers,
     updateBoulderMovement,
-    createPositionKey,
-    type BoulderStateManager
+    createPositionKey
 } from '../physics/boulder-state-manager';
 import { CELL, type MazeCell } from '../maze';
 import type { SoundEvent } from '../Interfaces/ISoundEvent';
@@ -157,7 +151,7 @@ describe('Boulder Behavior Integration Tests', () => {
             );
 
             // Check for any sound events from boulder
-            const boulderSounds = physicsResult.soundEvents.filter(
+            physicsResult.soundEvents.filter(
                 event => event.source === 'boulder'
             );
             const collisionSounds = physicsResult.soundEvents.filter(
@@ -307,10 +301,8 @@ describe('Boulder Behavior Integration Tests', () => {
 
             // Both boulders should be triggered
             const boulder1Key = createPositionKey({ x: 1, y: 1 });
-            const boulder2Key = createPositionKey({ x: 3, y: 1 });
 
             const boulder1State = step1.boulderStateManager.boulders.get(boulder1Key);
-            const boulder2State = step1.boulderStateManager.boulders.get(boulder2Key);
 
             // Boulder at (1,1) should be triggered as it's adjacent to player at (1,2)
             expect(boulder1State?.isTriggered).toBe(true);
@@ -363,13 +355,9 @@ describe('Boulder Behavior Integration Tests', () => {
             const step1 = movePlayer(gameState, -1, 0); // Move to (3,2)
 
             // Boulder at (3,1) should be triggered as it's adjacent to player at (3,2)
-            const boulder1Key = createPositionKey({ x: 1, y: 1 });
-            const boulder2Key = createPositionKey({ x: 2, y: 1 });
             const boulder3Key = createPositionKey({ x: 3, y: 1 });
 
             const manager = step1.boulderStateManager;
-            const boulder1State = manager.boulders.get(boulder1Key);
-            const boulder2State = manager.boulders.get(boulder2Key);
             const boulder3State = manager.boulders.get(boulder3Key);
 
             // Only boulder at (3,1) should be triggered as it's adjacent to player at (3,2)
@@ -475,10 +463,8 @@ describe('Boulder Behavior Integration Tests', () => {
 
             // Left boulder should be triggered as it's adjacent to player at (2,2)
             const leftBoulderKey = createPositionKey({ x: 1, y: 1 });
-            const rightBoulderKey = createPositionKey({ x: 4, y: 1 });
 
             const leftBoulderState = step1.boulderStateManager.boulders.get(leftBoulderKey);
-            const rightBoulderState = step1.boulderStateManager.boulders.get(rightBoulderKey);
 
             expect(leftBoulderState?.isTriggered).toBe(true);
             // Right boulder might not be triggered as it's not adjacent to player at (2,2)
@@ -688,13 +674,12 @@ describe('Boulder Behavior Integration Tests', () => {
             ];
 
             const gameState = createInitialGameState(testMaze);
-            const initialMoves = gameState.moves;
             const initialScore = gameState.score;
 
             // Perform multiple moves with boulder interactions
             let currentState = gameState;
             for (let i = 0; i < 5; i++) {
-                const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                const directions: [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
                 const [dx, dy] = directions[i % directions.length]!;
                 currentState = movePlayer(currentState, dx, dy);
 
@@ -729,7 +714,7 @@ describe('Boulder Behavior Integration Tests', () => {
             const startTime = performance.now();
             let currentState = gameState;
 
-            const moves = [
+            const moves: [number, number][] = [
                 [-1, 0], [1, 0], [-1, 0], [1, 0], [0, 1], [0, -1],
                 [1, 0], [-1, 0], [0, 1], [0, -1]
             ];

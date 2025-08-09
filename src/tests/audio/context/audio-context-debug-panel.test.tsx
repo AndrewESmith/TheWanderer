@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { ReactNode } from "react";
+import type{ ReactNode } from "react";
 import {
   AudioProvider,
   useAudioContext,
@@ -35,7 +35,22 @@ const mockAudioManager: AudioManager = {
   setMuted: vi.fn(),
   isMuted: vi.fn().mockReturnValue(false),
   isSupported: vi.fn().mockReturnValue(true),
+  stopAllSounds: vi.fn(),
   cleanup: vi.fn(),
+  getLoadingState: vi.fn(() => ({
+    isLoading: false,
+    loadedCount: 0,
+    totalCount: 0,
+    failedSounds: [],
+    errors: new Map(),
+  })),
+  onLoadingProgress: vi.fn(() => vi.fn()),
+  getOptimizationReport: vi.fn(() => ({})),
+  setGlobalVolume: vi.fn(),
+  getGlobalVolume: vi.fn(() => 1),
+  setCategoryVolume: vi.fn(),
+  getCategoryVolume: vi.fn(() => 1),
+  getAllCategoryVolumes: vi.fn(() => ({})),
 };
 
 // Mock the createAudioManager function

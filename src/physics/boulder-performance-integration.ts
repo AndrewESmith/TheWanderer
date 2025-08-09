@@ -8,8 +8,6 @@ import {
 } from './boulder-state-manager';
 import {
     OptimizedBoulderStateManager,
-    createSpatialIndex,
-    detectAdjacentBouldersOptimized,
     findBoulderPositionsOptimized,
     BoulderPositionTracker,
     processBouldersBatch,
@@ -229,8 +227,7 @@ export class PerformanceOptimizedBoulderSystem {
 
         if (mazeSize > 10000) { // Large maze threshold
             // Use larger spatial index cell size for better performance
-            const positions = findBoulderPositionsOptimized(maze);
-            const largeCellSize = Math.max(5, Math.floor(Math.sqrt(mazeSize) / 20));
+            findBoulderPositionsOptimized(maze);
 
             // Recreate optimized manager with larger cell size
             const baseManager = createBoulderStateManager(maze);

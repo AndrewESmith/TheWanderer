@@ -166,7 +166,7 @@ const MAZE_LEVELS: MazeLevelData[] = [
  * @param levelIndex The index of the level in the array (for context)
  * @returns The validated level or a repaired/fallback level
  */
-function validateAndRepairLevel(level: MazeLevelData, levelIndex: number): MazeLevelData | null {
+function validateAndRepairLevel(level: MazeLevelData, _levelIndex: number): MazeLevelData | null {
     return withLevelErrorHandling(() => {
         const validationResult = validateLevel(level);
 

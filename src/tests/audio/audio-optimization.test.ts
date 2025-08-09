@@ -7,14 +7,6 @@ const mockAudioContext = {
     decodeAudioData: vi.fn()
 };
 
-const mockAudioBuffer = {
-    duration: 2.5,
-    sampleRate: 44100,
-    numberOfChannels: 2,
-    length: 110250,
-    getChannelData: vi.fn(() => new Float32Array(110250))
-};
-
 // Mock Audio constructor
 global.Audio = vi.fn(() => ({
     canPlayType: vi.fn((type: string) => {

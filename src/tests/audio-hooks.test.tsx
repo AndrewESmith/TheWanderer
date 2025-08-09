@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { ReactNode } from "react";
+import type{ ReactNode } from "react";
 import { useSound, useAudioSettings, AudioProvider } from "../audio";
 import type { AudioManager } from "../Interfaces/IAudioManager";
 
@@ -13,8 +13,20 @@ const mockAudioManager: AudioManager = {
   isSupported: vi.fn().mockReturnValue(true),
   cleanup: vi.fn(),
   setGlobalVolume: vi.fn(),
+  getGlobalVolume: vi.fn(() => 1),
   setCategoryVolume: vi.fn(),
+  getCategoryVolume: vi.fn(() => 1),
+  getAllCategoryVolumes: vi.fn(() => ({})),
   stopAllSounds: vi.fn(),
+  getLoadingState: vi.fn(() => ({
+    isLoading: false,
+    loadedCount: 0,
+    totalCount: 0,
+    failedSounds: [],
+    errors: new Map(),
+  })),
+  onLoadingProgress: vi.fn(() => vi.fn()),
+  getOptimizationReport: vi.fn(() => ({})),
 };
 
 // Mock the createAudioManager function
@@ -42,14 +54,6 @@ Object.defineProperty(window, "localStorage", {
 // Test wrapper component
 function TestWrapper({ children }: { children: ReactNode }) {
   return <AudioProvider>{children}</AudioProvider>;
-}
-
-// Helper to create a failing audio manager
-function createFailingAudioManager() {
-  return {
-    ...mockAudioManager,
-    preloadSounds: vi.fn().mockRejectedValue(new Error("Failed to initialize")),
-  };
 }
 
 describe("Audio Hooks", () => {
@@ -106,7 +110,7 @@ describe("Audio Hooks", () => {
     });
 
     it("should return muted state from audio manager", async () => {
-      mockAudioManager.isMuted.mockReturnValue(true);
+      vi.mocked(mockAudioManager.isMuted).mockReturnValue(true);
 
       const { result } = renderHook(() => useSound(), {
         wrapper: TestWrapper,
@@ -121,7 +125,7 @@ describe("Audio Hooks", () => {
     });
 
     it("should toggle mute state", async () => {
-      mockAudioManager.isMuted.mockReturnValue(false);
+      vi.mocked(mockAudioManager.isMuted).mockReturnValue(false);
 
       const { result } = renderHook(() => useSound(), {
         wrapper: TestWrapper,
@@ -198,7 +202,7 @@ describe("Audio Hooks", () => {
     });
 
     it("should handle playSound errors gracefully", async () => {
-      mockAudioManager.playSound.mockImplementation(() => {
+      vi.mocked(mockAudioManager.playSound).mockImplementation(() => {
         throw new Error("Playback failed");
       });
 

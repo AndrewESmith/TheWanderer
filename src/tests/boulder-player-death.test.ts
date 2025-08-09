@@ -4,7 +4,6 @@ import { CELL } from '../maze';
 import { simulatePhysicsStepWithState } from '../physics/physics-engine';
 import { createBoulderStateManager, updateBoulderTriggers } from '../physics/boulder-state-manager';
 import { movePlayer, type GameStateData } from '../GameState';
-import { emitSoundEvents } from '../audio/events/sound-event-emitter';
 import { handleGameEndSounds } from '../audio/events/game-end-sound-manager';
 import { createMazeLevelManager } from '../levels/maze-level-manager';
 import { createLevelProgressionHandler } from '../levels/level-progression-handler';

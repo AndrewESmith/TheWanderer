@@ -1,9 +1,7 @@
 import type { BoulderStateManager, MovementConstraint } from './boulder-state-manager';
 import { hasMovingBoulders, createMovementConstraint } from './boulder-state-manager';
 import {
-    validateBoulderStateManager,
     logBoulderError,
-    type ErrorResult
 } from './boulder-error-handling';
 
 // Movement constraint system interface

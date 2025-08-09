@@ -308,7 +308,7 @@ export class BoulderPositionTracker {
 }
 
 // Performance monitoring functions
-function updatePerformanceMetrics(operation: string, duration: number): void {
+function updatePerformanceMetrics(_operation: string, duration: number): void {
     performanceState.operations++;
 
     // Update metrics every 100 operations or every 5 seconds

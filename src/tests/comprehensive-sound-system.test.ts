@@ -2,13 +2,12 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { performance } from 'perf_hooks';
 
 // Import sound system components
-import { WebAudioManager, HTML5AudioManager, SilentAudioManager } from '../audio/managers/audio-manager';
+import { WebAudioManager, HTML5AudioManager } from '../audio/managers/audio-manager';
 import { SOUND_ASSETS, SOUND_CONFIG, SOUND_IDS } from '../audio/config/sound-config';
 import { mapPlayerMovementToSound, mapGameStateChangeToSound, generatePlayerMoveEvents } from '../audio/events/sound-event-mapper';
 import { createSoundEventEmitter } from '../audio/events/sound-event-emitter';
 import { CELL } from '../maze';
-import type { SoundEvent, PlaySoundOptions } from '../Interfaces/ISoundEvent';
-import type { AudioManager } from '../Interfaces/IAudioManager';
+import type { SoundEvent } from '../Interfaces/ISoundEvent';
 
 // Comprehensive Web Audio API Mock
 class ComprehensiveMockAudioContext {
@@ -69,7 +68,7 @@ class ComprehensiveMockAudioContext {
         };
     }
 
-    decodeAudioData = vi.fn((arrayBuffer: ArrayBuffer) => {
+    decodeAudioData = vi.fn((_arrayBuffer: ArrayBuffer) => {
         const buffer = this.createBuffer(2, 44100, 44100);
         return Promise.resolve(buffer);
     });
@@ -193,7 +192,7 @@ class ComprehensiveMockAudio {
 
 // Mock fetch for sound file loading
 const createMockFetch = (shouldFail = false, delay = 0) => {
-    return vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    return vi.fn((input: RequestInfo | URL, _init?: RequestInit): Promise<Response> => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 const url = typeof input === 'string' ? input : input.toString();
@@ -430,7 +429,7 @@ describe('Comprehensive Sound System Test Suite', () => {
 
         describe('Sound Configuration Validation', () => {
             it('should have valid sound asset configuration', () => {
-                Object.entries(SOUND_ASSETS).forEach(([key, asset]) => {
+                Object.entries(SOUND_ASSETS).forEach(([_key, asset]) => {
                     expect(asset).toHaveProperty('id');
                     expect(asset).toHaveProperty('src');
                     expect(asset).toHaveProperty('volume');
@@ -473,7 +472,7 @@ describe('Comprehensive Sound System Test Suite', () => {
                 expect(SOUND_CONFIG.globalVolume).toBeGreaterThan(0);
                 expect(SOUND_CONFIG.globalVolume).toBeLessThanOrEqual(1);
 
-                Object.entries(SOUND_CONFIG.categories).forEach(([key, category]) => {
+                Object.entries(SOUND_CONFIG.categories).forEach(([_key, category]) => {
                     expect(category).toHaveProperty('name');
                     expect(category).toHaveProperty('volume');
                     expect(category).toHaveProperty('sounds');
@@ -507,7 +506,7 @@ describe('Comprehensive Sound System Test Suite', () => {
             });
 
             it('should handle audio context state changes', async () => {
-                const manager = new WebAudioManager();
+                new WebAudioManager();
 
                 // Simulate suspension
                 mockAudioContext.simulateStateChange('suspended');
@@ -519,7 +518,7 @@ describe('Comprehensive Sound System Test Suite', () => {
             });
 
             it('should create and manage gain nodes correctly', () => {
-                const manager = new WebAudioManager();
+                new WebAudioManager();
 
                 // Should have created a gain node during initialization
                 const gainNodes = mockAudioContext.getGainNodes();

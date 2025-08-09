@@ -129,7 +129,7 @@ describe('Enhanced Audio Manager', () => {
         describe('enhanced preloading', () => {
             it('should preload sounds with progress tracking', async () => {
                 // Ensure fetch mock returns proper response for all sound assets
-                mockFetch.mockImplementation((url: string) => {
+                mockFetch.mockImplementation((_url: string) => {
                     return Promise.resolve({
                         ok: true,
                         status: 200,

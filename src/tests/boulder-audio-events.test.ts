@@ -9,10 +9,8 @@ import {
 import {
     createBoulderStateManager,
     updateBoulderTriggers,
-    updateBoulderMovement,
-    type BoulderStateManager
+    updateBoulderMovement
 } from '../physics/boulder-state-manager';
-import { emitSoundEvents, getSoundEventEmitter } from '../audio/events/sound-event-emitter';
 import { mapSoundEventToId } from '../audio/events/sound-event-mapper';
 import { SOUND_IDS } from '../audio/config/sound-config';
 
@@ -236,7 +234,7 @@ describe('Boulder Audio Events', () => {
                 { cell: CELL.BOULDER, description: 'another boulder' }
             ];
 
-            solidTestCases.forEach(({ cell, description }) => {
+            solidTestCases.forEach(({ cell }) => {
                 const testMaze: MazeCell[][] = [
                     [CELL.ROCK, CELL.ROCK, CELL.ROCK],
                     [CELL.ROCK, CELL.BOULDER, CELL.ROCK],
@@ -293,7 +291,7 @@ describe('Boulder Audio Events', () => {
                 { cell: CELL.EXIT, description: 'exit', expectedSoundType: 'collision' }
             ];
 
-            solidObjectTestCases.forEach(({ cell, description, expectedSoundType }) => {
+            solidObjectTestCases.forEach(({ cell, expectedSoundType }) => {
                 const testMaze: MazeCell[][] = [
                     [CELL.ROCK, CELL.ROCK, CELL.ROCK],
                     [CELL.ROCK, CELL.BOULDER, CELL.ROCK],
@@ -324,7 +322,7 @@ describe('Boulder Audio Events', () => {
                 { cell: CELL.PLAYER, description: 'player', expectedSoundType: 'death' }
             ];
 
-            specialCollisionTestCases.forEach(({ cell, description, expectedSoundType }) => {
+            specialCollisionTestCases.forEach(({ cell, expectedSoundType }) => {
                 const testMaze: MazeCell[][] = [
                     [CELL.ROCK, CELL.ROCK, CELL.ROCK],
                     [CELL.ROCK, CELL.BOULDER, CELL.ROCK],

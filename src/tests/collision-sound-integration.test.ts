@@ -341,7 +341,7 @@ describe('Collision Sound Integration Tests', () => {
             ];
 
             const gameState = createInitialGameState(testMaze);
-            const newGameState = movePlayer(gameState, 1, 0); // Move player right
+            movePlayer(gameState, 1, 0); // Move player right
 
             // Should have called emitSoundEvents with sounds
             expect(vi.mocked(emitSoundEvents)).toHaveBeenCalled();

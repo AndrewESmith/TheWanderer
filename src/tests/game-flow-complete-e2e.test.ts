@@ -239,7 +239,7 @@ describe('Complete Game Flow End-to-End Unit Tests', () => {
 
     describe('Performance and Stress Testing', () => {
         it('should handle rapid level transitions efficiently', () => {
-            const gameState = createGameState();
+            createGameState();
 
             const startTime = performance.now();
 

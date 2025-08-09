@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi, type MockedFunction } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { WebAudioManager, HTML5AudioManager, SilentAudioManager, createAudioManager } from '../audio/managers/audio-manager';
 import type { PlaySoundOptions } from '../Interfaces/ISoundEvent';
 
@@ -41,7 +41,7 @@ class MockAudioContext {
         };
     }
 
-    decodeAudioData(arrayBuffer: ArrayBuffer) {
+    decodeAudioData(_arrayBuffer: ArrayBuffer) {
         return Promise.resolve({
             length: 1000,
             sampleRate: 44100,

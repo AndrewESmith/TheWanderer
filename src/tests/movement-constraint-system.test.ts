@@ -9,9 +9,7 @@ import {
     createMovementConstraintSystem,
     createEnhancedMovementConstraint,
     isMovementAllowed,
-    getMovementStatus,
-    type MovementConstraintSystem,
-    type EnhancedMovementConstraint,
+    getMovementStatus
 } from '../physics/movement-constraint-system';
 import {
     createBoulderStateManager,
@@ -463,7 +461,7 @@ describe('Movement Constraint System', () => {
             );
             largeMaze[0] = Array(10).fill(CELL.ROCK);
             largeMaze[9] = Array(10).fill(CELL.ROCK);
-            largeMaze[5][5] = CELL.PLAYER;
+            largeMaze[5]![5] = CELL.PLAYER;
 
             const largeManager = createBoulderStateManager(largeMaze);
 
@@ -471,7 +469,9 @@ describe('Movement Constraint System', () => {
             const manyBoulders = Array.from(largeManager.boulders.keys())
                 .slice(0, 50)
                 .map(key => {
-                    const [x, y] = key.split(',').map(Number);
+                    const parts = key.split(',');
+                    const x = Number(parts[0]!);
+                    const y = Number(parts[1]!);
                     return { x, y };
                 });
 

@@ -5,7 +5,6 @@ import type { MazeCell } from '../maze';
 import { getSoundEventEmitter } from '../audio/events/sound-event-emitter';
 import { getGameEndSoundManager } from '../audio/events/game-end-sound-manager';
 import { SOUND_IDS } from '../audio/config/sound-config';
-import type { SoundEvent } from '../Interfaces/ISoundEvent';
 
 describe('Game State Sound Transitions', () => {
     let mockCallback: ReturnType<typeof vi.fn>;

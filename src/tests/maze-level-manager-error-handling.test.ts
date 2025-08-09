@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMazeLevelManager } from '../levels/maze-level-manager';
+import type { MazeLevelManager } from '../Interfaces/IMazeLevelManager';
 import { CELL } from '../maze';
-import type { MazeLevelData } from '../Interfaces/IMazeLevelData';
 
 // Mock console methods to avoid noise in tests
 const mockConsole = {
@@ -262,7 +262,7 @@ describe('MazeLevelManager Error Handling', () => {
 
     describe('Performance under error conditions', () => {
         it('should handle multiple manager instances', () => {
-            const managers = [];
+            const managers: MazeLevelManager[] = [];
 
             // Create multiple managers
             for (let i = 0; i < 5; i++) {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   AudioProvider,
   useAudioContext,
@@ -51,7 +51,22 @@ const mockAudioManager: AudioManager = {
   setMuted: vi.fn(),
   isMuted: vi.fn().mockReturnValue(false),
   isSupported: vi.fn().mockReturnValue(true),
+  stopAllSounds: vi.fn(),
   cleanup: vi.fn(),
+  getLoadingState: vi.fn(() => ({
+    isLoading: false,
+    loadedCount: 0,
+    totalCount: 0,
+    failedSounds: [],
+    errors: new Map(),
+  })),
+  onLoadingProgress: vi.fn(() => vi.fn()),
+  getOptimizationReport: vi.fn(() => ({})),
+  setGlobalVolume: vi.fn(),
+  getGlobalVolume: vi.fn(() => 1),
+  setCategoryVolume: vi.fn(),
+  getCategoryVolume: vi.fn(() => 1),
+  getAllCategoryVolumes: vi.fn(() => ({})),
 };
 
 // Mock the createAudioManager function
@@ -126,7 +141,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
         expect.stringContaining('"showDebugPanel":true')
       );
 
-      const savedData = JSON.parse(mockLocalStorage._getStore()[STORAGE_KEY]);
+      const savedRaw = mockLocalStorage._getStore()[STORAGE_KEY]!;
+      const savedData = JSON.parse(savedRaw);
       expect(savedData.showDebugPanel).toBe(true);
     });
 
@@ -156,7 +172,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      const savedData = JSON.parse(mockLocalStorage._getStore()[STORAGE_KEY]);
+      const savedRaw = mockLocalStorage._getStore()[STORAGE_KEY]!;
+      const savedData = JSON.parse(savedRaw);
       expect(savedData.showDebugPanel).toBe(false);
     });
 
@@ -179,7 +196,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      const savedData = JSON.parse(mockLocalStorage._getStore()[STORAGE_KEY]);
+      const savedRaw = mockLocalStorage._getStore()[STORAGE_KEY]!;
+      const savedData = JSON.parse(savedRaw);
       expect(savedData.isMuted).toBe(true);
       expect(savedData.globalVolume).toBe(0.5);
       expect(savedData.showDebugPanel).toBe(true);
@@ -389,7 +407,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
 
         expect(result.current.settings.showDebugPanel).toBe(value);
 
-        const savedData = JSON.parse(mockLocalStorage._getStore()[STORAGE_KEY]);
+        const savedRaw = mockLocalStorage._getStore()[STORAGE_KEY]!;
+        const savedData = JSON.parse(savedRaw);
         expect(savedData.showDebugPanel).toBe(value);
       }
     });
@@ -499,7 +518,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
       expect(keys[0]).toBe(STORAGE_KEY);
 
       // Both settings should be in the same entry
-      const savedData = JSON.parse(store[STORAGE_KEY]);
+      const savedRaw = store[STORAGE_KEY]!;
+      const savedData = JSON.parse(savedRaw);
       expect(savedData.isMuted).toBe(true);
       expect(savedData.showDebugPanel).toBe(true);
     });
@@ -523,7 +543,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      const savedData = JSON.parse(mockLocalStorage._getStore()[STORAGE_KEY]);
+      const savedRaw = mockLocalStorage._getStore()[STORAGE_KEY]!;
+      const savedData = JSON.parse(savedRaw);
       expect(typeof savedData.showDebugPanel).toBe("boolean");
       expect(savedData.showDebugPanel).toBe(true);
     });
@@ -557,7 +578,8 @@ describe("Audio Settings localStorage Persistence - Debug Panel", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      const savedData = JSON.parse(mockLocalStorage._getStore()[STORAGE_KEY]);
+      const savedRaw = mockLocalStorage._getStore()[STORAGE_KEY]!;
+      const savedData = JSON.parse(savedRaw);
       expect(savedData.isMuted).toBe(true);
       expect(savedData.globalVolume).toBe(0.3);
       expect(savedData.categoryVolumes.movement).toBe(0.5);

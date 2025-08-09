@@ -3,22 +3,15 @@ import { performance } from 'perf_hooks';
 
 // Import all sound system components for end-to-end testing
 import { WebAudioManager, HTML5AudioManager, SilentAudioManager, createAudioManager } from '../audio/managers/audio-manager';
-import { SOUND_ASSETS, SOUND_CONFIG, SOUND_IDS } from '../audio/config/sound-config';
+import { SOUND_ASSETS, SOUND_IDS } from '../audio/config/sound-config';
 import {
-    mapPlayerMovementToSound,
-    mapGameStateChangeToSound,
-    generatePlayerMoveEvents,
-    mapSoundEventToId
+    generatePlayerMoveEvents
 } from '../audio/events/sound-event-mapper';
 import {
-    createSoundEventEmitter,
-    getSoundEventEmitter,
-    emitSoundEvent,
-    emitSoundEvents
+    getSoundEventEmitter
 } from '../audio/events/sound-event-emitter';
 import { CELL } from '../maze';
-import type { SoundEvent, PlaySoundOptions } from '../Interfaces/ISoundEvent';
-import type { AudioManager } from '../Interfaces/IAudioManager';
+import type { SoundEvent } from '../Interfaces/ISoundEvent';
 
 // Comprehensive mock setup for E2E tests
 class E2EMockAudioContext {
@@ -30,7 +23,6 @@ class E2EMockAudioContext {
     private stateChangeListeners: Array<() => void> = [];
     private gainNodes: Array<any> = [];
     private bufferSources: Array<any> = [];
-    private buffers: Map<string, any> = new Map();
 
     createGain() {
         const gainNode = {
@@ -84,7 +76,7 @@ class E2EMockAudioContext {
         return buffer;
     }
 
-    decodeAudioData(arrayBuffer: ArrayBuffer) {
+    decodeAudioData(_arrayBuffer: ArrayBuffer) {
         const buffer = this.createBuffer(2, 44100, 44100);
         return Promise.resolve(buffer);
     }
@@ -217,7 +209,7 @@ class E2EMockAudio {
 
 // Mock fetch with realistic network simulation
 const createE2EMockFetch = (networkDelay = 10, failureRate = 0) => {
-    return vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    return vi.fn((input: RequestInfo | URL, _init?: RequestInit): Promise<Response> => {
         const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
 
         return new Promise((resolve, reject) => {
@@ -607,7 +599,7 @@ describe('4. End-to-End Tests for Complete Sound Workflows', () => {
         it('should handle localStorage failures and continue operation', async () => {
             // Mock localStorage to fail intermittently
             let setItemCallCount = 0;
-            mockLocalStorage.setItem.mockImplementation((key: string, value: string) => {
+            mockLocalStorage.setItem.mockImplementation((_key: string, _value: string) => {
                 setItemCallCount++;
                 if (setItemCallCount % 2 === 0) {
                     throw new Error('Storage quota exceeded');

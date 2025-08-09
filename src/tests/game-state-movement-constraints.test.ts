@@ -133,7 +133,7 @@ describe('GameState Movement Constraints Integration', () => {
             };
 
             const originalPlayerPos = stateWithMovingBoulders.player;
-            const directions = [
+            const directions: [number, number][] = [
                 [0, -1], // Up
                 [0, 1],  // Down
                 [-1, 0], // Left
@@ -262,7 +262,7 @@ describe('GameState Movement Constraints Integration', () => {
 
     describe('Movement constraints with invalid moves', () => {
         it('should not affect constraint state when move is invalid due to boundaries', () => {
-            const initialState = createInitialGameState(testMaze);
+            createInitialGameState(testMaze);
 
             // Try to move player out of bounds (up from position 2,2 to 2,1 is valid, but 2,0 would be rock)
             // Let's move to a corner first
@@ -392,7 +392,7 @@ describe('GameState Movement Constraints Integration', () => {
             let currentState = initialState;
 
             // Perform many movement operations
-            const movements = [
+            const movements: [number, number][] = [
                 [1, 0], [-1, 0], [0, 1], [0, -1],
                 [1, 0], [-1, 0], [0, 1], [0, -1],
             ];

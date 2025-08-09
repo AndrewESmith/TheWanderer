@@ -1,13 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect} from 'vitest';
 import type { MazeCell } from '../maze';
 import { CELL } from '../maze';
 import {
     detectBoulderCollision,
     simulateEnhancedBoulderFall,
     canBoulderFall,
-    type Position,
-    type BoulderCollisionResult,
-    type BoulderFallResult
+    type Position
 } from '../physics/collision-detection';
 import {
     mapBoulderObjectCollisionToSound,

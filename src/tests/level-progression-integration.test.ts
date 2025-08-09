@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createGameState, movePlayer } from '../GameState';
+import { createGameState } from '../GameState';
 import { CELL } from '../maze';
 import type { MazeCell } from '../maze';
 

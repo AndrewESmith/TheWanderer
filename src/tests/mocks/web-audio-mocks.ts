@@ -87,7 +87,7 @@ export class MockAudioBufferSourceNode {
         }
     }
 
-    start(when?: number): void {
+    start(_when?: number): void {
         if (this.started) {
             throw new Error('Cannot start AudioBufferSourceNode more than once');
         }
@@ -104,7 +104,7 @@ export class MockAudioBufferSourceNode {
         }
     }
 
-    stop(when?: number): void {
+    stop(_when?: number): void {
         if (!this.started || this.stopped) {
             return;
         }
@@ -602,7 +602,7 @@ export function validateMockHTMLAudioElement(audio: MockHTMLAudioElement): void 
 // Performance testing utilities
 export function measureMockPerformance<T>(
     operation: () => T,
-    name: string
+    _name: string
 ): { result: T; duration: number } {
     const start = performance.now();
     const result = operation();
@@ -613,7 +613,7 @@ export function measureMockPerformance<T>(
 
 export async function measureAsyncMockPerformance<T>(
     operation: () => Promise<T>,
-    name: string
+    _name: string
 ): Promise<{ result: T; duration: number }> {
     const start = performance.now();
     const result = await operation();

@@ -9,11 +9,9 @@ import {
 import {
     createBoulderStateManager,
     updateBoulderTriggers,
-    updateBoulderMovement,
-    type BoulderStateManager
+    updateBoulderMovement
 } from '../physics/boulder-state-manager';
-import { emitSoundEvents, getSoundEventEmitter } from '../audio/events/sound-event-emitter';
-import { createInitialGameState, movePlayer } from '../GameState';
+import { emitSoundEvents } from '../audio/events/sound-event-emitter';
 
 // Mock the sound event emitter to track calls
 const mockEmit = vi.fn();
