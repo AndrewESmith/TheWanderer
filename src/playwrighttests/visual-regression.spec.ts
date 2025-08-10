@@ -182,20 +182,26 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
 
     test('partial image loading failure handling', async ({ page }) => {
         // Block some images but not others to test mixed states
+        // Block boulder and bomb images which are present in the initial maze
         await simulatePartialImageFailures(page, ['boulder.png', 'bomb.png']);
 
         await page.goto('/');
         await setupTestEnvironment(page);
-        await waitForGameStable(page, { minLoadedPercentage: 0.5 });
+        await waitForGameStable(page, { minLoadedPercentage: 0.3 }); // Lower threshold since some images will fail
 
         await takeStableScreenshot(page.locator('.maze-grid'), 'maze-grid-partial-failure.png');
 
         // Verify we have both loaded and error states
         const loadedCells = await page.locator('.cell.image-loaded').count();
         const errorCells = await page.locator('.cell.image-error').count();
+        const totalCells = await page.locator('.cell').count();
 
+        // We should have some loaded cells (player, rock, soil, diamond, empty, exit)
         expect(loadedCells).toBeGreaterThan(0);
+        // We should have some error cells (boulder, bomb)
         expect(errorCells).toBeGreaterThan(0);
+        // The sum of loaded and error cells should equal total cells
+        expect(loadedCells + errorCells).toBe(totalCells);
     });
 
     test('image loading error indicators', async ({ page }) => {

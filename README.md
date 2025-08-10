@@ -116,6 +116,13 @@ npm run test:e2e           # Run Playwright E2E tests
 npm run test:e2e:ui        # Run with Playwright UI
 npm run test:e2e:debug     # Debug Playwright tests
 
+# Visual Regression Tests
+npm run test:visual        # Run all visual regression tests
+npm run test:visual:update # Update visual baselines after UI changes
+npm run test:visual:chromium # Run visual tests on Chromium only
+npm run test:visual:firefox  # Run visual tests on Firefox only
+npm run test:visual:webkit   # Run visual tests on WebKit only
+
 # Specialized Test Suites
 npm run test:isolated      # Run tests in isolated environment
 ```
@@ -128,14 +135,15 @@ npm run test:isolated      # Run tests in isolated environment
 - **Integration Tests**: End-to-end testing of complete game workflows
 - **Performance Tests**: Boulder physics performance and optimization validation
 - **Error Handling Tests**: Comprehensive error recovery and fallback testing
+- **Visual Regression Tests**: Automated UI consistency testing across browsers and screen sizes with baseline comparison
 
 ## Environment Variables
 
 Environment variables should be prefixed with `VITE_` to be accessible in the client-side code. You can define them in the following files:
 
-- `.env` - Loaded in all environments
-- `.env.development` - Loaded in development mode
-- `.env.production` - Loaded in production builds
+- `.env` - Loaded in all environments (currently v9.0.0)
+- `.env.development` - Loaded in development mode with debug features enabled
+- `.env.production` - Loaded in production builds with debug features disabled
 
 **Note**: This project was migrated from Create React App, so any legacy `REACT_APP_*` variables need to be updated to use the `VITE_*` prefix. See [MigrateToVite.md](./MigrateToVite.md) for migration details.
 
@@ -147,13 +155,24 @@ This project includes VS Code configurations for:
 - Debugging tests with Vitest
 - Running tests from the Test Explorer
 
+## MCP (Model Context Protocol) Integration
+
+This project includes MCP server integration for enhanced development capabilities:
+
+- **Playwright MCP Server**: Automated browser testing and interaction capabilities
+- **AWS Documentation MCP Server**: Access to AWS documentation for cloud deployment research
+- **Auto-approved Actions**: Pre-configured safe actions for seamless AI-assisted development
+
+MCP configuration is managed in `.kiro/settings/mcp.json` for workspace-specific server settings.
+
 ## Technologies
 
 - **React 19.1.0** - Latest React with modern hooks and functional components
 - **TypeScript 5.8.3** - Following modern TypeScript standards with interfaces over types
 - **Vite 6.3.5** - Fast build tool with optimized chunking strategy and ES modules
 - **Vitest 3.2.4** - Modern testing framework with native TypeScript support
-- **Playwright 1.54.1** - End-to-end testing with MCP server integration
+- **Playwright 1.54.1** - End-to-end testing with MCP server integration and visual regression testing
+- **MCP Servers** - Model Context Protocol integration for AI-assisted development
 - **Web Audio API** - Advanced audio processing and sound management
 - **HTML5 Audio** - Fallback audio system for broader browser compatibility
 - **Cross-env 7.0.3** - Cross-platform environment variable management
@@ -174,6 +193,7 @@ This project includes VS Code configurations for:
 - ✅ **Error Recovery**: Robust error handling throughout all game systems
 - ✅ **Debug Tools**: Development tools for testing audio and physics systems
 - ✅ **Browser Compatibility**: Graceful fallback for different browser capabilities
+- ✅ **Visual Regression Testing**: Automated UI consistency verification across browsers and screen sizes
 - **Functional State Management** with immutable updates and pure functions
 - **Responsive HUD** that adapts to the maze dimensions using mobile-first CSS
 - **Multiple game elements** with type-safe interfaces:
@@ -266,3 +286,12 @@ Access audio debugging tools in development mode:
 - Maze layout visualization
 - Element count verification
 - Level progression testing
+
+### Visual Regression Testing
+Comprehensive UI consistency testing system:
+- Automated screenshot comparison across browsers
+- Baseline image management and updates
+- Cross-browser compatibility verification
+- Responsive design validation
+- Game state visual tracking
+- See [docs/visual-regression-testing.md](./docs/visual-regression-testing.md) for detailed usage

@@ -35,39 +35,7 @@ interface ImageLoadingState {
   errors: string[];
 }
 
-// Individual cell image state tracking
-interface CellImageState {
-  loaded: boolean;
-  error: boolean;
-  retryCount: number;
-}
-
 // Utility function to compare maze structures (ignoring player position)
-function areMazesStructurallyEqual(
-  maze1: MazeCell[][],
-  maze2: MazeCell[][]
-): boolean {
-  if (maze1.length !== maze2.length) return false;
-
-  for (let y = 0; y < maze1.length; y++) {
-    const row1 = maze1[y];
-    const row2 = maze2[y];
-    if (!row1 || !row2 || row1.length !== row2.length) return false;
-
-    for (let x = 0; x < row1.length; x++) {
-      const cell1 = row1[x];
-      const cell2 = row2[x];
-
-      // Ignore player position differences for structural comparison
-      const normalizedCell1 = cell1 === CELL.PLAYER ? CELL.EMPTY : cell1;
-      const normalizedCell2 = cell2 === CELL.PLAYER ? CELL.EMPTY : cell2;
-
-      if (normalizedCell1 !== normalizedCell2) return false;
-    }
-  }
-
-  return true;
-}
 
 function preloadImages(): Promise<ImageLoadingState> {
   const imagePaths = Object.values(ICONS);
@@ -271,17 +239,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     () => gameState.maze
   );
 
-  // Track player position separately to avoid maze re-renders
-  const [playerPosition, setPlayerPosition] = React.useState(
-    () => gameState.player || { x: 0, y: 0 }
-  );
-
   // Track previous maze state to detect actual changes
-  const previousMazeRef = React.useRef<MazeCell[][]>(gameState.maze);
-  const [mazeChangeKey, setMazeChangeKey] = React.useState(0);
+  const [mazeChangeKey] = React.useState(0);
 
   // Create a stable maze reference that only changes when non-player cells change
-  const stableMazeForRendering = React.useMemo(() => {
+  React.useMemo(() => {
     return stableMazeRef;
   }, [mazeChangeKey]);
 
@@ -339,28 +301,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
 
   const movePlayer = React.useCallback(
     (dx: number, dy: number) => {
-      // Store the previous state for comparison
-      const previousMazeRef = stableMazeRef;
-      const previousGameState = gameState.gameState;
-      const previousLevel = gameState.currentLevel;
-      const previousPlayerPos = gameState.player;
-
       // Stop all currently playing sounds before the player moves
       stopAllSounds();
 
       // Call the GameState method immediately for responsive gameplay
       gameState.movePlayer(dx, dy);
-
-      // Update player position immediately for responsive movement
-      // Note: This is kept for potential future use but the Cell component
-      // should NOT depend on this state for rendering the player
-      if (
-        gameState.player &&
-        (gameState.player.x !== previousPlayerPos?.x ||
-          gameState.player.y !== previousPlayerPos?.y)
-      ) {
-        setPlayerPosition({ ...gameState.player });
-      }
 
       // CRITICAL: Always update the maze reference immediately to ensure visual updates
       // This is essential for player movement to be visible immediately.
@@ -416,30 +361,33 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     y: number;
     dominantColors: Record<string, string>;
   }> = React.memo(
-    ({ type, x, y, dominantColors }) => {
+    ({ type, dominantColors }) => {
       // IMPORTANT: Use the actual cell type from the maze data directly
       // This ensures the player is always rendered where the game state says it should be
       // DO NOT modify this to use separate player position state!
       const actualCellType = type;
 
       // Track image loading state for test compatibility while preventing re-renders
-      const [imageLoaded, setImageLoaded] = React.useState(false);
+      const [imageState, setImageState] = React.useState<{
+        loaded: boolean;
+        error: boolean;
+      }>({ loaded: false, error: false });
       const imagePath = ICONS[actualCellType];
       const isImageCached = imageCache.current.has(imagePath);
 
       // Pre-load image and track loading state for tests
       React.useEffect(() => {
         if (isImageCached) {
-          setImageLoaded(true);
+          setImageState({ loaded: true, error: false });
         } else {
           const img = new Image();
           img.onload = () => {
             imageCache.current.set(imagePath, true);
-            setImageLoaded(true);
+            setImageState({ loaded: true, error: false });
           };
           img.onerror = () => {
             console.warn(`Failed to load image: ${imagePath}`);
-            setImageLoaded(true); // Still mark as "loaded" to prevent test timeouts
+            setImageState({ loaded: false, error: true });
           };
           img.src = imagePath;
         }
@@ -461,11 +409,13 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
         cellStyle.backgroundColor = dominantColors[actualCellType];
       }
 
-      // CSS classes with image-loaded class for test compatibility
+      // CSS classes with proper image state classes for test compatibility
       const cssClasses = [
         "cell",
         actualCellType,
-        imageLoaded ? "image-loaded" : "",
+        imageState.error ? "image-error" : "",
+        imageState.loaded ? "image-loaded" : "",
+        !imageState.loaded && !imageState.error ? "image-loading" : "",
       ]
         .filter(Boolean)
         .join(" ");
