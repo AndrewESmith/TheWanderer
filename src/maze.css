@@ -11,8 +11,6 @@
 .maze-container {
   /* Container optimizations to prevent flickering */
   contain: layout style paint;
-  transform: translateZ(0);
-  backface-visibility: hidden;
   /* Center the maze */
   display: flex;
   justify-content: center;
@@ -26,6 +24,14 @@
   box-sizing: border-box;
 }
 
+/* Apply hardware acceleration only on desktop to avoid mobile conflicts */
+@media (min-width: 769px) {
+  .maze-container {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
 .maze-grid {
   display: grid;
   grid-template-columns: var(--maze-columns, repeat(16, 32px));
@@ -35,21 +41,42 @@
   padding: 10px;
   width: max-content;
   /* Prevent layout shifts and improve performance */
-  will-change: auto;
   contain: layout style;
-  /* Optimize for frequent updates */
-  transform: translateZ(0);
-  backface-visibility: hidden;
   /* Ensure maze fits on mobile screens */
   max-width: calc(100vw - 20px);
   max-height: calc(100vh - 200px); /* Account for HUD and controls */
-  /* Smooth scaling transitions */
-  transition: transform 0.2s ease-out;
   /* Ensure proper positioning */
   position: relative;
   margin: 0 auto;
   /* Ensure the border is complete */
   box-sizing: border-box;
+}
+
+/* Apply hardware acceleration and transitions only on desktop */
+@media (min-width: 769px) {
+  .maze-grid {
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    transition: transform 0.2s ease-out;
+  }
+}
+
+/* Mobile-specific optimizations to prevent flickering */
+@media (max-width: 768px) {
+  .maze-grid {
+    /* Disable hardware acceleration that can cause mobile flickering */
+    will-change: auto;
+    transform: none;
+    backface-visibility: visible;
+    /* Remove transitions that can interfere with scaling */
+    transition: none;
+    /* Optimize for mobile rendering */
+    contain: layout style paint;
+    /* Ensure smooth scaling without flickering */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
 }
 
 .cell {
@@ -61,11 +88,6 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  /* Optimize rendering performance and prevent flickering */
-  transform: translateZ(0); /* Force hardware acceleration */
-  backface-visibility: hidden; /* Prevent flickering during transforms */
-  will-change: auto; /* Let browser decide what to optimize */
-  contain: layout style paint; /* Contain rendering to this element */
   /* Remove transitions to prevent flickering during rapid updates */
   transition: none;
   /* Ensure consistent rendering */
@@ -77,11 +99,40 @@
   -moz-osx-font-smoothing: grayscale;
   /* Prevent repaints during background changes */
   background-attachment: local;
-  /* Optimize compositing */
-  isolation: isolate;
   /* Responsive cell sizing */
   min-width: 16px;
   min-height: 16px;
+}
+
+/* Desktop-specific cell optimizations */
+@media (min-width: 769px) {
+  .cell {
+    /* Hardware acceleration for desktop */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: auto;
+    contain: layout style paint;
+    /* Optimize compositing */
+    isolation: isolate;
+  }
+}
+
+/* Mobile-specific cell optimizations */
+@media (max-width: 768px) {
+  .cell {
+    /* Disable hardware acceleration that can cause flickering on mobile */
+    transform: none;
+    backface-visibility: visible;
+    will-change: auto;
+    /* Use lighter containment for mobile */
+    contain: layout style;
+    /* Optimize for mobile rendering */
+    -webkit-backface-visibility: visible;
+    -webkit-transform: none;
+    /* Prevent mobile-specific rendering issues */
+    -webkit-perspective: none;
+    perspective: none;
+  }
 }
 
 /* Fallback background colors - always present as base layer */
@@ -93,6 +144,22 @@
   /* Additional optimization for player cell to prevent flickering */
   z-index: 1;
   position: relative;
+}
+
+/* Mobile-specific player cell optimizations */
+@media (max-width: 768px) {
+  .cell.player {
+    /* Prevent mobile flickering for player movement */
+    -webkit-transform: none;
+    transform: none;
+    /* Ensure stable rendering */
+    contain: layout style paint;
+    /* Optimize for frequent updates on mobile */
+    will-change: auto;
+    /* Prevent iOS Safari flickering */
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+  }
 }
 .cell.rock {
   background-color: #795548;
@@ -351,6 +418,16 @@
     /* Ensure maze stays within viewport */
     max-width: none;
     position: relative;
+    /* Mobile-specific anti-flickering */
+    -webkit-transform: scale(
+      min(0.85, calc((100vw - 16px) / var(--maze-pixel-width, 532px)))
+    );
+    -webkit-transform-origin: center center;
+    /* Prevent mobile browser optimizations that cause flickering */
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    /* Ensure stable rendering during player movement */
+    will-change: auto;
   }
 
   .hud {
@@ -389,6 +466,15 @@
     margin: 0;
     max-width: none;
     position: relative;
+    /* Mobile-specific anti-flickering */
+    -webkit-transform: scale(
+      min(0.7, calc((100vw - 8px) / var(--maze-pixel-width, 532px)))
+    );
+    -webkit-transform-origin: center center;
+    /* Prevent mobile browser optimizations that cause flickering */
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    will-change: auto;
   }
 
   .hud {
@@ -450,6 +536,17 @@
     max-width: none;
     max-height: none;
     position: relative;
+    /* Mobile landscape anti-flickering */
+    -webkit-transform: scale(
+      min(
+        calc((100vw - 8px) / var(--maze-pixel-width, 532px)),
+        calc((100vh - 80px) / var(--maze-pixel-height, 340px))
+      )
+    );
+    -webkit-transform-origin: center center;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
+    will-change: auto;
   }
 
   .hud {
@@ -492,6 +589,14 @@
     overflow-x: hidden; /* Prevent horizontal scrolling */
     width: 100%;
     position: relative;
+    /* Prevent mobile flickering during orientation changes */
+    -webkit-overflow-scrolling: touch;
+    /* Optimize mobile rendering */
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    /* But disable for the main container to avoid conflicts */
+    transform: none;
+    backface-visibility: visible;
   }
 
   /* Ensure maze container doesn't cause overflow */
@@ -499,6 +604,12 @@
     overflow: visible; /* Allow scaled content to be visible */
     width: 100%;
     position: relative;
+    /* Mobile-specific container optimizations */
+    -webkit-transform: none;
+    transform: none;
+    /* Prevent mobile Safari flickering */
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
   }
 
   /* Prevent zoom on input focus and ensure touch-friendly sizes */
@@ -508,6 +619,11 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
+    /* Prevent button flickering on mobile */
+    -webkit-transform: none;
+    transform: none;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
   }
 
   /* Prevent text selection on mobile */
@@ -515,6 +631,11 @@
   .mobile-controls {
     user-select: none;
     -webkit-user-select: none;
+    /* Prevent HUD flickering */
+    -webkit-transform: none;
+    transform: none;
+    -webkit-backface-visibility: visible;
+    backface-visibility: visible;
   }
 }
 

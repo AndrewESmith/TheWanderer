@@ -265,6 +265,9 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     () => gameState.player || { x: 0, y: 0 }
   );
 
+  // Use deferred value for player position to reduce mobile flickering
+  const deferredPlayerPosition = React.useDeferredValue(playerPosition);
+
   const [showMobileControls, setShowMobileControls] = React.useState(false);
 
   // Calculate maze dimensions and set CSS custom properties
@@ -325,7 +328,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       // Stop all currently playing sounds before the player moves
       stopAllSounds();
 
-      // Call the GameState method
+      // Call the GameState method immediately for responsive gameplay
       gameState.movePlayer(dx, dy);
 
       // Force re-render to reflect game state changes
@@ -340,19 +343,22 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
         setPlayerPosition({ ...gameState.player });
       }
 
-      // Only update maze if it actually changed (level change, physics, etc.)
-      // or if game state changed (death, victory)
-      const gameStateChanged = gameState.gameState !== previousGameState;
-      const levelChanged = gameState.currentLevel !== previousLevel;
+      // Use startTransition only for non-critical updates to reduce mobile flickering
+      React.startTransition(() => {
+        // Only update maze if it actually changed (level change, physics, etc.)
+        // or if game state changed (death, victory)
+        const gameStateChanged = gameState.gameState !== previousGameState;
+        const levelChanged = gameState.currentLevel !== previousLevel;
 
-      // Check if maze structure changed (not just player position)
-      const mazeStructureChanged =
-        gameState.maze !== previousMazeRef &&
-        !areMazesStructurallyEqual(previousMazeRef, gameState.maze);
+        // Check if maze structure changed (not just player position)
+        const mazeStructureChanged =
+          gameState.maze !== previousMazeRef &&
+          !areMazesStructurallyEqual(previousMazeRef, gameState.maze);
 
-      if (mazeStructureChanged || gameStateChanged || levelChanged) {
-        setStableMazeRef(gameState.maze);
-      }
+        if (mazeStructureChanged || gameStateChanged || levelChanged) {
+          setStableMazeRef(gameState.maze);
+        }
+      });
     },
     [gameState, stopAllSounds, stableMazeRef, forceUpdate]
   );
@@ -381,75 +387,93 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     x: number;
     y: number;
     dominantColors: Record<string, string>;
-  }> = ({ type, x, y, dominantColors }) => {
-    // Determine actual cell type based on current player position
-    const isPlayerCell = playerPosition.x === x && playerPosition.y === y;
-    const actualCellType = isPlayerCell
-      ? CELL.PLAYER
-      : type === CELL.PLAYER
-      ? CELL.EMPTY
-      : type;
+  }> = React.memo(
+    ({ type, x, y, dominantColors }) => {
+      // Use immediate player position for responsive visual feedback
+      // (deferred value is used elsewhere for performance optimizations)
+      const isPlayerCell = playerPosition.x === x && playerPosition.y === y;
+      const actualCellType = isPlayerCell
+        ? CELL.PLAYER
+        : type === CELL.PLAYER
+        ? CELL.EMPTY
+        : type;
 
-    // Track image loading state for visual regression tests
-    const [imageState, setImageState] = React.useState<CellImageState>({
-      loaded: false,
-      error: false,
-      retryCount: 0,
-    });
+      // Track image loading state for visual regression tests
+      const [imageState, setImageState] = React.useState<CellImageState>({
+        loaded: false,
+        error: false,
+        retryCount: 0,
+      });
 
-    // Simplified image loading with cache
-    const imagePath = ICONS[actualCellType];
-    const isImageCached = imageCache.current.has(imagePath);
+      // Simplified image loading with cache
+      const imagePath = ICONS[actualCellType];
+      const isImageCached = imageCache.current.has(imagePath);
 
-    // Cache image on first load and track loading state
-    React.useEffect(() => {
-      if (!isImageCached && !imageState.loaded && !imageState.error) {
-        setImageState((prev) => ({ ...prev, loaded: false, error: false }));
+      // Cache image on first load and track loading state
+      React.useEffect(() => {
+        if (!isImageCached && !imageState.loaded && !imageState.error) {
+          setImageState((prev) => ({ ...prev, loaded: false, error: false }));
 
-        const img = new Image();
-        img.onload = () => {
-          imageCache.current.set(imagePath, true);
+          const img = new Image();
+          img.onload = () => {
+            imageCache.current.set(imagePath, true);
+            setImageState((prev) => ({ ...prev, loaded: true, error: false }));
+          };
+          img.onerror = () => {
+            setImageState((prev) => ({ ...prev, loaded: false, error: true }));
+          };
+          img.src = imagePath;
+        } else if (isImageCached && !imageState.loaded) {
+          // Image is already cached, mark as loaded
           setImageState((prev) => ({ ...prev, loaded: true, error: false }));
-        };
-        img.onerror = () => {
-          setImageState((prev) => ({ ...prev, loaded: false, error: true }));
-        };
-        img.src = imagePath;
-      } else if (isImageCached && !imageState.loaded) {
-        // Image is already cached, mark as loaded
-        setImageState((prev) => ({ ...prev, loaded: true, error: false }));
+        }
+      }, [imagePath, isImageCached, imageState.loaded, imageState.error]);
+
+      // Simple styling with cached images and dominant colors for soil/rock
+      const cellStyle: React.CSSProperties = {
+        backgroundImage: `url(${imagePath})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      };
+
+      // Add dominant color as background for soil and rock cells
+      if (
+        (actualCellType === CELL.SOIL || actualCellType === CELL.ROCK) &&
+        dominantColors[actualCellType]
+      ) {
+        cellStyle.backgroundColor = dominantColors[actualCellType];
       }
-    }, [imagePath, isImageCached, imageState.loaded, imageState.error]);
 
-    // Simple styling with cached images and dominant colors for soil/rock
-    const cellStyle: React.CSSProperties = {
-      backgroundImage: `url(${imagePath})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-    };
+      // Build CSS classes including image loading state
+      const cssClasses = [
+        "cell",
+        actualCellType,
+        imageState.loaded ? "image-loaded" : "",
+        imageState.error ? "image-error" : "",
+        !imageState.loaded && !imageState.error ? "image-loading" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
 
-    // Add dominant color as background for soil and rock cells
-    if (
-      (actualCellType === CELL.SOIL || actualCellType === CELL.ROCK) &&
-      dominantColors[actualCellType]
-    ) {
-      cellStyle.backgroundColor = dominantColors[actualCellType];
+      return <div className={cssClasses} style={cellStyle} />;
+    },
+    (prevProps, nextProps) => {
+      // Only re-render if the base cell type actually changes
+      // Ignore player position changes for non-player cells
+      const prevBaseType =
+        prevProps.type === CELL.PLAYER ? CELL.EMPTY : prevProps.type;
+      const nextBaseType =
+        nextProps.type === CELL.PLAYER ? CELL.EMPTY : nextProps.type;
+
+      return (
+        prevBaseType === nextBaseType &&
+        prevProps.x === nextProps.x &&
+        prevProps.y === nextProps.y &&
+        prevProps.dominantColors === nextProps.dominantColors
+      );
     }
-
-    // Build CSS classes including image loading state
-    const cssClasses = [
-      "cell",
-      actualCellType,
-      imageState.loaded ? "image-loaded" : "",
-      imageState.error ? "image-error" : "",
-      !imageState.loaded && !imageState.error ? "image-loading" : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    return <div className={cssClasses} style={cellStyle} />;
-  };
+  );
 
   // Handle audio system reset
   const handleAudioReset = React.useCallback(async () => {
@@ -522,8 +546,8 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
                   />
                 ))
               ),
-            // Re-render maze when structure changes OR when player position changes
-            [stableMazeRef, playerPosition]
+            // Only re-render maze when structure changes, not player position
+            [stableMazeRef, dominantColors]
           )}
         </div>
       </div>
@@ -639,16 +663,15 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
 };
 
 const App: React.FC = () => {
-  const [, setImageLoadingState] =
-    React.useState<ImageLoadingState>({
-      isLoading: true,
-      loadedCount: 0,
-      totalCount: Object.values(ICONS).length,
-      errors: [],
-    });
+  const [, setImageLoadingState] = React.useState<ImageLoadingState>({
+    isLoading: true,
+    loadedCount: 0,
+    totalCount: Object.values(ICONS).length,
+    errors: [],
+  });
 
   // Load dominant colors for soil and rock
-  const { dominantColors} = useDominantColors();
+  const { dominantColors } = useDominantColors();
 
   // Preload images on app initialization
   React.useEffect(() => {
