@@ -348,13 +348,42 @@ export async function verifyImageLoadingStates(page: Page): Promise<void> {
  * Test game state visual changes
  */
 export async function testGameStateChanges(page: Page): Promise<void> {
-    // Initial state
+    // Ensure game is stable and ready for input
     await waitForGameStable(page);
+
+    // Ensure How to Play popup is dismissed and game has focus
+    await dismissAudioDialogs(page);
+
+    // Click on the maze container to ensure focus
+    await page.locator('.maze-container').click();
+    await page.waitForTimeout(100);
+
+    // Verify game is in playing state
+    const gameStatus = page.locator('.hud span').filter({ hasText: /Game Over|Level Complete|Victory/ });
+    await expect(gameStatus).not.toBeVisible();
+
+    // Initial state
     await takeStableScreenshot(page.locator('.maze-grid'), 'game-state-initial.png');
+
+    // Get initial player position for verification
+    const initialPlayerCell = page.locator('.cell.player');
+    await expect(initialPlayerCell).toBeVisible();
+
+    // Get initial moves count
+    const initialMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
+    const initialMoves = initialMovesText ? parseInt(initialMovesText.match(/Moves: (\d+)/)?.[1] || '0') : 0;
 
     // After player movement
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(500); // Increased wait time for movement to complete
+
+    // Verify the move was registered by checking moves count changed
+    const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
+    const newMoves = newMovesText ? parseInt(newMovesText.match(/Moves: (\d+)/)?.[1] || '0') : 0;
+
+    // Moves should have decreased (remaining moves counter)
+    expect(newMoves).toBeLessThan(initialMoves);
+
     await takeStableScreenshot(page.locator('.maze-grid'), 'game-state-after-move.png');
 
     // HUD changes

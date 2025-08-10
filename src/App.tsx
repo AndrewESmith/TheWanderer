@@ -331,9 +331,6 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       // Call the GameState method immediately for responsive gameplay
       gameState.movePlayer(dx, dy);
 
-      // Force re-render to reflect game state changes
-      forceUpdate();
-
       // Update player position immediately for responsive movement
       if (
         gameState.player &&
@@ -342,6 +339,13 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       ) {
         setPlayerPosition({ ...gameState.player });
       }
+
+      // Always update the maze reference immediately to ensure visual updates
+      // This ensures the Cell components re-render with the new player position
+      setStableMazeRef([...gameState.maze.map((row) => [...row])]);
+
+      // Force re-render to reflect game state changes
+      forceUpdate();
 
       // Use startTransition only for non-critical updates to reduce mobile flickering
       React.startTransition(() => {
@@ -356,7 +360,8 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
           !areMazesStructurallyEqual(previousMazeRef, gameState.maze);
 
         if (mazeStructureChanged || gameStateChanged || levelChanged) {
-          setStableMazeRef(gameState.maze);
+          // Maze structure changed, but we already updated it above
+          // This is just for consistency
         }
       });
     },
@@ -389,14 +394,9 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     dominantColors: Record<string, string>;
   }> = React.memo(
     ({ type, x, y, dominantColors }) => {
-      // Use immediate player position for responsive visual feedback
-      // (deferred value is used elsewhere for performance optimizations)
-      const isPlayerCell = playerPosition.x === x && playerPosition.y === y;
-      const actualCellType = isPlayerCell
-        ? CELL.PLAYER
-        : type === CELL.PLAYER
-        ? CELL.EMPTY
-        : type;
+      // Use the actual cell type from the maze data directly
+      // This ensures the player is always rendered where the game state says it should be
+      const actualCellType = type;
 
       // Track image loading state for visual regression tests
       const [imageState, setImageState] = React.useState<CellImageState>({
