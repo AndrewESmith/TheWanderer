@@ -65,17 +65,18 @@
 /* Mobile-specific optimizations to prevent flickering */
 @media (max-width: 768px) {
   .maze-grid {
-    /* Disable hardware acceleration that can cause mobile flickering */
+    /* Completely disable hardware acceleration on mobile */
     will-change: auto;
-    transform: none;
+    transform: none !important;
+    -webkit-transform: none !important;
     backface-visibility: visible;
+    -webkit-backface-visibility: visible;
     /* Remove transitions that can interfere with scaling */
     transition: none;
-    /* Optimize for mobile rendering */
-    contain: layout style paint;
-    /* Ensure smooth scaling without flickering */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
+    /* Use minimal containment to prevent flickering */
+    contain: layout;
+    /* Disable image rendering optimizations that can cause flickering */
+    image-rendering: auto;
   }
 }
 
@@ -120,18 +121,19 @@
 /* Mobile-specific cell optimizations */
 @media (max-width: 768px) {
   .cell {
-    /* Disable hardware acceleration that can cause flickering on mobile */
-    transform: none;
+    /* Completely disable hardware acceleration on mobile */
+    transform: none !important;
+    -webkit-transform: none !important;
     backface-visibility: visible;
-    will-change: auto;
-    /* Use lighter containment for mobile */
-    contain: layout style;
-    /* Optimize for mobile rendering */
     -webkit-backface-visibility: visible;
-    -webkit-transform: none;
-    /* Prevent mobile-specific rendering issues */
-    -webkit-perspective: none;
+    will-change: auto;
+    /* Minimal containment to prevent flickering */
+    contain: none;
+    /* Disable perspective that can cause flickering */
     perspective: none;
+    -webkit-perspective: none;
+    /* Ensure stable rendering */
+    isolation: auto;
   }
 }
 
@@ -149,16 +151,19 @@
 /* Mobile-specific player cell optimizations */
 @media (max-width: 768px) {
   .cell.player {
-    /* Prevent mobile flickering for player movement */
-    -webkit-transform: none;
-    transform: none;
-    /* Ensure stable rendering */
-    contain: layout style paint;
-    /* Optimize for frequent updates on mobile */
+    /* Completely disable transforms for player cell on mobile */
+    transform: none !important;
+    -webkit-transform: none !important;
+    /* Disable containment that can cause flickering during movement */
+    contain: none;
+    /* Ensure stable rendering for frequent updates */
     will-change: auto;
     /* Prevent iOS Safari flickering */
-    -webkit-backface-visibility: visible;
     backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    /* Keep z-index for proper layering */
+    z-index: 1;
+    position: relative;
   }
 }
 .cell.rock {
@@ -384,7 +389,7 @@
   }
 }
 
-/* Mobile portrait mode - scale maze to fit screen */
+/* Mobile portrait mode - simplified scaling to prevent flickering */
 @media (max-width: 768px) and (orientation: portrait) {
   .game-wrapper {
     padding: 8px;
@@ -406,28 +411,24 @@
     box-sizing: border-box;
     overflow: visible;
     margin: 0;
+    /* Disable any transforms on the container */
+    transform: none;
+    -webkit-transform: none;
   }
 
   .maze-grid {
-    /* Calculate scale to fit width with proper margins */
-    transform: scale(
-      min(0.85, calc((100vw - 16px) / var(--maze-pixel-width, 532px)))
-    );
+    /* Use simple fixed scaling instead of complex calc() to prevent flickering */
+    transform: scale(0.75);
+    -webkit-transform: scale(0.75);
     transform-origin: center center;
+    -webkit-transform-origin: center center;
     margin: 0;
-    /* Ensure maze stays within viewport */
     max-width: none;
     position: relative;
-    /* Mobile-specific anti-flickering */
-    -webkit-transform: scale(
-      min(0.85, calc((100vw - 16px) / var(--maze-pixel-width, 532px)))
-    );
-    -webkit-transform-origin: center center;
-    /* Prevent mobile browser optimizations that cause flickering */
-    -webkit-backface-visibility: visible;
-    backface-visibility: visible;
-    /* Ensure stable rendering during player movement */
+    /* Ensure stable rendering */
     will-change: auto;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   .hud {
@@ -446,7 +447,7 @@
   }
 }
 
-/* Very small screens - more aggressive scaling */
+/* Very small screens - simplified scaling */
 @media (max-width: 480px) and (orientation: portrait) {
   .game-wrapper {
     padding: 4px;
@@ -455,26 +456,22 @@
   .maze-container {
     padding: 0;
     margin: 0;
+    transform: none;
+    -webkit-transform: none;
   }
 
   .maze-grid {
-    /* More aggressive scaling for small screens */
-    transform: scale(
-      min(0.7, calc((100vw - 8px) / var(--maze-pixel-width, 532px)))
-    );
+    /* Use simple fixed scaling to prevent flickering */
+    transform: scale(0.6);
+    -webkit-transform: scale(0.6);
     transform-origin: center center;
+    -webkit-transform-origin: center center;
     margin: 0;
     max-width: none;
     position: relative;
-    /* Mobile-specific anti-flickering */
-    -webkit-transform: scale(
-      min(0.7, calc((100vw - 8px) / var(--maze-pixel-width, 532px)))
-    );
-    -webkit-transform-origin: center center;
-    /* Prevent mobile browser optimizations that cause flickering */
-    -webkit-backface-visibility: visible;
-    backface-visibility: visible;
     will-change: auto;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   .hud {
@@ -497,7 +494,7 @@
   }
 }
 
-/* Landscape mobile - different approach */
+/* Landscape mobile - simplified approach */
 @media (max-width: 768px) and (orientation: landscape) {
   .game-wrapper {
     padding: 4px;
@@ -521,32 +518,23 @@
     overflow: visible;
     flex: 1;
     margin: 0;
+    transform: none;
+    -webkit-transform: none;
   }
 
   .maze-grid {
-    /* Scale to fit both width and height in landscape */
-    transform: scale(
-      min(
-        calc((100vw - 8px) / var(--maze-pixel-width, 532px)),
-        calc((100vh - 80px) / var(--maze-pixel-height, 340px))
-      )
-    );
+    /* Use simple fixed scaling for landscape to prevent flickering */
+    transform: scale(0.8);
+    -webkit-transform: scale(0.8);
     transform-origin: center center;
+    -webkit-transform-origin: center center;
     margin: 0;
     max-width: none;
     max-height: none;
     position: relative;
-    /* Mobile landscape anti-flickering */
-    -webkit-transform: scale(
-      min(
-        calc((100vw - 8px) / var(--maze-pixel-width, 532px)),
-        calc((100vh - 80px) / var(--maze-pixel-height, 340px))
-      )
-    );
-    -webkit-transform-origin: center center;
-    -webkit-backface-visibility: visible;
-    backface-visibility: visible;
     will-change: auto;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   .hud {
@@ -579,7 +567,7 @@
   }
 }
 
-/* Additional mobile optimizations */
+/* Additional mobile optimizations - simplified to prevent flickering */
 @media (max-width: 768px) {
   /* Ensure the game wrapper uses full viewport */
   .game-wrapper {
@@ -589,14 +577,13 @@
     overflow-x: hidden; /* Prevent horizontal scrolling */
     width: 100%;
     position: relative;
-    /* Prevent mobile flickering during orientation changes */
-    -webkit-overflow-scrolling: touch;
-    /* Optimize mobile rendering */
-    -webkit-transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    /* But disable for the main container to avoid conflicts */
+    /* Completely disable hardware acceleration on mobile */
     transform: none;
+    -webkit-transform: none;
     backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    /* Disable smooth scrolling that can cause flickering */
+    -webkit-overflow-scrolling: auto;
   }
 
   /* Ensure maze container doesn't cause overflow */
@@ -604,12 +591,11 @@
     overflow: visible; /* Allow scaled content to be visible */
     width: 100%;
     position: relative;
-    /* Mobile-specific container optimizations */
-    -webkit-transform: none;
+    /* Disable all transforms on mobile */
     transform: none;
-    /* Prevent mobile Safari flickering */
-    -webkit-backface-visibility: visible;
+    -webkit-transform: none;
     backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   /* Prevent zoom on input focus and ensure touch-friendly sizes */
@@ -619,11 +605,11 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    /* Prevent button flickering on mobile */
-    -webkit-transform: none;
+    /* Disable transforms on buttons */
     transform: none;
-    -webkit-backface-visibility: visible;
+    -webkit-transform: none;
     backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   /* Prevent text selection on mobile */
@@ -631,40 +617,36 @@
   .mobile-controls {
     user-select: none;
     -webkit-user-select: none;
-    /* Prevent HUD flickering */
-    -webkit-transform: none;
+    /* Disable transforms on UI elements */
     transform: none;
-    -webkit-backface-visibility: visible;
+    -webkit-transform: none;
     backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 }
 
-/* Ultra-wide screens in portrait (tall phones) */
+/* Ultra-wide screens in portrait (tall phones) - simplified */
 @media (max-width: 480px) and (min-height: 800px) and (orientation: portrait) {
   .maze-grid {
     transform: scale(0.55);
+    -webkit-transform: scale(0.55);
     transform-origin: center center;
+    -webkit-transform-origin: center center;
     margin: 0 auto;
-  }
-
-  .maze-grid[style*="--maze-pixel-width"] {
-    transform: scale(
-      min(1, calc((100vw - 30px) / var(--maze-pixel-width, 532px)))
-    );
   }
 }
 
-/* Foldable phones and very narrow screens */
+/* Foldable phones and very narrow screens - simplified */
 @media (max-width: 360px) and (orientation: portrait) {
   .game-wrapper {
     padding: 2px;
   }
 
   .maze-grid {
-    transform: scale(
-      min(0.6, calc((100vw - 4px) / var(--maze-pixel-width, 532px)))
-    );
+    transform: scale(0.5);
+    -webkit-transform: scale(0.5);
     transform-origin: center center;
+    -webkit-transform-origin: center center;
     margin: 0;
     max-width: none;
     position: relative;

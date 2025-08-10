@@ -276,8 +276,8 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     () => gameState.player || { x: 0, y: 0 }
   );
 
-  // Use deferred value for player position to reduce mobile flickering
-  const deferredPlayerPosition = React.useDeferredValue(playerPosition);
+  // Remove deferred value as it causes mobile flickering due to delayed updates
+  // const deferredPlayerPosition = React.useDeferredValue(playerPosition);
 
   const [showMobileControls, setShowMobileControls] = React.useState(false);
 
@@ -363,23 +363,24 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       // Force re-render to reflect game state changes
       forceUpdate();
 
-      // Use startTransition only for non-critical updates to reduce mobile flickering
-      React.startTransition(() => {
-        // Only update maze if it actually changed (level change, physics, etc.)
-        // or if game state changed (death, victory)
-        const gameStateChanged = gameState.gameState !== previousGameState;
-        const levelChanged = gameState.currentLevel !== previousLevel;
+      // Remove startTransition as it can cause mobile flickering by deferring updates
+      // Keep all updates synchronous for immediate visual feedback
+      // React.startTransition(() => {
+      //   // Only update maze if it actually changed (level change, physics, etc.)
+      //   // or if game state changed (death, victory)
+      //   const gameStateChanged = gameState.gameState !== previousGameState;
+      //   const levelChanged = gameState.currentLevel !== previousLevel;
 
-        // Check if maze structure changed (not just player position)
-        const mazeStructureChanged =
-          gameState.maze !== previousMazeRef &&
-          !areMazesStructurallyEqual(previousMazeRef, gameState.maze);
+      //   // Check if maze structure changed (not just player position)
+      //   const mazeStructureChanged =
+      //     gameState.maze !== previousMazeRef &&
+      //     !areMazesStructurallyEqual(previousMazeRef, gameState.maze);
 
-        if (mazeStructureChanged || gameStateChanged || levelChanged) {
-          // Maze structure changed, but we already updated it above
-          // This is just for consistency
-        }
-      });
+      //   if (mazeStructureChanged || gameStateChanged || levelChanged) {
+      //     // Maze structure changed, but we already updated it above
+      //     // This is just for consistency
+      //   }
+      // });
     },
     [gameState, stopAllSounds, stableMazeRef, forceUpdate]
   );
