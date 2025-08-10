@@ -32,17 +32,24 @@ export async function waitForGameStable(
 ): Promise<void> {
     const opts = { ...DEFAULT_VISUAL_OPTIONS, ...options };
 
-    // Set localStorage to prevent "How to Play" dialog from showing
-    await page.evaluate(() => {
-        localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
-            dontShowAgain: true,
-            hasSeenInstructions: true,
-            lastViewedVersion: '1.0.0'
-        }));
-    });
-
-    // Wait for the maze grid to be visible
+    // Wait for the maze grid to be visible first
     await page.waitForSelector('.maze-grid', { timeout: 5000 });
+
+    // Set localStorage to prevent "How to Play" dialog from showing
+    // Use try-catch to handle localStorage access errors
+    await page.evaluate(() => {
+        try {
+            if (typeof Storage !== 'undefined' && window.localStorage) {
+                localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
+                    dontShowAgain: true,
+                    hasSeenInstructions: true,
+                    lastViewedVersion: '1.0.0'
+                }));
+            }
+        } catch (error) {
+            console.warn('Could not access localStorage:', error);
+        }
+    });
 
     // Close any open dialogs that might still appear
     const closeButton = page.locator('button:has-text("Close"), button[aria-label*="Close"], button:has-text("×")');
@@ -125,20 +132,27 @@ export async function verifyCellTypes(page: Page): Promise<void> {
  */
 export async function setupTestEnvironment(page: Page): Promise<void> {
     // Set localStorage to prevent dialogs and ensure consistent state
+    // Use try-catch to handle localStorage access errors
     await page.evaluate(() => {
-        // Prevent "How to Play" dialog
-        localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
-            dontShowAgain: true,
-            hasSeenInstructions: true,
-            lastViewedVersion: '1.0.0'
-        }));
+        try {
+            if (typeof Storage !== 'undefined' && window.localStorage) {
+                // Prevent "How to Play" dialog
+                localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
+                    dontShowAgain: true,
+                    hasSeenInstructions: true,
+                    lastViewedVersion: '1.0.0'
+                }));
 
-        // Set audio preferences to avoid audio-related popups
-        localStorage.setItem('wanderer-audio-settings', JSON.stringify({
-            enabled: false,
-            volume: 0.5,
-            userHasInteracted: true
-        }));
+                // Set audio preferences to avoid audio-related popups
+                localStorage.setItem('wanderer-audio-settings', JSON.stringify({
+                    enabled: false,
+                    volume: 0.5,
+                    userHasInteracted: true
+                }));
+            }
+        } catch (error) {
+            console.warn('Could not access localStorage:', error);
+        }
     });
 }
 
@@ -159,9 +173,9 @@ export async function testResponsiveLayout(
     for (const viewport of viewports) {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
 
-        // Setup environment before navigating
-        await setupTestEnvironment(page);
+        // Navigate first, then setup environment
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         // Take full page screenshot

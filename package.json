@@ -25,8 +25,12 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
-    "test:visual": "playwright test src/playwrighttests/visual-regression.spec.ts",
-    "test:visual:update": "playwright test src/playwrighttests/visual-regression.spec.ts --update-snapshots",
+    "test:visual": "node scripts/run-visual-tests.js",
+    "test:visual:update": "node scripts/run-visual-tests.js --update-snapshots",
+    "test:visual:generate": "node scripts/generate-visual-baselines.js",
+    "test:visual:chromium": "node scripts/run-visual-tests.js --browser=chromium",
+    "test:visual:firefox": "node scripts/run-visual-tests.js --browser=firefox",
+    "test:visual:webkit": "node scripts/run-visual-tests.js --browser=webkit",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "eslintConfig": {

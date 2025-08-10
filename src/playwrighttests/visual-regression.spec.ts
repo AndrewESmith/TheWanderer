@@ -14,8 +14,9 @@ import {
 
 test.describe('Visual Regression Tests - Core Interface', () => {
     test.beforeEach(async ({ page }) => {
-        await setupTestEnvironment(page);
+        // Navigate first, then setup environment
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
     });
 
@@ -60,8 +61,8 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
     test('mobile controls visibility and layout', async ({ page }) => {
         // Test mobile viewport specifically
         await page.setViewportSize({ width: 375, height: 667 });
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         // Mobile controls should be visible
@@ -75,8 +76,8 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
     test('tablet layout verification', async ({ page }) => {
         await page.setViewportSize({ width: 768, height: 1024 });
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         await takeStableScreenshot(page, 'tablet-interface.png');
@@ -92,8 +93,8 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
         for (const viewport of viewports) {
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
-            await setupTestEnvironment(page);
             await page.goto('/');
+            await setupTestEnvironment(page);
             await waitForGameStable(page);
 
             const hud = page.locator('.hud');
@@ -104,8 +105,9 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
 test.describe('Visual Regression Tests - Cross-Browser Consistency', () => {
     test.beforeEach(async ({ page }) => {
-        await setupTestEnvironment(page);
+        // Navigate first, then setup environment
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
     });
 
@@ -136,8 +138,8 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
         // Block all image requests to test fallback behavior
         await simulateImageLoadingFailures(page);
 
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await page.waitForSelector('.maze-grid');
 
         // Wait for fallback rendering to complete
@@ -163,8 +165,8 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
         // Block some images but not others to test mixed states
         await simulatePartialImageFailures(page, ['boulder.png', 'bomb.png']);
 
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page, { minLoadedPercentage: 0.5 });
 
         await takeStableScreenshot(page.locator('.maze-grid'), 'maze-grid-partial-failure.png');
@@ -181,8 +183,8 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
         // Block specific images to test error indicators
         await page.route('**/boulder.png', route => route.abort());
 
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page, { minLoadedPercentage: 0.7 });
 
         // Find error cells and verify they have error indicators
@@ -201,8 +203,9 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
 
 test.describe('Visual Regression Tests - Game State Changes', () => {
     test.beforeEach(async ({ page }) => {
-        await setupTestEnvironment(page);
+        // Navigate first, then setup environment
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
     });
 
@@ -240,8 +243,8 @@ test.describe('Visual Regression Tests - Game State Changes', () => {
 
     test('game over state visual verification', async ({ page }) => {
         // Navigate to test maze with bomb next to player
-        await setupTestEnvironment(page);
         await page.goto('/?testMaze=bomb');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         // Capture initial state
@@ -285,8 +288,8 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     test('high contrast mode compatibility', async ({ page }) => {
         // Simulate high contrast mode
         await page.emulateMedia({ colorScheme: 'dark' });
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         await takeStableScreenshot(page, 'high-contrast-mode.png');
@@ -296,16 +299,16 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     test('reduced motion preferences', async ({ page }) => {
         // Simulate reduced motion preference
         await page.emulateMedia({ reducedMotion: 'reduce' });
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         await takeStableScreenshot(page, 'reduced-motion-mode.png');
     });
 
     test('zoom level compatibility', async ({ page }) => {
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         // Test different zoom levels
@@ -322,8 +325,8 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     });
 
     test('keyboard navigation visual feedback', async ({ page }) => {
-        await setupTestEnvironment(page);
         await page.goto('/');
+        await setupTestEnvironment(page);
         await waitForGameStable(page);
 
         // Test keyboard focus states if any interactive elements exist
