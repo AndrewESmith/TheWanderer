@@ -348,6 +348,10 @@ export async function verifyImageLoadingStates(page: Page): Promise<void> {
  * Test game state visual changes
  */
 export async function testGameStateChanges(page: Page): Promise<void> {
+    // IMPORTANT: This test verifies that player movement is visually apparent
+    // It takes screenshots before and after movement to ensure the player position changes
+    // If this test fails, check PLAYER_MOVEMENT_FIX_DOCUMENTATION.md for troubleshooting
+
     // Ensure game is stable and ready for input
     await waitForGameStable(page);
 

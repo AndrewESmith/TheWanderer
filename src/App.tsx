@@ -3,6 +3,17 @@ import { ICONS, CELL } from "./maze";
 import type { MazeCell } from "./maze";
 import "./maze.css";
 import "./App.css";
+
+// IMPORTANT: Player Movement Rendering
+// ===================================
+// This file contains critical logic for player movement rendering.
+// Before modifying the Cell component or movePlayer function, please read:
+// PLAYER_MOVEMENT_FIX_DOCUMENTATION.md
+//
+// Key principles:
+// 1. Use maze data as single source of truth for cell rendering
+// 2. Update stableMazeRef immediately when player moves
+// 3. Keep Cell component logic simple - just render what maze data says
 import { createGameState } from "./GameState";
 import { AudioProvider } from "./audio/context/audio-context";
 import { useSound } from "./audio/hooks/use-sound";
@@ -332,6 +343,8 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       gameState.movePlayer(dx, dy);
 
       // Update player position immediately for responsive movement
+      // Note: This is kept for potential future use but the Cell component
+      // should NOT depend on this state for rendering the player
       if (
         gameState.player &&
         (gameState.player.x !== previousPlayerPos?.x ||
@@ -340,8 +353,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
         setPlayerPosition({ ...gameState.player });
       }
 
-      // Always update the maze reference immediately to ensure visual updates
-      // This ensures the Cell components re-render with the new player position
+      // CRITICAL: Always update the maze reference immediately to ensure visual updates
+      // This is essential for player movement to be visible immediately.
+      // The Cell components depend on stableMazeRef for rendering, so this must be
+      // updated synchronously when the player moves to prevent visual lag or
+      // test failures where movement appears not to work.
       setStableMazeRef([...gameState.maze.map((row) => [...row])]);
 
       // Force re-render to reflect game state changes
@@ -387,6 +403,19 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
   const imageCache = React.useRef<Map<string, boolean>>(new Map());
 
   // Optimized cell component with essential flickering prevention
+  //
+  // CRITICAL: Player Movement Rendering Logic
+  // ========================================
+  // This Cell component MUST use the maze data directly (type prop) to determine
+  // what to render. DO NOT attempt to overlay player position from separate state
+  // as this creates synchronization issues between visual representation and game state.
+  //
+  // Previous Issue: The component was using a separate `playerPosition` state to
+  // determine if a cell should show the player, which could get out of sync with
+  // the actual maze data, causing player movement to appear broken in tests.
+  //
+  // Solution: Always use `type` prop directly - the GameState already handles
+  // updating the maze with the correct player position.
   const Cell: React.FC<{
     type: MazeCell;
     x: number;
@@ -394,8 +423,9 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
     dominantColors: Record<string, string>;
   }> = React.memo(
     ({ type, x, y, dominantColors }) => {
-      // Use the actual cell type from the maze data directly
+      // IMPORTANT: Use the actual cell type from the maze data directly
       // This ensures the player is always rendered where the game state says it should be
+      // DO NOT modify this to use separate player position state!
       const actualCellType = type;
 
       // Track image loading state for visual regression tests
@@ -546,7 +576,10 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
                   />
                 ))
               ),
-            // Only re-render maze when structure changes, not player position
+            // IMPORTANT: Re-render maze when stableMazeRef changes
+            // This includes player position changes since the player is part of the maze data
+            // The dependency on stableMazeRef ensures that when movePlayer updates the maze,
+            // all Cell components re-render with the new positions
             [stableMazeRef, dominantColors]
           )}
         </div>
