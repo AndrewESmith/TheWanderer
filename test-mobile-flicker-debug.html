@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobile Flicker Debug Test</title>
+    <style>
+      /* Simulate mobile conditions */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+        overflow-x: hidden;
+      }
+
+      .test-container {
+        padding: 20px;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 32px);
+        grid-template-rows: repeat(3, 32px);
+        gap: 0;
+        background: #222;
+        padding: 10px;
+        margin: 20px 0;
+        transform: scale(0.8);
+        transform-origin: center;
+      }
+
+      .test-cell {
+        width: 32px;
+        height: 32px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 1px solid #333;
+        box-sizing: border-box;
+      }
+
+      .test-cell.diamond {
+        background-color: #fff;
+        background-image: url("/diamond.png");
+      }
+
+      .test-cell.player {
+        background-color: #f44336;
+        background-image: url("/player.png");
+      }
+
+      .test-cell.empty {
+        background-color: #2e7d32;
+        background-image: url("/Empty.png");
+      }
+
+      /* Test different mobile optimizations */
+      .test-grid.no-hardware-accel {
+        transform-style: flat;
+        -webkit-transform-style: flat;
+        backface-visibility: visible;
+        -webkit-backface-visibility: visible;
+      }
+
+      .test-grid.no-transforms .test-cell {
+        transform: none !important;
+        -webkit-transform: none !important;
+      }
+
+      .test-grid.no-containment {
+        contain: none;
+      }
+
+      .test-grid.no-containment .test-cell {
+        contain: none;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      .controls button {
+        padding: 10px;
+        background: #333;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .controls button:hover {
+        background: #444;
+      }
+
+      .info {
+        background: #333;
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>Mobile Flicker Debug Test</h1>
+
+      <div class="info">
+        <strong>Test Setup:</strong><br />
+        - Player (red) at position (1,1)<br />
+        - Diamond (white) at position (3,1)<br />
+        - Move player with arrow keys to test flickering
+      </div>
+
+      <div class="test-grid" id="testGrid">
+        <div class="test-cell empty"></div>
+        <div class="test-cell player" id="player"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell diamond" id="diamond"></div>
+        <div class="test-cell empty"></div>
+
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+        <div class="test-cell empty"></div>
+      </div>
+
+      <div class="controls">
+        <button onclick="movePlayer(-1, 0)">← Move Left</button>
+        <button onclick="movePlayer(1, 0)">→ Move Right</button>
+        <button onclick="movePlayer(0, -1)">↑ Move Up</button>
+        <button onclick="movePlayer(0, 1)">↓ Move Down</button>
+      </div>
+
+      <div class="controls">
+        <h3>Test Different Optimizations:</h3>
+        <button onclick="toggleHardwareAccel()">
+          Toggle Hardware Acceleration
+        </button>
+        <button onclick="toggleTransforms()">Toggle Cell Transforms</button>
+        <button onclick="toggleContainment()">Toggle Containment</button>
+        <button onclick="resetGrid()">Reset Position</button>
+      </div>
+
+      <div class="info" id="status">
+        Player at: (1, 1)<br />
+        Current optimizations: Default
+      </div>
+    </div>
+
+    <script>
+      let playerX = 1,
+        playerY = 1;
+      const gridWidth = 5,
+        gridHeight = 3;
+
+      function getCellIndex(x, y) {
+        return y * gridWidth + x;
+      }
+
+      function updateDisplay() {
+        const cells = document.querySelectorAll(".test-cell");
+
+        // Clear all player classes
+        cells.forEach((cell) => cell.classList.remove("player"));
+        cells.forEach((cell) => cell.classList.add("empty"));
+
+        // Set player position
+        const playerIndex = getCellIndex(playerX, playerY);
+        if (playerIndex >= 0 && playerIndex < cells.length) {
+          cells[playerIndex].classList.remove("empty");
+          cells[playerIndex].classList.add("player");
+        }
+
+        // Ensure diamond stays at (3,1)
+        const diamondIndex = getCellIndex(3, 1);
+        if (diamondIndex >= 0 && diamondIndex < cells.length) {
+          cells[diamondIndex].classList.remove("empty", "player");
+          cells[diamondIndex].classList.add("diamond");
+        }
+
+        document.getElementById("status").innerHTML =
+          `Player at: (${playerX}, ${playerY})<br>` +
+          `Current optimizations: ${getCurrentOptimizations()}`;
+      }
+
+      function movePlayer(dx, dy) {
+        const newX = Math.max(0, Math.min(gridWidth - 1, playerX + dx));
+        const newY = Math.max(0, Math.min(gridHeight - 1, playerY + dy));
+
+        if (newX !== playerX || newY !== playerY) {
+          playerX = newX;
+          playerY = newY;
+
+          // Force immediate update to test flickering
+          requestAnimationFrame(() => {
+            updateDisplay();
+          });
+        }
+      }
+
+      function getCurrentOptimizations() {
+        const grid = document.getElementById("testGrid");
+        const opts = [];
+        if (grid.classList.contains("no-hardware-accel"))
+          opts.push("No Hardware Accel");
+        if (grid.classList.contains("no-transforms"))
+          opts.push("No Transforms");
+        if (grid.classList.contains("no-containment"))
+          opts.push("No Containment");
+        return opts.length > 0 ? opts.join(", ") : "Default";
+      }
+
+      function toggleHardwareAccel() {
+        const grid = document.getElementById("testGrid");
+        grid.classList.toggle("no-hardware-accel");
+        updateDisplay();
+      }
+
+      function toggleTransforms() {
+        const grid = document.getElementById("testGrid");
+        grid.classList.toggle("no-transforms");
+        updateDisplay();
+      }
+
+      function toggleContainment() {
+        const grid = document.getElementById("testGrid");
+        grid.classList.toggle("no-containment");
+        updateDisplay();
+      }
+
+      function resetGrid() {
+        playerX = 1;
+        playerY = 1;
+        updateDisplay();
+      }
+
+      // Handle keyboard input
+      document.addEventListener("keydown", (e) => {
+        switch (e.key) {
+          case "ArrowLeft":
+          case "a":
+          case "A":
+            movePlayer(-1, 0);
+            break;
+          case "ArrowRight":
+          case "d":
+          case "D":
+            movePlayer(1, 0);
+            break;
+          case "ArrowUp":
+          case "w":
+          case "W":
+            movePlayer(0, -1);
+            break;
+          case "ArrowDown":
+          case "s":
+          case "S":
+            movePlayer(0, 1);
+            break;
+        }
+      });
+
+      // Initialize display
+      updateDisplay();
+
+      // Add touch event debugging
+      document.addEventListener("touchstart", (e) => {
+        console.log("Touch start detected");
+      });
+
+      document.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // Prevent scrolling
+      });
+    </script>
+  </body>
+</html>

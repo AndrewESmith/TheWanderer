@@ -135,6 +135,35 @@
     -webkit-perspective: none;
     /* Ensure stable rendering */
     isolation: auto;
+    /* Additional mobile-specific optimizations to prevent flickering */
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    /* Prevent background image flickering */
+    background-attachment: scroll;
+  }
+
+  /* Specific optimizations for diamond cells to prevent flickering */
+  .cell.diamond {
+    /* Ensure diamond background is stable */
+    background-color: #fff !important;
+    /* Prevent any transform-related flickering */
+    -webkit-transform: none !important;
+    transform: none !important;
+    /* Ensure consistent rendering */
+    image-rendering: auto;
+    -webkit-image-rendering: auto;
+  }
+
+  /* Specific optimizations for bomb cells to prevent flickering */
+  .cell.bomb {
+    /* Ensure bomb background is stable */
+    background-color: #000 !important;
+    /* Prevent any transform-related flickering */
+    -webkit-transform: none !important;
+    transform: none !important;
+    /* Ensure consistent rendering */
+    image-rendering: auto;
+    -webkit-image-rendering: auto;
   }
 }
 
