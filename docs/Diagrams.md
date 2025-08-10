@@ -219,26 +219,50 @@ graph TD
 ## Physics Engine Class
 
 ```mermaid
-sequenceDiagram
-  participant GameState
-  participant Phys as PhysicsEngine
-  participant BSM as BoulderStateManager
+classDiagram
+  class PositionUpdate {
+    +Position from
+    +Position to
+  }
+  class BoulderCategories {
+    +Position[] moving
+    +Position[] stationary
+    +Position[] triggered
+    +number total
+  }
+  class PhysicsSimulationResult {
+    +MazeCell[][] newMaze
+    +SoundEvent[] soundEvents
+    +Position[] boulderPositions
+    +Position[] arrowPositions
+    +Position[] movingBoulders
+    +Position[] completedBoulders
+    +Position[] playerCollisions
+    +PositionUpdate[] positionUpdates
+  }
 
-  GameState->>Phys: simulatePhysicsStepWithState(maze, BSM, moveNum, arrows)
-  Phys->>Phys: simulateGravityWithState(maze, BSM, moveNum)
-  Phys->>BSM: getTriggeredBouldersForMove(BSM, moveNum)
-  Phys-->>Phys: triggeredBoulders
-  loop for each moving boulder (bottom->top)
-    Phys->>Phys: simulateEnhancedBoulderFall()
-    alt moved
-      Phys-->>Phys: update newMaze, positionUpdates
-    else stopped
-      Phys-->>Phys: completedBoulders += pos
-    end
-  end
-  Phys-->>GameState: gravityResult (newMaze, events, positions, moving/stopped)
-  Phys->>Phys: simulateArrows(newMaze, arrows)
-  Phys-->>GameState: combined PhysicsSimulationResult
+  class PhysicsEngine {
+    +findBoulders(maze: MazeCell[][]): Position[]
+    +simulateGravity(maze: MazeCell[][]): PhysicsSimulationResult
+    +simulateArrows(maze: MazeCell[][], arrows): PhysicsSimulationResult
+    +simulatePhysicsStep(maze: MazeCell[][], arrows?): PhysicsSimulationResult
+    +simulateGravityWithState(maze, BoulderStateManager, moveNum): PhysicsSimulationResult
+    +simulatePhysicsStepWithState(maze, BoulderStateManager, moveNum, arrows?): PhysicsSimulationResult
+    +shouldContinuePhysics(prev: MazeCell[][], curr: MazeCell[][]): boolean
+    +shouldContinuePhysicsWithState(BoulderStateManager): boolean
+    +getMovingBoulderPositions(BoulderStateManager): Position[]
+    +getStationaryBoulderPositions(BoulderStateManager): Position[]
+    +getTriggeredBoulderPositions(BoulderStateManager): Position[]
+    +categorizeBoulders(BoulderStateManager): BoulderCategories
+  }
+
+  class BoulderStateManager {
+    +Map<string,BoulderState> boulders
+    +number movingBoulderCount
+  }
+
+  PhysicsEngine ..> BoulderStateManager : uses
+  PhysicsEngine --> PhysicsSimulationResult : returns
 ```
 
 ## Physics Engine Sequence
