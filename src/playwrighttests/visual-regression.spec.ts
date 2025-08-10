@@ -10,6 +10,7 @@ import {
     testGameStateChanges,
     verifyCrossBrowserConsistency,
     setupTestEnvironment,
+    dismissAudioDialogs,
 } from './utils/visual-test-helpers';
 
 test.describe('Visual Regression Tests - Core Interface', () => {
@@ -21,6 +22,24 @@ test.describe('Visual Regression Tests - Core Interface', () => {
     });
 
     test('full game interface screenshot - desktop', async ({ page }) => {
+        // Ensure extra stability for full page screenshot
+        await page.waitForTimeout(1000); // Additional wait for full stability
+
+        // Verify all critical elements are visible and stable
+        await expect(page.locator('.maze-grid')).toBeVisible();
+        await expect(page.locator('.hud')).toBeVisible();
+
+        // Wait for any potential animations or transitions to complete
+        await page.waitForFunction(() => {
+            // Check if all images have finished loading or erroring
+            const cells = document.querySelectorAll('.cell');
+            const processedCells = document.querySelectorAll('.cell.image-loaded, .cell.image-error');
+            return cells.length > 0 && processedCells.length === cells.length;
+        }, { timeout: 15000 });
+
+        // Additional stabilization
+        await page.waitForTimeout(500);
+
         // Take a full page screenshot for baseline comparison
         await takeStableScreenshot(page, 'full-game-desktop.png');
     });
@@ -203,9 +222,16 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
 
 test.describe('Visual Regression Tests - Game State Changes', () => {
     test.beforeEach(async ({ page }) => {
-        // Navigate first, then setup environment
-        await page.goto('/');
+        // Set up environment before navigation to prevent dialogs
         await setupTestEnvironment(page);
+
+        // Navigate to the page
+        await page.goto('/');
+
+        // Additional dialog dismissal after navigation
+        await dismissAudioDialogs(page);
+
+        // Wait for game to be stable
         await waitForGameStable(page);
     });
 
@@ -247,12 +273,45 @@ test.describe('Visual Regression Tests - Game State Changes', () => {
         await setupTestEnvironment(page);
         await waitForGameStable(page);
 
+        // Dismiss any audio dialogs before capturing initial state
+        await page.evaluate(() => {
+            // Additional audio context handling
+            try {
+                if (typeof Storage !== 'undefined' && window.localStorage) {
+                    localStorage.setItem('wanderer-audio-settings', JSON.stringify({
+                        enabled: false,
+                        volume: 0,
+                        userHasInteracted: true,
+                        dismissedErrors: true,
+                        autoRetryFailed: false
+                    }));
+                }
+            } catch (error) {
+                console.warn('Could not set audio settings:', error);
+            }
+        });
+
+        // Wait for any dialogs and dismiss them
+        await page.waitForTimeout(1000);
+        const dismissButton = page.locator('button:has-text("Dismiss")');
+        if (await dismissButton.count() > 0) {
+            await dismissButton.click();
+            await page.waitForTimeout(500);
+        }
+
         // Capture initial state
         await takeStableScreenshot(page, 'game-over-initial-state.png');
 
         // Move into bomb to trigger game over
         await page.keyboard.press('ArrowRight');
         await page.waitForTimeout(500);
+
+        // Dismiss any new audio dialogs that might appear after game over
+        const dismissButtonAfter = page.locator('button:has-text("Dismiss")');
+        if (await dismissButtonAfter.count() > 0) {
+            await dismissButtonAfter.click();
+            await page.waitForTimeout(500);
+        }
 
         // Capture game over state
         await takeStableScreenshot(page, 'game-over-final-state.png');

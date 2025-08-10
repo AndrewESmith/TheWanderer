@@ -31,6 +31,18 @@
     "test:visual:chromium": "node scripts/run-visual-tests.js --browser=chromium",
     "test:visual:firefox": "node scripts/run-visual-tests.js --browser=firefox",
     "test:visual:webkit": "node scripts/run-visual-tests.js --browser=webkit",
+    "test:visual:core": "node scripts/run-visual-tests.js --collection=core",
+    "test:visual:responsive": "node scripts/run-visual-tests.js --collection=responsive",
+    "test:visual:cross-browser": "node scripts/run-visual-tests.js --collection=cross-browser",
+    "test:visual:image-loading": "node scripts/run-visual-tests.js --collection=image-loading",
+    "test:visual:game-state": "node scripts/run-visual-tests.js --collection=game-state",
+    "test:visual:accessibility": "node scripts/run-visual-tests.js --collection=accessibility",
+    "test:visual:core:update": "node scripts/run-visual-tests.js --collection=core --update-snapshots",
+    "test:visual:responsive:update": "node scripts/run-visual-tests.js --collection=responsive --update-snapshots",
+    "test:visual:cross-browser:update": "node scripts/run-visual-tests.js --collection=cross-browser --update-snapshots",
+    "test:visual:image-loading:update": "node scripts/run-visual-tests.js --collection=image-loading --update-snapshots",
+    "test:visual:game-state:update": "node scripts/run-visual-tests.js --collection=game-state --update-snapshots",
+    "test:visual:accessibility:update": "node scripts/run-visual-tests.js --collection=accessibility --update-snapshots",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "eslintConfig": {

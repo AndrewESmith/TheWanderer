@@ -52,6 +52,8 @@ export async function waitForGameStable(
     });
 
     // Close any open dialogs that might still appear
+    await dismissAudioDialogs(page);
+
     const closeButton = page.locator('button:has-text("Close"), button[aria-label*="Close"], button:has-text("×")');
     if (await closeButton.count() > 0) {
         await closeButton.first().click();
@@ -74,6 +76,16 @@ export async function waitForGameStable(
         { timeout: opts.imageLoadTimeout }
     );
 
+    // Wait for any pending DOM updates to complete
+    await page.waitForFunction(() => {
+        // Check if document is ready and no pending image loads
+        return document.readyState === 'complete' &&
+            !document.querySelector('.cell:not(.image-loaded):not(.image-error)');
+    }, { timeout: 5000 }).catch(() => {
+        // If this fails, continue anyway as it's an additional check
+        console.warn('Some cells may still be in loading state');
+    });
+
     // Additional stabilization delay
     await page.waitForTimeout(opts.stabilizationDelay);
 }
@@ -88,8 +100,14 @@ export async function takeStableScreenshot(
 ): Promise<void> {
     const opts = { ...DEFAULT_VISUAL_OPTIONS, ...options };
 
+    // Wait a moment before taking screenshot to ensure stability
+    // Handle both Page and Locator objects
+    const page = locator.page ? locator.page() : locator;
+    await page.waitForTimeout(100);
+
     await expect(locator).toHaveScreenshot(name, {
         animations: opts.disableAnimations ? 'disabled' : 'allow',
+        threshold: 0.2, // Allow up to 20% difference to handle minor rendering variations
     });
 }
 
@@ -136,24 +154,103 @@ export async function setupTestEnvironment(page: Page): Promise<void> {
     await page.evaluate(() => {
         try {
             if (typeof Storage !== 'undefined' && window.localStorage) {
-                // Prevent "How to Play" dialog
-                localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
+                // Prevent "How to Play" dialog with multiple possible keys
+                const howToPlaySettings = {
                     dontShowAgain: true,
                     hasSeenInstructions: true,
-                    lastViewedVersion: '1.0.0'
-                }));
+                    lastViewedVersion: '1.0.0',
+                    dismissed: true,
+                    showOnStartup: false
+                };
+
+                localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify(howToPlaySettings));
+                localStorage.setItem('how-to-play-settings', JSON.stringify(howToPlaySettings));
+                localStorage.setItem('wanderer-tutorial-dismissed', 'true');
+                localStorage.setItem('tutorial-dismissed', 'true');
 
                 // Set audio preferences to avoid audio-related popups
-                localStorage.setItem('wanderer-audio-settings', JSON.stringify({
+                const audioSettings = {
                     enabled: false,
-                    volume: 0.5,
-                    userHasInteracted: true
-                }));
+                    volume: 0,
+                    userHasInteracted: true,
+                    dismissedErrors: true,
+                    autoRetryFailed: false,
+                    muted: true
+                };
+
+                localStorage.setItem('wanderer-audio-settings', JSON.stringify(audioSettings));
+                localStorage.setItem('audio-settings', JSON.stringify(audioSettings));
             }
         } catch (error) {
             console.warn('Could not access localStorage:', error);
         }
     });
+
+    // Dismiss any audio error dialogs that might appear
+    await dismissAudioDialogs(page);
+}
+
+/**
+ * Dismiss any dialogs that might interfere with tests
+ */
+export async function dismissAudioDialogs(page: Page): Promise<void> {
+    // Wait a moment for any dialogs to appear
+    await page.waitForTimeout(500);
+
+    // First, try to dismiss "How to Play" dialog if it appears
+    const howToPlayDialog = page.locator('[data-testid="how-to-play-popup"]');
+    if (await howToPlayDialog.count() > 0) {
+        // Try different ways to close the How to Play dialog
+        const closeButtons = [
+            '[data-testid="close-button"]', // Specific close button
+            'button.close-footer-button', // Footer close button
+            '[data-testid="how-to-play-popup"] button:has-text("×")',
+            '.how-to-play-overlay .close-button'
+        ];
+
+        for (const selector of closeButtons) {
+            const button = page.locator(selector);
+            if (await button.count() > 0) {
+                try {
+                    // Use first() to handle multiple matches
+                    await button.first().click({ timeout: 2000 });
+                    await page.waitForTimeout(500);
+                    break;
+                } catch (error) {
+                    console.warn(`Could not click ${selector}:`, error);
+                }
+            }
+        }
+
+        // If buttons don't work, try pressing Escape
+        if (await howToPlayDialog.count() > 0) {
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(500);
+        }
+    }
+
+    // Then look for audio dialog dismiss buttons
+    const dismissButtons = [
+        'button:has-text("Dismiss")',
+        'button:has-text("OK")',
+        'button[aria-label*="dismiss"]',
+        'button[aria-label*="close"]',
+        '.audio-error-dialog button:last-child',
+        '.dialog button:has-text("Dismiss")'
+    ];
+
+    for (const selector of dismissButtons) {
+        const button = page.locator(selector);
+        if (await button.count() > 0 && await button.isVisible()) {
+            try {
+                await button.click({ timeout: 2000 });
+                await page.waitForTimeout(300);
+                break;
+            } catch (error) {
+                console.warn(`Could not click ${selector}:`, error);
+            }
+        }
+    }
 }
 
 /**

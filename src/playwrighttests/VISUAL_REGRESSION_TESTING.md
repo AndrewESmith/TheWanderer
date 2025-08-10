@@ -88,16 +88,58 @@ npx playwright test src/playwrighttests/visual-regression.spec.ts --ui
 npm run test:visual:update
 ```
 
-#### Run specific test categories:
+#### Run specific test collections:
 ```bash
-# Core interface tests only
-npx playwright test src/playwrighttests/visual-regression.spec.ts -g "Core Interface"
+# Core interface tests
+npm run test:visual:core
 
-# Responsive design tests only
-npx playwright test src/playwrighttests/visual-regression.spec.ts -g "Responsive Design"
+# Responsive design tests
+npm run test:visual:responsive
 
-# Cross-browser tests only
-npx playwright test src/playwrighttests/visual-regression.spec.ts -g "Cross-Browser"
+# Cross-browser consistency tests
+npm run test:visual:cross-browser
+
+# Image loading scenario tests
+npm run test:visual:image-loading
+
+# Game state change tests
+npm run test:visual:game-state
+
+# Accessibility and edge case tests
+npm run test:visual:accessibility
+```
+
+#### Update specific test collections:
+```bash
+# Update core interface baselines
+npm run test:visual:core:update
+
+# Update responsive design baselines
+npm run test:visual:responsive:update
+
+# Update cross-browser baselines
+npm run test:visual:cross-browser:update
+
+# Update image loading baselines
+npm run test:visual:image-loading:update
+
+# Update game state baselines
+npm run test:visual:game-state:update
+
+# Update accessibility baselines
+npm run test:visual:accessibility:update
+```
+
+#### Advanced usage with the script directly:
+```bash
+# Run specific collection with custom browser
+node scripts/run-visual-tests.js --collection=responsive --browser=firefox
+
+# Run with custom grep pattern
+node scripts/run-visual-tests.js --grep="Mobile Controls"
+
+# Show help and available options
+node scripts/run-visual-tests.js --help
 ```
 
 ## Understanding Test Results
