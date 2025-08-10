@@ -360,27 +360,11 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       // test failures where movement appears not to work.
       setStableMazeRef([...gameState.maze.map((row) => [...row])]);
 
-      // Force re-render to reflect game state changes
-      forceUpdate();
-
-      // Remove startTransition as it can cause mobile flickering by deferring updates
-      // Keep all updates synchronous for immediate visual feedback
-      // React.startTransition(() => {
-      //   // Only update maze if it actually changed (level change, physics, etc.)
-      //   // or if game state changed (death, victory)
-      //   const gameStateChanged = gameState.gameState !== previousGameState;
-      //   const levelChanged = gameState.currentLevel !== previousLevel;
-
-      //   // Check if maze structure changed (not just player position)
-      //   const mazeStructureChanged =
-      //     gameState.maze !== previousMazeRef &&
-      //     !areMazesStructurallyEqual(previousMazeRef, gameState.maze);
-
-      //   if (mazeStructureChanged || gameStateChanged || levelChanged) {
-      //     // Maze structure changed, but we already updated it above
-      //     // This is just for consistency
-      //   }
-      // });
+      // Use requestAnimationFrame for smoother updates on mobile
+      requestAnimationFrame(() => {
+        // Force re-render to reflect game state changes
+        forceUpdate();
+      });
     },
     [gameState, stopAllSounds, stableMazeRef, forceUpdate]
   );
@@ -429,36 +413,23 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
       // DO NOT modify this to use separate player position state!
       const actualCellType = type;
 
-      // Track image loading state for visual regression tests
-      const [imageState, setImageState] = React.useState<CellImageState>({
-        loaded: false,
-        error: false,
-        retryCount: 0,
-      });
-
-      // Simplified image loading with cache
+      // Simplified image loading with cache - no state to prevent re-renders
       const imagePath = ICONS[actualCellType];
       const isImageCached = imageCache.current.has(imagePath);
 
-      // Cache image on first load and track loading state
+      // Pre-load image if not cached, but don't track loading state to avoid re-renders
       React.useEffect(() => {
-        if (!isImageCached && !imageState.loaded && !imageState.error) {
-          setImageState((prev) => ({ ...prev, loaded: false, error: false }));
-
+        if (!isImageCached) {
           const img = new Image();
           img.onload = () => {
             imageCache.current.set(imagePath, true);
-            setImageState((prev) => ({ ...prev, loaded: true, error: false }));
           };
           img.onerror = () => {
-            setImageState((prev) => ({ ...prev, loaded: false, error: true }));
+            console.warn(`Failed to load image: ${imagePath}`);
           };
           img.src = imagePath;
-        } else if (isImageCached && !imageState.loaded) {
-          // Image is already cached, mark as loaded
-          setImageState((prev) => ({ ...prev, loaded: true, error: false }));
         }
-      }, [imagePath, isImageCached, imageState.loaded, imageState.error]);
+      }, [imagePath, isImageCached]);
 
       // Simple styling with cached images and dominant colors for soil/rock
       const cellStyle: React.CSSProperties = {
@@ -476,29 +447,16 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
         cellStyle.backgroundColor = dominantColors[actualCellType];
       }
 
-      // Build CSS classes including image loading state
-      const cssClasses = [
-        "cell",
-        actualCellType,
-        imageState.loaded ? "image-loaded" : "",
-        imageState.error ? "image-error" : "",
-        !imageState.loaded && !imageState.error ? "image-loading" : "",
-      ]
-        .filter(Boolean)
-        .join(" ");
+      // Simple CSS classes without loading state to prevent re-renders
+      const cssClasses = ["cell", actualCellType].filter(Boolean).join(" ");
 
       return <div className={cssClasses} style={cellStyle} />;
     },
     (prevProps, nextProps) => {
-      // Only re-render if the base cell type actually changes
-      // Ignore player position changes for non-player cells
-      const prevBaseType =
-        prevProps.type === CELL.PLAYER ? CELL.EMPTY : prevProps.type;
-      const nextBaseType =
-        nextProps.type === CELL.PLAYER ? CELL.EMPTY : nextProps.type;
-
+      // Enhanced memoization: only re-render if the actual cell type changes
+      // This prevents unnecessary re-renders during player movement
       return (
-        prevBaseType === nextBaseType &&
+        prevProps.type === nextProps.type &&
         prevProps.x === nextProps.x &&
         prevProps.y === nextProps.y &&
         prevProps.dominantColors === nextProps.dominantColors

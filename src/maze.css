@@ -65,10 +65,8 @@
 /* Mobile-specific optimizations to prevent flickering */
 @media (max-width: 768px) {
   .maze-grid {
-    /* Completely disable hardware acceleration on mobile */
+    /* Disable hardware acceleration that can cause mobile flickering */
     will-change: auto;
-    transform: none !important;
-    -webkit-transform: none !important;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
     /* Remove transitions that can interfere with scaling */
@@ -77,6 +75,9 @@
     contain: layout;
     /* Disable image rendering optimizations that can cause flickering */
     image-rendering: auto;
+    /* Allow transforms for scaling but disable hardware acceleration */
+    transform-style: flat;
+    -webkit-transform-style: flat;
   }
 }
 
@@ -417,18 +418,24 @@
   }
 
   .maze-grid {
-    /* Use simple fixed scaling instead of complex calc() to prevent flickering */
-    transform: scale(0.75);
-    -webkit-transform: scale(0.75);
+    /* Use responsive scaling that fits the screen width */
+    transform: scale(
+      min(0.9, calc((100vw - 32px) / var(--maze-pixel-width, 532px)))
+    );
+    -webkit-transform: scale(
+      min(0.9, calc((100vw - 32px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     -webkit-transform-origin: center center;
     margin: 0;
     max-width: none;
     position: relative;
-    /* Ensure stable rendering */
+    /* Disable hardware acceleration but allow transforms */
     will-change: auto;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
+    transform-style: flat;
+    -webkit-transform-style: flat;
   }
 
   .hud {
@@ -461,9 +468,13 @@
   }
 
   .maze-grid {
-    /* Use simple fixed scaling to prevent flickering */
-    transform: scale(0.6);
-    -webkit-transform: scale(0.6);
+    /* Use responsive scaling for small screens */
+    transform: scale(
+      min(0.8, calc((100vw - 16px) / var(--maze-pixel-width, 532px)))
+    );
+    -webkit-transform: scale(
+      min(0.8, calc((100vw - 16px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     -webkit-transform-origin: center center;
     margin: 0;
@@ -472,6 +483,8 @@
     will-change: auto;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
+    transform-style: flat;
+    -webkit-transform-style: flat;
   }
 
   .hud {
@@ -523,9 +536,19 @@
   }
 
   .maze-grid {
-    /* Use simple fixed scaling for landscape to prevent flickering */
-    transform: scale(0.8);
-    -webkit-transform: scale(0.8);
+    /* Use responsive scaling for landscape that fits both width and height */
+    transform: scale(
+      min(
+        calc((100vw - 16px) / var(--maze-pixel-width, 532px)),
+        calc((100vh - 120px) / var(--maze-pixel-height, 340px))
+      )
+    );
+    -webkit-transform: scale(
+      min(
+        calc((100vw - 16px) / var(--maze-pixel-width, 532px)),
+        calc((100vh - 120px) / var(--maze-pixel-height, 340px))
+      )
+    );
     transform-origin: center center;
     -webkit-transform-origin: center center;
     margin: 0;
@@ -535,6 +558,8 @@
     will-change: auto;
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
+    transform-style: flat;
+    -webkit-transform-style: flat;
   }
 
   .hud {
@@ -628,11 +653,17 @@
 /* Ultra-wide screens in portrait (tall phones) - simplified */
 @media (max-width: 480px) and (min-height: 800px) and (orientation: portrait) {
   .maze-grid {
-    transform: scale(0.55);
-    -webkit-transform: scale(0.55);
+    transform: scale(
+      min(0.7, calc((100vw - 32px) / var(--maze-pixel-width, 532px)))
+    );
+    -webkit-transform: scale(
+      min(0.7, calc((100vw - 32px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     -webkit-transform-origin: center center;
     margin: 0 auto;
+    transform-style: flat;
+    -webkit-transform-style: flat;
   }
 }
 
@@ -643,13 +674,19 @@
   }
 
   .maze-grid {
-    transform: scale(0.5);
-    -webkit-transform: scale(0.5);
+    transform: scale(
+      min(0.6, calc((100vw - 8px) / var(--maze-pixel-width, 532px)))
+    );
+    -webkit-transform: scale(
+      min(0.6, calc((100vw - 8px) / var(--maze-pixel-width, 532px)))
+    );
     transform-origin: center center;
     -webkit-transform-origin: center center;
     margin: 0;
     max-width: none;
     position: relative;
+    transform-style: flat;
+    -webkit-transform-style: flat;
   }
 
   .hud {
