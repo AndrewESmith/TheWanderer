@@ -18,9 +18,8 @@
 ## Presentation - Stop Coding and get presentation dafted
 
 - [ ] Use Chat, Onenote and prompt to build a presentation out line
-- [ ] Experimement with running game from git hub from a certain commit eg POC to show progress instead of using video.
 - [ ] Use gamma.app to create our presentation
-- [ ] invite family property team to review
+- [x] invite family property team to review
 
 ## Version 2
 
@@ -60,6 +59,7 @@
 - [x] Create a how to play page
 - [x] Fix typescript errors
 - [ ] Ensure working playwright tests
+- [ ] Fix mobile flicker
 
 ## Version 8
 

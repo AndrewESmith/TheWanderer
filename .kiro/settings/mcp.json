@@ -1,9 +1,9 @@
 {
   "mcpServers": {
     "playwright": {
-      "command": "npx",
+      "command": "node",
       "args": [
-        "@executeautomation/playwright-mcp-server"
+        "D:\\FizzBash\\TheWanderer\\node_modules\\@executeautomation\\playwright-mcp-server\\dist\\index.js"
       ],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR"
@@ -37,10 +37,7 @@
         "FASTMCP_LOG_LEVEL": "ERROR"
       },
       "disabled": false,
-      "autoApprove": [
-        "read_documentation",
-        "recommend"
-      ]
+      "autoApprove": ["read_documentation", "recommend"]
     }
   }
 }
