@@ -54,9 +54,11 @@ function saveHowToPlaySettings(settings: HowToPlaySettings): void {
  * Provides localStorage persistence with graceful fallback for localStorage failures
  */
 export function useHowToPlaySettings(): UseHowToPlaySettingsReturn {
-    const [settings, setSettings] = useState<HowToPlaySettings>(() =>
-        loadHowToPlaySettings()
-    );
+    const [settings, setSettings] = useState<HowToPlaySettings>(() => {
+        // Always load settings synchronously on initialization
+        const loaded = loadHowToPlaySettings();
+        return loaded;
+    });
 
     // Save settings to localStorage whenever they change
     useEffect(() => {

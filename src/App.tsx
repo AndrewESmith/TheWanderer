@@ -207,7 +207,7 @@ const GameComponent: React.FC<{ dominantColors: Record<string, string> }> = ({
   } = useSound();
 
   // How to Play popup state management
-  const { shouldShowOnStartup } = useHowToPlaySettings();
+  const { shouldShowOnStartup, settings } = useHowToPlaySettings();
   const [isHowToPlayOpen, setIsHowToPlayOpen] = React.useState(false);
 
   // First-visit detection and automatic popup display
