@@ -87,11 +87,14 @@ export function useHowToPlaySettings(): UseHowToPlaySettingsReturn {
 
     /**
      * Determine if popup should show on app startup
-     * Returns true if user hasn't seen instructions OR hasn't opted out
+     * Returns true if user hasn't opted out (dontShowAgain is false)
+     * For first-time users: show popup (hasSeenInstructions: false, dontShowAgain: false)
+     * For returning users who opted out: don't show popup (dontShowAgain: true)
+     * For returning users who didn't opt out: show popup (dontShowAgain: false)
      */
     const shouldShowOnStartup = useCallback((): boolean => {
-        return !settings.hasSeenInstructions || !settings.dontShowAgain;
-    }, [settings.hasSeenInstructions, settings.dontShowAgain]);
+        return !settings.dontShowAgain;
+    }, [settings.dontShowAgain]);
 
     return {
         settings,
