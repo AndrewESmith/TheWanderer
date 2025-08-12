@@ -81,7 +81,9 @@ export default defineConfig({
       name: 'webkit',
       use: {
         ...devices['Desktop Safari'],
-        // Webkit-specific settings for better visual consistency
+        // Webkit-specific settings for better visual consistency and stability
+        actionTimeout: 20000, // Increased timeout for WebKit
+        navigationTimeout: 45000, // Increased navigation timeout for WebKit
         launchOptions: {
           args: [
             '--disable-web-security',
@@ -90,6 +92,8 @@ export default defineConfig({
           ]
         }
       },
+      // WebKit-specific test timeout
+      timeout: 90000, // 90 seconds for WebKit tests
     },
 
     /* Test against mobile viewports. */

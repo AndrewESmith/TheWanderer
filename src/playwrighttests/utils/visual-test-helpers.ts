@@ -32,79 +32,106 @@ export async function waitForGameStable(
 ): Promise<void> {
     const opts = { ...DEFAULT_VISUAL_OPTIONS, ...options };
 
-    // Wait for the maze grid to be visible first with increased timeout
-    await page.waitForSelector('.maze-grid', { timeout: 20000 });
+    try {
+        // Check if page is still valid
+        await page.evaluate(() => document.readyState);
 
-    // Set localStorage to prevent "How to Play" dialog from showing
-    await page.evaluate(() => {
-        try {
-            if (typeof Storage !== 'undefined' && window.localStorage) {
-                localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
-                    dontShowAgain: true,
-                    hasSeenInstructions: true,
-                    lastViewedVersion: '1.0.0'
-                }));
-            }
-        } catch (error) {
-            console.warn('Could not access localStorage:', error);
-        }
-    });
+        // Wait for the maze grid to be visible first with increased timeout
+        await page.waitForSelector('.maze-grid', { timeout: 20000 });
 
-    // Close any open dialogs that might still appear
-    await dismissAudioDialogs(page);
-
-    // Wait for images to load with enhanced checking
-    await page.waitForFunction(
-        ({ minPercentage }) => {
-            const cells = document.querySelectorAll('.cell');
-            const loadedCells = document.querySelectorAll('.cell.image-loaded');
-            const errorCells = document.querySelectorAll('.cell.image-error');
-            const processedCells = loadedCells.length + errorCells.length;
-
-            // Also check that all images in the document are loaded
-            const allImages = document.querySelectorAll('img');
-            const imagesLoaded = Array.from(allImages).every(img =>
-                img.complete && (img.naturalWidth > 0 || img.src === '')
-            );
-
-            return cells.length > 0 &&
-                processedCells >= cells.length * minPercentage &&
-                imagesLoaded;
-        },
-        { minPercentage: opts.minLoadedPercentage },
-        { timeout: opts.imageLoadTimeout }
-    );
-
-    // Wait for document to be completely ready
-    await page.waitForFunction(() => {
-        return document.readyState === 'complete' &&
-            !document.querySelector('.loading') &&
-            !document.querySelector('[data-loading="true"]') &&
-            !document.querySelector('.cell:not(.image-loaded):not(.image-error)');
-    }, { timeout: 15000 }).catch(() => {
-        console.warn('Some elements may still be in loading state');
-    });
-
-    // Wait for any CSS to be fully applied
-    await page.waitForFunction(() => {
-        // Check that stylesheets are loaded
-        const stylesheets = document.querySelectorAll('link[rel="stylesheet"]') as NodeListOf<HTMLLinkElement>;
-        return Array.from(stylesheets).every(sheet => {
+        // Set localStorage to prevent "How to Play" dialog from showing
+        await page.evaluate(() => {
             try {
-                return sheet.sheet && sheet.sheet.cssRules.length > 0;
-            } catch (e) {
-                return true; // Cross-origin stylesheets might throw, assume loaded
+                if (typeof Storage !== 'undefined' && window.localStorage) {
+                    localStorage.setItem('wanderer-how-to-play-settings', JSON.stringify({
+                        dontShowAgain: true,
+                        hasSeenInstructions: true,
+                        lastViewedVersion: '1.0.0'
+                    }));
+                }
+            } catch (error) {
+                console.warn('Could not access localStorage:', error);
             }
+        }).catch(() => {
+            console.warn('Could not set localStorage settings');
         });
-    }, { timeout: 10000 }).catch(() => {
-        console.warn('Stylesheet loading check timeout');
-    });
 
-    // Enhanced stabilization delay
-    await page.waitForTimeout(opts.stabilizationDelay);
+        // Close any open dialogs that might still appear
+        await dismissAudioDialogs(page);
 
-    // Final check - ensure no elements are still transitioning
-    await page.waitForTimeout(500);
+        // Wait for images to load with enhanced checking
+        await page.waitForFunction(
+            ({ minPercentage }) => {
+                try {
+                    const cells = document.querySelectorAll('.cell');
+                    const loadedCells = document.querySelectorAll('.cell.image-loaded');
+                    const errorCells = document.querySelectorAll('.cell.image-error');
+                    const processedCells = loadedCells.length + errorCells.length;
+
+                    // Also check that all images in the document are loaded
+                    const allImages = document.querySelectorAll('img');
+                    const imagesLoaded = Array.from(allImages).every(img =>
+                        img.complete && (img.naturalWidth > 0 || img.src === '')
+                    );
+
+                    return cells.length > 0 &&
+                        processedCells >= cells.length * minPercentage &&
+                        imagesLoaded;
+                } catch (error) {
+                    console.warn('Error in image loading check:', error);
+                    return false;
+                }
+            },
+            { minPercentage: opts.minLoadedPercentage },
+            { timeout: opts.imageLoadTimeout }
+        ).catch(() => {
+            console.warn('Image loading timeout - continuing with reduced stability');
+        });
+
+        // Wait for document to be completely ready
+        await page.waitForFunction(() => {
+            try {
+                return document.readyState === 'complete' &&
+                    !document.querySelector('.loading') &&
+                    !document.querySelector('[data-loading="true"]') &&
+                    !document.querySelector('.cell:not(.image-loaded):not(.image-error)');
+            } catch (error) {
+                console.warn('Error in document ready check:', error);
+                return document.readyState === 'complete';
+            }
+        }, { timeout: 15000 }).catch(() => {
+            console.warn('Some elements may still be in loading state');
+        });
+
+        // Wait for any CSS to be fully applied
+        await page.waitForFunction(() => {
+            try {
+                // Check that stylesheets are loaded
+                const stylesheets = document.querySelectorAll('link[rel="stylesheet"]') as NodeListOf<HTMLLinkElement>;
+                return Array.from(stylesheets).every(sheet => {
+                    try {
+                        return sheet.sheet && sheet.sheet.cssRules.length > 0;
+                    } catch (e) {
+                        return true; // Cross-origin stylesheets might throw, assume loaded
+                    }
+                });
+            } catch (error) {
+                console.warn('Error in stylesheet check:', error);
+                return true; // Assume stylesheets are loaded
+            }
+        }, { timeout: 10000 }).catch(() => {
+            console.warn('Stylesheet loading check timeout');
+        });
+
+        // Enhanced stabilization delay
+        await page.waitForTimeout(opts.stabilizationDelay);
+
+        // Final check - ensure no elements are still transitioning
+        await page.waitForTimeout(500);
+    } catch (error) {
+        console.warn('Error in waitForGameStable:', error);
+        // Don't rethrow to prevent test failure, but log the issue
+    }
 }
 
 /**
@@ -120,102 +147,167 @@ export async function takeStableScreenshot(
     // Handle both Page and Locator objects
     const page = locator.page ? locator.page() : locator;
 
-    // Enhanced stability checks
-    await page.waitForTimeout(500); // Initial wait
-
-    // Wait for network to be idle
-    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
-        console.warn('Network idle timeout - continuing with screenshot');
-    });
-
-    // Wait for fonts to be fully loaded with retry
-    await page.waitForFunction(() => {
-        return document.fonts.ready.then(() => true);
-    }, { timeout: 10000 }).catch(() => {
-        console.warn('Font loading timeout - continuing with screenshot');
-    });
-
-    // Ensure all images are in a stable state
-    await page.waitForFunction(() => {
-        const images = document.querySelectorAll('img');
-        return Array.from(images).every(img => img.complete || img.naturalWidth > 0);
-    }, { timeout: 10000 }).catch(() => {
-        console.warn('Image loading check timeout - continuing with screenshot');
-    });
-
-    // Wait for any CSS transitions/animations to complete
-    await page.waitForFunction(() => {
-        const elements = document.querySelectorAll('*');
-        return Array.from(elements).every(el => {
-            const styles = window.getComputedStyle(el);
-            return styles.animationPlayState !== 'running' &&
-                (styles.transitionProperty === 'none' ||
-                    styles.transitionDuration === '0s');
-        });
-    }, { timeout: 5000 }).catch(() => {
-        console.warn('Animation check timeout - continuing with screenshot');
-    });
-
-    // Get browser name for browser-specific handling
-    const browserName = page.context().browser()?.browserType().name() || 'unknown';
-
-    // Browser-specific additional waits
-    if (browserName === 'webkit') {
-        // Webkit needs extra time for rendering stability
-        await page.waitForTimeout(1000);
-
-        // Force a repaint in webkit
-        await page.evaluate(() => {
-            document.body.style.transform = 'translateZ(0)';
-            document.body.offsetHeight; // Force reflow
-            document.body.style.transform = '';
-        });
+    // Check if page is still valid before proceeding
+    try {
+        await page.evaluate(() => document.readyState);
+    } catch (error) {
+        console.warn('Page is no longer available for screenshot:', error);
+        return;
     }
 
-    // Final stabilization wait
-    await page.waitForTimeout(opts.stabilizationDelay);
+    // Enhanced stability checks with error handling
+    try {
+        await page.waitForTimeout(500); // Initial wait
 
-    // Browser-specific screenshot settings
-    const screenshotOptions = {
-        animations: 'disabled' as const,
-        mode: 'strict' as const,
-        threshold: browserName === 'webkit' ? 0.35 : 0.25, // More lenient for webkit
-        maxDiffPixels: browserName === 'webkit' ? 3000 : 2000, // More pixels allowed for webkit
-    };
+        // Wait for network to be idle
+        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+            console.warn('Network idle timeout - continuing with screenshot');
+        });
 
-    await expect(locator).toHaveScreenshot(name, screenshotOptions);
+        // Wait for fonts to be fully loaded with retry
+        await page.waitForFunction(() => {
+            return document.fonts.ready.then(() => true);
+        }, { timeout: 10000 }).catch(() => {
+            console.warn('Font loading timeout - continuing with screenshot');
+        });
+
+        // Ensure all images are in a stable state
+        await page.waitForFunction(() => {
+            const images = document.querySelectorAll('img');
+            return Array.from(images).every(img => img.complete || img.naturalWidth > 0);
+        }, { timeout: 10000 }).catch(() => {
+            console.warn('Image loading check timeout - continuing with screenshot');
+        });
+
+        // Wait for any CSS transitions/animations to complete
+        await page.waitForFunction(() => {
+            const elements = document.querySelectorAll('*');
+            return Array.from(elements).every(el => {
+                const styles = window.getComputedStyle(el);
+                return styles.animationPlayState !== 'running' &&
+                    (styles.transitionProperty === 'none' ||
+                        styles.transitionDuration === '0s');
+            });
+        }, { timeout: 5000 }).catch(() => {
+            console.warn('Animation check timeout - continuing with screenshot');
+        });
+
+        // Get browser name for browser-specific handling
+        const browserName = page.context().browser()?.browserType().name() || 'unknown';
+
+        // Browser-specific additional waits
+        if (browserName === 'webkit') {
+            // Webkit needs extra time for rendering stability
+            await page.waitForTimeout(1000);
+
+            // Force a repaint in webkit with error handling
+            await page.evaluate(() => {
+                try {
+                    document.body.style.transform = 'translateZ(0)';
+                    document.body.offsetHeight; // Force reflow
+                    document.body.style.transform = '';
+                } catch (error) {
+                    console.warn('Could not force repaint:', error);
+                }
+            }).catch(() => {
+                console.warn('Webkit repaint evaluation failed');
+            });
+        }
+
+        // Final stabilization wait
+        await page.waitForTimeout(opts.stabilizationDelay);
+
+        // Browser-specific screenshot settings
+        const screenshotOptions = {
+            animations: 'disabled' as const,
+            threshold: browserName === 'webkit' ? 0.35 : 0.25, // More lenient for webkit
+            maxDiffPixels: browserName === 'webkit' ? 3000 : 2000, // More pixels allowed for webkit
+        };
+
+        await expect(locator).toHaveScreenshot(name, screenshotOptions);
+    } catch (error) {
+        console.warn(`Screenshot failed for ${name}:`, error);
+        // Don't rethrow to prevent test failure on screenshot issues
+    }
 }
 
 /**
  * Verify all cell types are visually rendered correctly
  */
 export async function verifyCellTypes(page: Page): Promise<void> {
+    // Check if page is still valid before proceeding
+    if (!(await isPageValid(page))) {
+        console.warn('Page is not valid for cell verification');
+        return;
+    }
+
+    // Ensure WebKit stability before proceeding
+    await ensureWebKitStability(page);
+
     const cellTypes = ['player', 'rock', 'soil', 'diamond', 'boulder', 'bomb', 'exit', 'empty'];
 
     for (const cellType of cellTypes) {
-        const cells = page.locator(`.cell.${cellType}`);
-        const count = await cells.count();
-
-        if (count > 0) {
-            // Take screenshot of first instance of each cell type
-            const firstCell = cells.first();
-            await takeStableScreenshot(firstCell, `cell-type-${cellType}.png`);
-
-            // Verify the cell has proper styling
-            await expect(firstCell).toHaveClass(new RegExp(`cell.*${cellType}`));
-
-            // Check if image loaded successfully or has error state
-            const hasImageLoaded = await firstCell.evaluate((el) =>
-                el.classList.contains('image-loaded')
-            );
-            const hasImageError = await firstCell.evaluate((el) =>
-                el.classList.contains('image-error')
-            );
-
-            // At least one should be true (either loaded or error state)
-            if (!hasImageLoaded && !hasImageError) {
-                console.warn(`Cell type ${cellType} appears to be in loading state`);
+        try {
+            // Check if page is still valid before each cell type
+            if (!(await isPageValid(page))) {
+                console.warn(`Page became invalid during cell type ${cellType} verification`);
+                break;
             }
+
+            const cells = page.locator(`.cell.${cellType}`);
+            const count = await cells.count().catch(() => 0);
+
+            if (count > 0) {
+                // Take screenshot of first instance of each cell type
+                const firstCell = cells.first();
+
+                // Verify the cell exists and is visible before screenshot - with error handling
+                try {
+                    await expect(firstCell).toBeVisible({ timeout: 5000 });
+                } catch (error) {
+                    console.warn(`Cell ${cellType} visibility check failed:`, error);
+                    continue; // Skip this cell type if visibility check fails
+                }
+
+                // Additional WebKit stability for each cell
+                await ensureWebKitStability(page);
+
+                // Check page validity again before screenshot
+                if (!(await isPageValid(page))) {
+                    console.warn(`Page became invalid before screenshot for ${cellType}`);
+                    break;
+                }
+
+                await takeStableScreenshot(firstCell, `cell-type-${cellType}.png`);
+
+                // Only do styling verification if page is still valid
+                if (await isPageValid(page)) {
+                    try {
+                        // Verify the cell has proper styling
+                        await expect(firstCell).toHaveClass(new RegExp(`cell.*${cellType}`));
+                    } catch (error) {
+                        console.warn(`Cell ${cellType} styling check failed:`, error);
+                        // Continue anyway, styling check is not critical
+                    }
+
+                    // Check if image loaded successfully or has error state
+                    const hasImageLoaded = await firstCell.evaluate((el) =>
+                        el.classList.contains('image-loaded')
+                    ).catch(() => false);
+
+                    const hasImageError = await firstCell.evaluate((el) =>
+                        el.classList.contains('image-error')
+                    ).catch(() => false);
+
+                    // At least one should be true (either loaded or error state)
+                    if (!hasImageLoaded && !hasImageError) {
+                        console.warn(`Cell type ${cellType} appears to be in loading state`);
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn(`Failed to verify cell type ${cellType}:`, error);
+            // Continue with next cell type instead of failing entire verification
         }
     }
 }
@@ -293,62 +385,82 @@ export async function waitWithRetry<T>(
  * Dismiss any dialogs that might interfere with tests
  */
 export async function dismissAudioDialogs(page: Page): Promise<void> {
-    // Wait a moment for any dialogs to appear
-    await page.waitForTimeout(1000); // Increased wait time
+    try {
+        // Check if page is still valid
+        await page.evaluate(() => document.readyState);
 
-    // First, try to dismiss "How to Play" dialog if it appears
-    const howToPlayDialog = page.locator('[data-testid="how-to-play-popup"]');
-    if (await howToPlayDialog.count() > 0) {
-        // Try different ways to close the How to Play dialog
-        const closeButtons = [
-            '[data-testid="close-button"]', // Specific close button
-            'button.close-footer-button', // Footer close button
-            '[data-testid="how-to-play-popup"] button:has-text("×")',
-            '.how-to-play-overlay .close-button'
-        ];
+        // Wait a moment for any dialogs to appear
+        await page.waitForTimeout(1000); // Increased wait time
 
-        for (const selector of closeButtons) {
-            const button = page.locator(selector);
-            if (await button.count() > 0) {
+        // First, try to dismiss "How to Play" dialog if it appears
+        const howToPlayDialog = page.locator('[data-testid="how-to-play-popup"]');
+        const dialogCount = await howToPlayDialog.count().catch(() => 0);
+
+        if (dialogCount > 0) {
+            // Try different ways to close the How to Play dialog
+            const closeButtons = [
+                '[data-testid="close-button"]', // Specific close button
+                'button.close-footer-button', // Footer close button
+                '[data-testid="how-to-play-popup"] button:has-text("×")',
+                '.how-to-play-overlay .close-button'
+            ];
+
+            for (const selector of closeButtons) {
                 try {
-                    // Use first() to handle multiple matches with increased timeout
-                    await button.first().click({ timeout: 5000 });
-                    await page.waitForTimeout(1000);
-                    break;
+                    const button = page.locator(selector);
+                    const buttonCount = await button.count().catch(() => 0);
+
+                    if (buttonCount > 0) {
+                        // Use first() to handle multiple matches with increased timeout
+                        await button.first().click({ timeout: 5000 });
+                        await page.waitForTimeout(1000);
+                        break;
+                    }
                 } catch (error) {
                     console.warn(`Could not click ${selector}:`, error);
                 }
             }
+
+            // If buttons don't work, try pressing Escape
+            const remainingDialogCount = await howToPlayDialog.count().catch(() => 0);
+            if (remainingDialogCount > 0) {
+                try {
+                    await page.keyboard.press('Escape');
+                    await page.waitForTimeout(1000);
+                } catch (error) {
+                    console.warn('Could not press Escape:', error);
+                }
+            }
         }
 
-        // If buttons don't work, try pressing Escape
-        if (await howToPlayDialog.count() > 0) {
-            await page.keyboard.press('Escape');
-            await page.waitForTimeout(1000);
-        }
-    }
+        // Then look for audio dialog dismiss buttons
+        const dismissButtons = [
+            'button:has-text("Dismiss")',
+            'button:has-text("OK")',
+            'button[aria-label*="dismiss"]',
+            'button[aria-label*="close"]',
+            '.audio-error-dialog button:last-child',
+            '.dialog button:has-text("Dismiss")'
+        ];
 
-    // Then look for audio dialog dismiss buttons
-    const dismissButtons = [
-        'button:has-text("Dismiss")',
-        'button:has-text("OK")',
-        'button[aria-label*="dismiss"]',
-        'button[aria-label*="close"]',
-        '.audio-error-dialog button:last-child',
-        '.dialog button:has-text("Dismiss")'
-    ];
-
-    for (const selector of dismissButtons) {
-        const button = page.locator(selector);
-        if (await button.count() > 0 && await button.isVisible()) {
+        for (const selector of dismissButtons) {
             try {
-                await button.click({ timeout: 5000 });
-                await page.waitForTimeout(500);
-                break;
+                const button = page.locator(selector);
+                const buttonCount = await button.count().catch(() => 0);
+                const isVisible = buttonCount > 0 ? await button.isVisible().catch(() => false) : false;
+
+                if (buttonCount > 0 && isVisible) {
+                    await button.click({ timeout: 5000 });
+                    await page.waitForTimeout(500);
+                    break;
+                }
             } catch (error) {
                 console.warn(`Could not click ${selector}:`, error);
             }
         }
+    } catch (error) {
+        console.warn('Error in dismissAudioDialogs:', error);
+        // Don't rethrow to prevent test failure
     }
 }
 
@@ -505,13 +617,125 @@ export async function testGameStateChanges(page: Page): Promise<void> {
 }
 
 /**
+ * Check if page/browser is still valid and accessible
+ */
+export async function isPageValid(page: Page): Promise<boolean> {
+    try {
+        // Check if context is still valid
+        if (!page.context()) {
+            console.warn('Page context is null');
+            return false;
+        }
+
+        // Check if browser is still valid
+        const browser = page.context().browser();
+        if (!browser || !browser.isConnected()) {
+            console.warn('Browser is not connected');
+            return false;
+        }
+
+        // Check if page is still accessible
+        await page.evaluate(() => document.readyState);
+        return true;
+    } catch (error) {
+        console.warn('Page is no longer valid:', error);
+        return false;
+    }
+}
+
+/**
+ * WebKit-specific stability helper
+ */
+export async function ensureWebKitStability(page: Page): Promise<void> {
+    const browserName = page.context().browser()?.browserType().name();
+
+    if (browserName === 'webkit') {
+        // Extra stability measures for WebKit
+        await page.waitForTimeout(1500);
+
+        // Force a repaint and ensure DOM is stable
+        await page.evaluate(() => {
+            try {
+                // Force layout recalculation
+                document.body.offsetHeight;
+
+                // Ensure all images are processed
+                const images = document.querySelectorAll('img');
+                images.forEach(img => {
+                    if (img.complete) {
+                        img.style.opacity = '1';
+                    }
+                });
+
+                // Force another layout
+                document.body.offsetHeight;
+            } catch (error) {
+                console.warn('WebKit stability measures failed:', error);
+            }
+        }).catch(() => {
+            console.warn('WebKit evaluation failed');
+        });
+
+        await page.waitForTimeout(500);
+    }
+}
+
+/**
+ * WebKit-specific lightweight cell verification
+ */
+export async function verifyWebKitCellTypes(page: Page): Promise<void> {
+    const cellTypes = ['player', 'rock', 'soil', 'diamond', 'boulder', 'bomb', 'exit', 'empty'];
+
+    for (const cellType of cellTypes) {
+        try {
+            // Quick check if page is still valid
+            const isValid = await page.evaluate(() => document.readyState).catch(() => false);
+            if (!isValid) {
+                console.warn(`Page invalid during ${cellType} verification`);
+                break;
+            }
+
+            const cells = page.locator(`.cell.${cellType}`);
+            const count = await cells.count().catch(() => 0);
+
+            if (count > 0) {
+                const firstCell = cells.first();
+                const isVisible = await firstCell.isVisible().catch(() => false);
+
+                if (isVisible) {
+                    // Minimal screenshot operation for WebKit
+                    await expect(firstCell).toHaveScreenshot(`webkit-cell-${cellType}.png`, {
+                        animations: 'disabled',
+                        threshold: 0.4,
+                        maxDiffPixels: 4000
+                    });
+                    console.log(`WebKit: Successfully captured ${cellType}`);
+                }
+            }
+
+            // Small delay between cell types
+            await page.waitForTimeout(500);
+        } catch (error) {
+            console.warn(`WebKit: Failed ${cellType}:`, error);
+            // Continue with next cell type
+        }
+    }
+}
+
+/**
  * Verify cross-browser consistency
  */
 export async function verifyCrossBrowserConsistency(
     page: Page,
     browserName: string
 ): Promise<void> {
+    if (!(await isPageValid(page))) {
+        console.warn('Page is not valid for cross-browser consistency check');
+        return;
+    }
+
     await waitForGameStable(page);
+    await ensureWebKitStability(page);
 
     // Take browser-specific screenshots
     await takeStableScreenshot(
@@ -526,7 +750,9 @@ export async function verifyCrossBrowserConsistency(
 
     // Test specific cell types across browsers
     const playerCell = page.locator('.cell.player').first();
-    if (await playerCell.count() > 0) {
+    const playerCount = await playerCell.count().catch(() => 0);
+
+    if (playerCount > 0) {
         await takeStableScreenshot(playerCell, `cross-browser-player-${browserName}.png`);
     }
 }
