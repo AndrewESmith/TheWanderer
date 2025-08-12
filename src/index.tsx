@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root container missing in index.html");
@@ -11,6 +12,7 @@ root.render(
   <React.StrictMode>
     <App />
     {import.meta.env.PROD && <SpeedInsights />}
+    {import.meta.env.PROD && <Analytics />}
   </React.StrictMode>
 );
 
