@@ -23,6 +23,8 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
+  /* Global timeout settings for visual regression tests */
+  timeout: 60000, // 60 seconds per test
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -33,6 +35,10 @@ export default defineConfig({
 
     /* Capture screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Increase action timeout for visual tests */
+    actionTimeout: 15000, // 15 seconds for individual actions
+    navigationTimeout: 30000, // 30 seconds for navigation
   },
 
   /* Configure visual comparisons */

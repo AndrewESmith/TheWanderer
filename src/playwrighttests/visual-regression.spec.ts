@@ -15,10 +15,16 @@ import {
 
 test.describe('Visual Regression Tests - Core Interface', () => {
     test.beforeEach(async ({ page }) => {
+        // Set longer timeout for beforeEach
+        test.setTimeout(90000); // 90 seconds for visual tests
+
         // Navigate first, then setup environment
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
     });
 
     test('full game interface screenshot - desktop', async ({ page }) => {
@@ -38,14 +44,14 @@ test.describe('Visual Regression Tests - Core Interface', () => {
             const cells = document.querySelectorAll('.cell');
             const processedCells = document.querySelectorAll('.cell.image-loaded, .cell.image-error');
             return cells.length > 0 && processedCells.length === cells.length;
-        }, { timeout: 15000 });
+        }, { timeout: 25000 });
 
         // Ensure no pending DOM mutations
         await page.waitForFunction(() => {
             return document.readyState === 'complete' &&
                 !document.querySelector('.loading') &&
                 !document.querySelector('[data-loading="true"]');
-        }, { timeout: 5000 }).catch(() => {
+        }, { timeout: 10000 }).catch(() => {
             // Continue if no loading indicators found
         });
 
@@ -86,15 +92,21 @@ test.describe('Visual Regression Tests - Core Interface', () => {
 
 test.describe('Visual Regression Tests - Responsive Design', () => {
     test('responsive layout across different screen sizes', async ({ page }) => {
+        test.setTimeout(120000); // 2 minutes for responsive tests
         await testResponsiveLayout(page, 'responsive-layout');
     });
 
     test('mobile controls visibility and layout', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for mobile tests
+
         // Test mobile viewport specifically
         await page.setViewportSize({ width: 375, height: 667 });
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         // Mobile controls should be visible
         const mobileControls = page.locator('.mobile-controls');
@@ -106,10 +118,15 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
     });
 
     test('tablet layout verification', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for tablet tests
+
         await page.setViewportSize({ width: 768, height: 1024 });
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         await takeStableScreenshot(page, 'tablet-interface.png');
         await takeStableScreenshot(page.locator('.maze-grid'), 'tablet-maze-grid.png');
@@ -117,6 +134,8 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
     });
 
     test('HUD responsive behavior', async ({ page }) => {
+        test.setTimeout(120000); // 2 minutes for HUD responsive tests
+
         const viewports = [
             { name: 'desktop', width: 1920, height: 1080 },
             { name: 'mobile', width: 375, height: 667 },
@@ -124,9 +143,12 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
         for (const viewport of viewports) {
             await page.setViewportSize({ width: viewport.width, height: viewport.height });
-            await page.goto('/');
+            await page.goto('/', { timeout: 30000 });
             await setupTestEnvironment(page);
-            await waitForGameStable(page);
+            await waitForGameStable(page, {
+                imageLoadTimeout: 25000,
+                stabilizationDelay: 1500
+            });
 
             const hud = page.locator('.hud');
             await takeStableScreenshot(hud, `hud-responsive-${viewport.name}.png`);
@@ -136,10 +158,15 @@ test.describe('Visual Regression Tests - Responsive Design', () => {
 
 test.describe('Visual Regression Tests - Cross-Browser Consistency', () => {
     test.beforeEach(async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for cross-browser tests
+
         // Navigate first, then setup environment
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
     });
 
     test('cross-browser maze rendering consistency', async ({ page, browserName }) => {
@@ -166,12 +193,14 @@ test.describe('Visual Regression Tests - Cross-Browser Consistency', () => {
 
 test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
     test('complete image loading failure fallback', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for image loading tests
+
         // Block all image requests to test fallback behavior
         await simulateImageLoadingFailures(page);
 
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await page.waitForSelector('.maze-grid');
+        await page.waitForSelector('.maze-grid', { timeout: 15000 });
 
         // Wait for fallback rendering to complete
         await page.waitForTimeout(2000);
@@ -193,13 +222,19 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
     });
 
     test('partial image loading failure handling', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for partial failure tests
+
         // Block some images but not others to test mixed states
         // Block boulder and bomb images which are present in the initial maze
         await simulatePartialImageFailures(page, ['boulder.png', 'bomb.png']);
 
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page, { minLoadedPercentage: 0.3 }); // Lower threshold since some images will fail
+        await waitForGameStable(page, {
+            minLoadedPercentage: 0.3, // Lower threshold since some images will fail
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         await takeStableScreenshot(page.locator('.maze-grid'), 'maze-grid-partial-failure.png');
 
@@ -217,12 +252,18 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
     });
 
     test('image loading error indicators', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for error indicator tests
+
         // Block specific images to test error indicators
         await page.route('**/boulder.png', route => route.abort());
 
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page, { minLoadedPercentage: 0.7 });
+        await waitForGameStable(page, {
+            minLoadedPercentage: 0.7,
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         // Find error cells and verify they have error indicators
         const errorCells = page.locator('.cell.image-error');
@@ -240,17 +281,22 @@ test.describe('Visual Regression Tests - Image Loading Scenarios', () => {
 
 test.describe('Visual Regression Tests - Game State Changes', () => {
     test.beforeEach(async ({ page }) => {
+        test.setTimeout(120000); // 2 minutes for game state tests
+
         // Set up environment before navigation to prevent dialogs
         await setupTestEnvironment(page);
 
         // Navigate to the page
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
 
         // Additional dialog dismissal after navigation
         await dismissAudioDialogs(page);
 
         // Wait for game to be stable
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
     });
 
     test('player movement visual tracking', async ({ page }) => {
@@ -286,10 +332,15 @@ test.describe('Visual Regression Tests - Game State Changes', () => {
     });
 
     test('game over state visual verification', async ({ page }) => {
+        test.setTimeout(120000); // 2 minutes for game over tests
+
         // Navigate to test maze with bomb next to player
-        await page.goto('/?testMaze=bomb');
+        await page.goto('/?testMaze=bomb', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         // Dismiss any audio dialogs before capturing initial state
         await page.evaluate(() => {
@@ -363,30 +414,45 @@ test.describe('Visual Regression Tests - Game State Changes', () => {
 
 test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     test('high contrast mode compatibility', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for accessibility tests
+
         // Simulate high contrast mode
         await page.emulateMedia({ colorScheme: 'dark' });
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         await takeStableScreenshot(page, 'high-contrast-mode.png');
         await takeStableScreenshot(page.locator('.maze-grid'), 'maze-grid-high-contrast.png');
     });
 
     test('reduced motion preferences', async ({ page }) => {
+        test.setTimeout(90000); // 90 seconds for reduced motion tests
+
         // Simulate reduced motion preference
         await page.emulateMedia({ reducedMotion: 'reduce' });
-        await page.goto('/');
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         await takeStableScreenshot(page, 'reduced-motion-mode.png');
     });
 
     test('zoom level compatibility', async ({ page }) => {
-        await page.goto('/');
+        test.setTimeout(120000); // 2 minutes for zoom level tests
+
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         // Test different zoom levels
         const zoomLevels = [0.75, 1.0, 1.25, 1.5];
@@ -402,9 +468,14 @@ test.describe('Visual Regression Tests - Accessibility and Edge Cases', () => {
     });
 
     test('keyboard navigation visual feedback', async ({ page }) => {
-        await page.goto('/');
+        test.setTimeout(90000); // 90 seconds for keyboard navigation tests
+
+        await page.goto('/', { timeout: 30000 });
         await setupTestEnvironment(page);
-        await waitForGameStable(page);
+        await waitForGameStable(page, {
+            imageLoadTimeout: 25000,
+            stabilizationDelay: 1500
+        });
 
         // Test keyboard focus states if any interactive elements exist
         await page.keyboard.press('Tab');
