@@ -24,6 +24,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: '127.0.0.1', // Explicit localhost binding for Firefox compatibility
     open: true,
     // Configure MIME types for audio files
     middlewareMode: false,

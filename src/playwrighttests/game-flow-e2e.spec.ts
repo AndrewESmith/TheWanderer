@@ -14,7 +14,7 @@ test.describe('Complete Game Flow End-to-End Tests', () => {
             ]);
 
             // If popup is visible, close it
-            const popup = await page.locator('.how-to-play-overlay').first();
+            const popup = page.locator('.how-to-play-overlay').first();
             if (await popup.isVisible()) {
                 // Close the popup by clicking the close button
                 await page.click('button:has-text("Close")');
