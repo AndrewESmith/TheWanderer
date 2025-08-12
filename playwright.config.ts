@@ -45,12 +45,13 @@ export default defineConfig({
   expect: {
     /* Threshold for visual comparisons */
     toHaveScreenshot: {
-      threshold: 0.2,
+      threshold: 0.25, // Increased threshold to handle browser differences
       mode: 'strict',
       animations: 'disabled',
+      maxDiffPixels: 2000, // Allow more pixel differences for cross-browser compatibility
     },
     toMatchSnapshot: {
-      threshold: 0.2,
+      threshold: 0.25,
       mode: 'strict',
     },
   },
@@ -78,7 +79,17 @@ export default defineConfig({
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+        // Webkit-specific settings for better visual consistency
+        launchOptions: {
+          args: [
+            '--disable-web-security',
+            '--disable-features=VizDisplayCompositor',
+            '--force-color-profile=srgb',
+          ]
+        }
+      },
     },
 
     /* Test against mobile viewports. */

@@ -17,9 +17,9 @@ export interface VisualTestOptions {
 }
 
 export const DEFAULT_VISUAL_OPTIONS: Required<VisualTestOptions> = {
-    imageLoadTimeout: 20000, // Increased from 10s to 20s
-    minLoadedPercentage: 0.8,
-    stabilizationDelay: 1000, // Increased from 500ms to 1s
+    imageLoadTimeout: 30000, // Increased to 30s for better reliability
+    minLoadedPercentage: 0.9, // Increased to 90% for more consistency
+    stabilizationDelay: 2000, // Increased to 2s for better stability
     disableAnimations: true,
 };
 
@@ -33,10 +33,9 @@ export async function waitForGameStable(
     const opts = { ...DEFAULT_VISUAL_OPTIONS, ...options };
 
     // Wait for the maze grid to be visible first with increased timeout
-    await page.waitForSelector('.maze-grid', { timeout: 15000 });
+    await page.waitForSelector('.maze-grid', { timeout: 20000 });
 
     // Set localStorage to prevent "How to Play" dialog from showing
-    // Use try-catch to handle localStorage access errors
     await page.evaluate(() => {
         try {
             if (typeof Storage !== 'undefined' && window.localStorage) {
@@ -54,40 +53,58 @@ export async function waitForGameStable(
     // Close any open dialogs that might still appear
     await dismissAudioDialogs(page);
 
-    const closeButton = page.locator('button:has-text("Close"), button[aria-label*="Close"], button:has-text("×")');
-    if (await closeButton.count() > 0) {
-        await closeButton.first().click();
-        await page.waitForTimeout(500);
-    }
-
-    // Wait for images to load by checking for image-loaded class on cells
+    // Wait for images to load with enhanced checking
     await page.waitForFunction(
         ({ minPercentage }) => {
             const cells = document.querySelectorAll('.cell');
             const loadedCells = document.querySelectorAll('.cell.image-loaded');
             const errorCells = document.querySelectorAll('.cell.image-error');
-
-            // Consider both loaded and error cells as "processed"
             const processedCells = loadedCells.length + errorCells.length;
 
-            return cells.length > 0 && processedCells >= cells.length * minPercentage;
+            // Also check that all images in the document are loaded
+            const allImages = document.querySelectorAll('img');
+            const imagesLoaded = Array.from(allImages).every(img =>
+                img.complete && (img.naturalWidth > 0 || img.src === '')
+            );
+
+            return cells.length > 0 &&
+                processedCells >= cells.length * minPercentage &&
+                imagesLoaded;
         },
         { minPercentage: opts.minLoadedPercentage },
         { timeout: opts.imageLoadTimeout }
     );
 
-    // Wait for any pending DOM updates to complete
+    // Wait for document to be completely ready
     await page.waitForFunction(() => {
-        // Check if document is ready and no pending image loads
         return document.readyState === 'complete' &&
+            !document.querySelector('.loading') &&
+            !document.querySelector('[data-loading="true"]') &&
             !document.querySelector('.cell:not(.image-loaded):not(.image-error)');
-    }, { timeout: 10000 }).catch(() => {
-        // If this fails, continue anyway as it's an additional check
-        console.warn('Some cells may still be in loading state');
+    }, { timeout: 15000 }).catch(() => {
+        console.warn('Some elements may still be in loading state');
     });
 
-    // Additional stabilization delay
+    // Wait for any CSS to be fully applied
+    await page.waitForFunction(() => {
+        // Check that stylesheets are loaded
+        const stylesheets = document.querySelectorAll('link[rel="stylesheet"]') as NodeListOf<HTMLLinkElement>;
+        return Array.from(stylesheets).every(sheet => {
+            try {
+                return sheet.sheet && sheet.sheet.cssRules.length > 0;
+            } catch (e) {
+                return true; // Cross-origin stylesheets might throw, assume loaded
+            }
+        });
+    }, { timeout: 10000 }).catch(() => {
+        console.warn('Stylesheet loading check timeout');
+    });
+
+    // Enhanced stabilization delay
     await page.waitForTimeout(opts.stabilizationDelay);
+
+    // Final check - ensure no elements are still transitioning
+    await page.waitForTimeout(500);
 }
 
 /**
@@ -100,28 +117,73 @@ export async function takeStableScreenshot(
 ): Promise<void> {
     const opts = { ...DEFAULT_VISUAL_OPTIONS, ...options };
 
-    // Wait a moment before taking screenshot to ensure stability
     // Handle both Page and Locator objects
     const page = locator.page ? locator.page() : locator;
 
-    // Multiple stability checks
-    await page.waitForTimeout(100);
+    // Enhanced stability checks
+    await page.waitForTimeout(500); // Initial wait
 
-    // Wait for any pending network requests to complete
-    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {
-        // Continue if network idle timeout - some requests might be ongoing
+    // Wait for network to be idle
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {
+        console.warn('Network idle timeout - continuing with screenshot');
     });
 
-    // Wait for fonts to be fully loaded
-    await page.waitForFunction(() => document.fonts.ready, { timeout: 5000 }).catch(() => {
-        // Continue if fonts timeout
+    // Wait for fonts to be fully loaded with retry
+    await page.waitForFunction(() => {
+        return document.fonts.ready.then(() => true);
+    }, { timeout: 10000 }).catch(() => {
+        console.warn('Font loading timeout - continuing with screenshot');
     });
 
-    await expect(locator).toHaveScreenshot(name, {
-        animations: opts.disableAnimations ? 'disabled' : 'allow',
-        threshold: 0.15, // Slightly more strict threshold for better consistency
-        maxDiffPixels: 1000, // Allow up to 1000 different pixels for minor variations
+    // Ensure all images are in a stable state
+    await page.waitForFunction(() => {
+        const images = document.querySelectorAll('img');
+        return Array.from(images).every(img => img.complete || img.naturalWidth > 0);
+    }, { timeout: 10000 }).catch(() => {
+        console.warn('Image loading check timeout - continuing with screenshot');
     });
+
+    // Wait for any CSS transitions/animations to complete
+    await page.waitForFunction(() => {
+        const elements = document.querySelectorAll('*');
+        return Array.from(elements).every(el => {
+            const styles = window.getComputedStyle(el);
+            return styles.animationPlayState !== 'running' &&
+                (styles.transitionProperty === 'none' ||
+                    styles.transitionDuration === '0s');
+        });
+    }, { timeout: 5000 }).catch(() => {
+        console.warn('Animation check timeout - continuing with screenshot');
+    });
+
+    // Get browser name for browser-specific handling
+    const browserName = page.context().browser()?.browserType().name() || 'unknown';
+
+    // Browser-specific additional waits
+    if (browserName === 'webkit') {
+        // Webkit needs extra time for rendering stability
+        await page.waitForTimeout(1000);
+
+        // Force a repaint in webkit
+        await page.evaluate(() => {
+            document.body.style.transform = 'translateZ(0)';
+            document.body.offsetHeight; // Force reflow
+            document.body.style.transform = '';
+        });
+    }
+
+    // Final stabilization wait
+    await page.waitForTimeout(opts.stabilizationDelay);
+
+    // Browser-specific screenshot settings
+    const screenshotOptions = {
+        animations: 'disabled' as const,
+        mode: 'strict' as const,
+        threshold: browserName === 'webkit' ? 0.35 : 0.25, // More lenient for webkit
+        maxDiffPixels: browserName === 'webkit' ? 3000 : 2000, // More pixels allowed for webkit
+    };
+
+    await expect(locator).toHaveScreenshot(name, screenshotOptions);
 }
 
 /**

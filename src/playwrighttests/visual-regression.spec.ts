@@ -27,36 +27,69 @@ test.describe('Visual Regression Tests - Core Interface', () => {
         });
     });
 
-    test('full game interface screenshot - desktop', async ({ page }) => {
+    test('full game interface screenshot - desktop', async ({ page, browserName }) => {
         // Set consistent viewport size for desktop screenshots
         await page.setViewportSize({ width: 1280, height: 720 });
 
+        // Browser-specific additional setup
+        if (browserName === 'webkit') {
+            // Webkit needs extra time and specific settings
+            await page.waitForTimeout(2000);
+
+            // Ensure webkit uses consistent font rendering
+            await page.addStyleTag({
+                content: `
+                    * {
+                        -webkit-font-smoothing: antialiased !important;
+                        -moz-osx-font-smoothing: grayscale !important;
+                        text-rendering: optimizeLegibility !important;
+                    }
+                `
+            });
+        }
+
         // Ensure extra stability for full page screenshot
-        await page.waitForTimeout(1000); // Additional wait for full stability
+        await page.waitForTimeout(1500); // Increased wait for full stability
 
         // Verify all critical elements are visible and stable
         await expect(page.locator('.maze-grid')).toBeVisible();
         await expect(page.locator('.hud')).toBeVisible();
 
-        // Wait for any potential animations or transitions to complete
+        // Enhanced stability checks for full page screenshot
         await page.waitForFunction(() => {
             // Check if all images have finished loading or erroring
             const cells = document.querySelectorAll('.cell');
             const processedCells = document.querySelectorAll('.cell.image-loaded, .cell.image-error');
-            return cells.length > 0 && processedCells.length === cells.length;
-        }, { timeout: 25000 });
 
-        // Ensure no pending DOM mutations
+            // Also check all img elements
+            const allImages = document.querySelectorAll('img');
+            const imagesReady = Array.from(allImages).every(img =>
+                img.complete && (img.naturalWidth > 0 || img.src === '')
+            );
+
+            return cells.length > 0 &&
+                processedCells.length === cells.length &&
+                imagesReady;
+        }, { timeout: 30000 });
+
+        // Ensure no pending DOM mutations or loading states
         await page.waitForFunction(() => {
             return document.readyState === 'complete' &&
                 !document.querySelector('.loading') &&
-                !document.querySelector('[data-loading="true"]');
-        }, { timeout: 10000 }).catch(() => {
-            // Continue if no loading indicators found
+                !document.querySelector('[data-loading="true"]') &&
+                !document.querySelector('.cell:not(.image-loaded):not(.image-error)');
+        }, { timeout: 15000 }).catch(() => {
+            console.warn('Some elements may still be in loading state');
         });
 
-        // Additional stabilization
-        await page.waitForTimeout(500);
+        // Wait for fonts to be fully loaded
+        await page.waitForFunction(() => document.fonts.ready, { timeout: 10000 }).catch(() => {
+            console.warn('Font loading timeout');
+        });
+
+        // Additional stabilization based on browser
+        const additionalWait = browserName === 'webkit' ? 2000 : 1000;
+        await page.waitForTimeout(additionalWait);
 
         // Take a full page screenshot for baseline comparison
         await takeStableScreenshot(page, 'full-game-desktop.png');

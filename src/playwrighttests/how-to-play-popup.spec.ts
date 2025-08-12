@@ -27,51 +27,75 @@ test.describe('How to Play Popup', () => {
         await expect(page.locator('text=Credits')).toBeVisible();
     });
 
-    test('should close popup when X button is clicked', async ({ page }) => {
+    test('should close popup when X button is clicked', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
         // Click the X close button
         await page.click('button[aria-label="Close dialog using X button"]');
 
-        // Verify popup is closed
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        // Verify popup is closed with increased timeout for webkit
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
         await expect(page.locator('.how-to-play-overlay')).not.toBeVisible();
     });
 
-    test('should close popup when footer Close button is clicked', async ({ page }) => {
+    test('should close popup when footer Close button is clicked', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
         // Click the footer close button
         await page.click('button.close-footer-button');
 
-        // Verify popup is closed
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        // Verify popup is closed with increased timeout for webkit
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
         await expect(page.locator('.how-to-play-overlay')).not.toBeVisible();
     });
 
-    test('should close popup when Escape key is pressed', async ({ page }) => {
+    test('should close popup when Escape key is pressed', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
         // Press Escape key
         await page.keyboard.press('Escape');
 
-        // Verify popup is closed
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        // Verify popup is closed with increased timeout for webkit
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
         await expect(page.locator('.how-to-play-overlay')).not.toBeVisible();
     });
 
-    test('should close popup when overlay is clicked', async ({ page }) => {
+    test('should close popup when overlay is clicked', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
         // Click on the overlay (outside the panel)
         await page.click('.how-to-play-overlay', { position: { x: 10, y: 10 } });
 
-        // Verify popup is closed
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        // Verify popup is closed with increased timeout for webkit
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
         await expect(page.locator('.how-to-play-overlay')).not.toBeVisible();
     });
 
@@ -86,7 +110,7 @@ test.describe('How to Play Popup', () => {
         await expect(page.locator('.how-to-play-overlay')).toBeVisible();
     });
 
-    test('should handle "Don\'t show again" checkbox', async ({ page }) => {
+    test('should handle "Don\'t show again" checkbox', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
@@ -97,7 +121,14 @@ test.describe('How to Play Popup', () => {
 
         // Close the popup
         await page.click('button.close-footer-button');
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
 
         // Reload the page
         await page.reload();
@@ -128,7 +159,7 @@ test.describe('How to Play Popup', () => {
         await expect(page.locator('[role="contentinfo"]')).toBeVisible();
     });
 
-    test('should prevent background interaction when open', async ({ page }) => {
+    test('should prevent background interaction when open', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
@@ -141,7 +172,14 @@ test.describe('How to Play Popup', () => {
 
         // Close popup
         await page.click('button.close-footer-button');
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
 
         // Now game controls should work
         await page.keyboard.press('ArrowRight');
@@ -201,13 +239,20 @@ test.describe('How to Play Popup', () => {
         await expect(authorLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
-    test('should persist settings across page reloads', async ({ page }) => {
+    test('should persist settings across page reloads', async ({ page, browserName }) => {
         // Wait for popup to appear
         await page.waitForSelector('.how-to-play-overlay');
 
         // Don't check "Don't show again" - just close
         await page.click('button.close-footer-button');
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+
+        // WebKit needs extra time for the close animation/transition
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        const timeout = browserName === 'webkit' ? 30000 : 15000;
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
 
         // Reload the page
         await page.reload();
@@ -219,7 +264,13 @@ test.describe('How to Play Popup', () => {
         // Now check "Don't show again" and close
         await page.check('input[type="checkbox"]');
         await page.click('button.close-footer-button');
-        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden' });
+
+        // WebKit needs extra time again
+        if (browserName === 'webkit') {
+            await page.waitForTimeout(500);
+        }
+
+        await page.waitForSelector('.how-to-play-overlay', { state: 'hidden', timeout });
 
         // Reload again
         await page.reload();
