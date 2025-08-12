@@ -22,6 +22,9 @@ test.describe('Visual Regression Tests - Core Interface', () => {
     });
 
     test('full game interface screenshot - desktop', async ({ page }) => {
+        // Set consistent viewport size for desktop screenshots
+        await page.setViewportSize({ width: 1280, height: 720 });
+
         // Ensure extra stability for full page screenshot
         await page.waitForTimeout(1000); // Additional wait for full stability
 
@@ -36,6 +39,15 @@ test.describe('Visual Regression Tests - Core Interface', () => {
             const processedCells = document.querySelectorAll('.cell.image-loaded, .cell.image-error');
             return cells.length > 0 && processedCells.length === cells.length;
         }, { timeout: 15000 });
+
+        // Ensure no pending DOM mutations
+        await page.waitForFunction(() => {
+            return document.readyState === 'complete' &&
+                !document.querySelector('.loading') &&
+                !document.querySelector('[data-loading="true"]');
+        }, { timeout: 5000 }).catch(() => {
+            // Continue if no loading indicators found
+        });
 
         // Additional stabilization
         await page.waitForTimeout(500);

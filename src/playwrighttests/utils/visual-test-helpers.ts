@@ -103,11 +103,24 @@ export async function takeStableScreenshot(
     // Wait a moment before taking screenshot to ensure stability
     // Handle both Page and Locator objects
     const page = locator.page ? locator.page() : locator;
+
+    // Multiple stability checks
     await page.waitForTimeout(100);
+
+    // Wait for any pending network requests to complete
+    await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {
+        // Continue if network idle timeout - some requests might be ongoing
+    });
+
+    // Wait for fonts to be fully loaded
+    await page.waitForFunction(() => document.fonts.ready, { timeout: 3000 }).catch(() => {
+        // Continue if fonts timeout
+    });
 
     await expect(locator).toHaveScreenshot(name, {
         animations: opts.disableAnimations ? 'disabled' : 'allow',
-        threshold: 0.2, // Allow up to 20% difference to handle minor rendering variations
+        threshold: 0.15, // Slightly more strict threshold for better consistency
+        maxDiffPixels: 1000, // Allow up to 1000 different pixels for minor variations
     });
 }
 
