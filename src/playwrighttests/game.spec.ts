@@ -101,14 +101,17 @@ test.describe('Game functionality', () => {
         }
     });
 
-    test('moves counter decreases with each move', async ({ page }) => {
+    test('moves counter decreases with each move', async ({ page, browserName }) => {
         // Get initial moves count
         const movesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
         const initialMoves = extractNumber(movesText || '0');
 
         // Make a move
         await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(100);
+
+        // Safari needs more time for game state updates
+        const waitTime = browserName === 'webkit' ? 500 : 100;
+        await page.waitForTimeout(waitTime);
 
         // Check if moves decreased
         const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();

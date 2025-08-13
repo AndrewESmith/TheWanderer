@@ -781,7 +781,7 @@ The key insight was that the mobile flicker fixes were too aggressive in removin
 Player movement is NOT fixed! I cannot see the player move all all. Please reference #CRITICAL_FIXES.md . 
 
 Kiro
-You're absolutely right! I need to check what the IDE autofix did to the file and properly implement the fix according to the CRITICAL_FIXES.md documentation. Let me read the current state of the App.tsx file first:
+pm  I need to check what the IDE autofix did to the file and properly implement the fix according to the CRITICAL_FIXES.md documentation. Let me read the current state of the App.tsx file first:
 
 Read file(s)
 
