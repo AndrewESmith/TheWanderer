@@ -86,7 +86,13 @@ export default defineConfig({
         // Webkit-specific settings for better visual consistency and stability
         actionTimeout: 20000, // Increased timeout for WebKit
         navigationTimeout: 45000, // Increased navigation timeout for WebKit
-        launchOptions: {
+        launchOptions: process.env.CI ? {
+          // CI-specific args for WebKit (GitHub Actions)
+          args: [
+            '--force-color-profile=srgb',
+          ]
+        } : {
+          // Local development args for WebKit
           args: [
             '--disable-web-security',
             '--disable-features=VizDisplayCompositor',
