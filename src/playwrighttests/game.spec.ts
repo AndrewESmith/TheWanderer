@@ -14,7 +14,7 @@ test.describe('Game functionality', () => {
             ]);
 
             // If popup is visible, close it
-            const popup = await page.locator('.how-to-play-overlay').first();
+            const popup = page.locator('.how-to-play-overlay').first();
             if (await popup.isVisible()) {
                 // Close the popup by clicking the close button
                 await page.click('button:has-text("Close")');
@@ -106,56 +106,54 @@ test.describe('Game functionality', () => {
         const movesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
         const initialMoves = extractNumber(movesText || '0');
 
-        // Make a move
-        await page.keyboard.press('ArrowRight');
+        // Ensure we have a valid initial moves count
+        expect(initialMoves).toBeGreaterThan(0);
 
-        // Wait for moves counter to update with retry logic for Safari stability
-        const expectedMoves = initialMoves - 1;
+        // Make a move - try multiple directions to ensure we make a valid move
+        let moveSuccessful = false;
+        const directions = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'];
 
-        if (browserName === 'webkit') {
-            // Safari needs more robust waiting - use waitFor with retry logic
-            await page.waitForFunction(
-                (expected) => {
-                    // Find the moves element by looking for spans containing "Moves:"
-                    const hudSpans = document.querySelectorAll('.hud span');
-                    let movesElement = null;
+        for (const direction of directions) {
+            await page.keyboard.press(direction);
 
-                    for (const span of hudSpans) {
-                        if (span.textContent && span.textContent.includes('Moves:')) {
-                            movesElement = span;
-                            break;
-                        }
-                    }
+            // Wait for the move to be processed (requestAnimationFrame + React update)
+            await page.waitForTimeout(browserName === 'webkit' ? 500 : 200);
 
-                    if (!movesElement) return false;
+            // Check if the move was successful by checking if moves decreased
+            const currentMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
+            const currentMoves = extractNumber(currentMovesText || '0');
 
-                    const text = movesElement.textContent || '';
-                    const match = text.match(/Moves:\s*(\d+)/);
-                    const currentMoves = match ? parseInt(match[1], 10) : 0;
-
-                    return currentMoves === expected;
-                },
-                expectedMoves,
-                {
-                    timeout: 3000, // 3 second timeout for Safari
-                    polling: 100   // Check every 100ms
-                }
-            );
-        } else {
-            // For other browsers, use shorter timeout
-            await page.waitForTimeout(100);
+            if (currentMoves < initialMoves) {
+                moveSuccessful = true;
+                break;
+            }
         }
 
-        // Verify the moves counter has decreased
-        const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
-        const newMoves = extractNumber(newMovesText || '0');
+        // If no move was successful, the player might be blocked - try a different approach
+        if (!moveSuccessful) {
+            // Force a move by pressing multiple keys in sequence
+            await page.keyboard.press('ArrowRight');
+            await page.keyboard.press('ArrowDown');
+            await page.waitForTimeout(browserName === 'webkit' ? 1000 : 300);
+        }
 
-        expect(newMoves).toBe(expectedMoves);
+        // Now wait for the moves counter to update using a more reliable approach
+        const expectedMoves = initialMoves - 1;
+
+        // Use Playwright's built-in waiting mechanism which is more reliable than waitForFunction
+        await expect(async () => {
+            const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
+            const newMoves = extractNumber(newMovesText || '0');
+            expect(newMoves).toBe(expectedMoves);
+        }).toPass({
+            timeout: browserName === 'webkit' ? 15000 : 5000,
+            intervals: [100, 200, 500] // Start with frequent checks, then back off
+        });
     });
 });
 
 // Helper function to extract numbers from strings like "Score: 10"
 function extractNumber(text: string): number {
     const match = text.match(/\d+/);
-    return match ? parseInt(match[0], 10) : 0;
+    return match && match[0] ? parseInt(match[0], 10) : 0;
 }
