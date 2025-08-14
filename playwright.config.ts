@@ -68,7 +68,11 @@ export default defineConfig({
       use: {
         ...devices['Desktop Firefox'],
         // Firefox-specific settings for better localhost handling
-        launchOptions: {
+        launchOptions: process.env.CI ? {
+          // CI-specific settings for Firefox (GitHub Actions)
+          // Keep minimal config for CI stability
+        } : {
+          // Local development settings for Firefox
           firefoxUserPrefs: {
             'network.dns.disableIPv6': true, // Force IPv4 for localhost
             'network.proxy.allow_hijacking_localhost': true,
@@ -86,9 +90,8 @@ export default defineConfig({
         navigationTimeout: 45000, // Increased navigation timeout for WebKit
         launchOptions: process.env.CI ? {
           // CI-specific args for WebKit (GitHub Actions)
-          args: [
-            '--force-color-profile=srgb',
-          ]
+          // Removed --force-color-profile=srgb as it's not supported in CI WebKit
+          args: []
         } : {
           // Local development args for WebKit
           args: [
