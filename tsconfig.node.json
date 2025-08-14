@@ -4,7 +4,13 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.js", "vitest.config.js", "*.d.ts"]
+  "include": [
+    "vite.config.js",
+    "vitest.config.js",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "*.d.ts"
+  ]
 }

@@ -48,13 +48,11 @@ export default defineConfig({
     /* Threshold for visual comparisons */
     toHaveScreenshot: {
       threshold: 0.3, // Increased threshold to handle platform differences
-      mode: 'strict',
       animations: 'disabled',
       maxDiffPixels: 3000, // Allow more pixel differences for cross-platform compatibility
     },
     toMatchSnapshot: {
       threshold: 0.3,
-      mode: 'strict',
     },
   },
 
@@ -131,7 +129,5 @@ export default defineConfig({
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000, // 2 minutes
-    // Add retry logic for Firefox compatibility
-    reuseExistingServer: !process.env.CI,
   },
 });
