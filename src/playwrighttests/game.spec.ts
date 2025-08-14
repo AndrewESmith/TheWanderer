@@ -109,15 +109,48 @@ test.describe('Game functionality', () => {
         // Make a move
         await page.keyboard.press('ArrowRight');
 
-        // Safari needs more time for game state updates
-        const waitTime = browserName === 'webkit' ? 500 : 100;
-        await page.waitForTimeout(waitTime);
+        // Wait for moves counter to update with retry logic for Safari stability
+        const expectedMoves = initialMoves - 1;
 
-        // Check if moves decreased
+        if (browserName === 'webkit') {
+            // Safari needs more robust waiting - use waitFor with retry logic
+            await page.waitForFunction(
+                (expected) => {
+                    // Find the moves element by looking for spans containing "Moves:"
+                    const hudSpans = document.querySelectorAll('.hud span');
+                    let movesElement = null;
+
+                    for (const span of hudSpans) {
+                        if (span.textContent && span.textContent.includes('Moves:')) {
+                            movesElement = span;
+                            break;
+                        }
+                    }
+
+                    if (!movesElement) return false;
+
+                    const text = movesElement.textContent || '';
+                    const match = text.match(/Moves:\s*(\d+)/);
+                    const currentMoves = match ? parseInt(match[1], 10) : 0;
+
+                    return currentMoves === expected;
+                },
+                expectedMoves,
+                {
+                    timeout: 3000, // 3 second timeout for Safari
+                    polling: 100   // Check every 100ms
+                }
+            );
+        } else {
+            // For other browsers, use shorter timeout
+            await page.waitForTimeout(100);
+        }
+
+        // Verify the moves counter has decreased
         const newMovesText = await page.locator('.hud span').filter({ hasText: /Moves:/ }).textContent();
         const newMoves = extractNumber(newMovesText || '0');
 
-        expect(newMoves).toBe(initialMoves - 1);
+        expect(newMoves).toBe(expectedMoves);
     });
 });
 

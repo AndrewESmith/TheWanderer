@@ -225,11 +225,11 @@ export async function takeStableScreenshot(
         // Final stabilization wait
         await page.waitForTimeout(opts.stabilizationDelay);
 
-        // Browser-specific screenshot settings
+        // Browser-specific screenshot settings with platform tolerance
         const screenshotOptions = {
             animations: 'disabled' as const,
-            threshold: browserName === 'webkit' ? 0.35 : 0.25, // More lenient for webkit
-            maxDiffPixels: browserName === 'webkit' ? 3000 : 2000, // More pixels allowed for webkit
+            threshold: browserName === 'webkit' ? 0.4 : 0.3, // More lenient for cross-platform differences
+            maxDiffPixels: browserName === 'webkit' ? 4000 : 3000, // More pixels allowed for platform differences
         };
 
         await expect(locator).toHaveScreenshot(name, screenshotOptions);

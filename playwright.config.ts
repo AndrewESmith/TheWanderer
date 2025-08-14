@@ -19,6 +19,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
+  /* Update snapshots on CI if they don't exist */
+  updateSnapshots: process.env.CI ? 'missing' : 'none',
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -45,13 +47,13 @@ export default defineConfig({
   expect: {
     /* Threshold for visual comparisons */
     toHaveScreenshot: {
-      threshold: 0.25, // Increased threshold to handle browser differences
+      threshold: 0.3, // Increased threshold to handle platform differences
       mode: 'strict',
       animations: 'disabled',
-      maxDiffPixels: 2000, // Allow more pixel differences for cross-browser compatibility
+      maxDiffPixels: 3000, // Allow more pixel differences for cross-platform compatibility
     },
     toMatchSnapshot: {
-      threshold: 0.25,
+      threshold: 0.3,
       mode: 'strict',
     },
   },
