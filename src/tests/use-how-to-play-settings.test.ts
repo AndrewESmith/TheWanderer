@@ -235,8 +235,9 @@ describe('useHowToPlaySettings', () => {
             expect(result.current.shouldShowOnStartup()).toBe(false);
         });
 
-        it('should return true when user opted out but has not seen instructions', () => {
+        it('should return false when user opted out but has not seen instructions', () => {
             // This is an edge case that shouldn't normally happen, but we handle it
+            // If user has opted out, they shouldn't see the popup regardless of hasSeenInstructions
             const storedSettings = {
                 dontShowAgain: true,
                 hasSeenInstructions: false,
@@ -245,7 +246,7 @@ describe('useHowToPlaySettings', () => {
 
             const { result } = renderHook(() => useHowToPlaySettings());
 
-            expect(result.current.shouldShowOnStartup()).toBe(true);
+            expect(result.current.shouldShowOnStartup()).toBe(false);
         });
     });
 

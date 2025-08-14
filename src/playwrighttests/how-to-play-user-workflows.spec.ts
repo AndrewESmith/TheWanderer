@@ -1,30 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-// Helper function to handle browser-specific popup visibility issues
-async function handlePopupVisibility(page: any, popup: any, shouldBeVisible: boolean = false) {
-    const browserName = await page.evaluate(() => navigator.userAgent);
-    const isWebKit = browserName.includes('WebKit');
-    const isFirefox = browserName.includes('Firefox');
-
-    // Give browsers time to process localStorage
-    const waitTime = isWebKit ? 3000 : isFirefox ? 3000 : 1000;
-    await page.waitForTimeout(waitTime);
-
-    const isCurrentlyVisible = await popup.isVisible();
-
-    if (shouldBeVisible && !isCurrentlyVisible) {
-        // Popup should be visible but isn't - this is unexpected
-        return;
-    }
-
-    if (!shouldBeVisible && isCurrentlyVisible) {
-        // Popup should be hidden but is visible - close it manually
-        const closeButton = page.locator('[data-testid="close-button"]');
-        await closeButton.click();
-        await expect(popup).not.toBeVisible({ timeout: 15000 });
-    }
-}
-
 test.describe('How to Play User Workflows E2E', () => {
     test.describe('New User Experience', () => {
         test.beforeEach(async ({ page }) => {

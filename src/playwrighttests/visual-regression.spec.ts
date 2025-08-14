@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import {
     waitForGameStable,
     takeStableScreenshot,
-    verifyCellTypes,
     testResponsiveLayout,
     simulateImageLoadingFailures,
     simulatePartialImageFailures,
