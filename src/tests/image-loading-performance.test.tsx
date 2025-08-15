@@ -782,7 +782,7 @@ describe("8. Performance Tests for Image Loading", () => {
       const lastRenderTime = reRenderTimes[reRenderTimes.length - 1]!;
 
       // Performance degradation should be minimal
-      expect(lastRenderTime / firstRenderTime).toBeLessThan(8a);
+      expect(lastRenderTime / firstRenderTime).toBeLessThan(8);
 
       // Average re-render time should be reasonable
       const avgReRenderTime =
